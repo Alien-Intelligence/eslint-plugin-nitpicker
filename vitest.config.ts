@@ -5,7 +5,7 @@ import { defineConfig } from "vitest/config"
  */
 export default defineConfig({
     resolve: {
-        // Resolve the `@/*` path alias from tsconfig.json natively (Vite 8+).
+        // Resolve the `@/*` path alias from tsconfig.json natively (Vite 8+)
         tsconfigPaths: true,
     },
     test: {

@@ -26,7 +26,7 @@ class NoEmDash extends NitpickerRule<MessageIds, Options> {
             emDash: nitpick({
                 problem: "Found an em dash (—) character.",
                 why: "Em dashes are typically introduced by AI-generated or auto-formatted text and are discouraged here.",
-                fix: "Replace the em dash with a hyphen (-), or reword the sentence to avoid it.",
+                fix: "Replace the em dash with a hyphen (-), a comma (,), or reword the sentence to avoid it.",
             }),
         },
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
