@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
-import { version } from "../package.json"
 import { buildConfigs } from "@/configs"
 import CONSTANTS from "@/lib/constants"
 import { rules } from "@/rules"
+import { version } from "../package.json"
 
 /**
  * The `@the-alien-club/eslint-plugin-nitpicker` plugin.

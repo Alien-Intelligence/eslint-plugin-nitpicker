@@ -4,7 +4,7 @@
 const CONSTANTS = {
     /**
      * The short name the plugin is registered under inside an ESLint config,
-     * e.g. `nitpicker/noEmDash`.
+     * e.g. `nitpicker/no-em-dash`.
      */
     PLUGIN_NAME: "nitpicker",
 

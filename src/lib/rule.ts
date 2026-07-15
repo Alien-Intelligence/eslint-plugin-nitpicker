@@ -9,10 +9,7 @@ import { createRule, type NitpickerRuleDocs } from "@/lib/utils/createRule"
  * metadata, default options, and visitor logic, and call {@link toRuleModule} to
  * turn an instance into the plain object ESLint expects.
  */
-export abstract class NitpickerRule<
-    MessageIds extends string = string,
-    Options extends readonly unknown[] = [],
-> {
+export abstract class NitpickerRule<MessageIds extends string = string, Options extends readonly unknown[] = []> {
     /**
      * The kebab-case name of the rule, without the plugin prefix
      * (e.g. `no-em-dash`).
