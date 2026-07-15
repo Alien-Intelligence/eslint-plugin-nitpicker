@@ -17,6 +17,12 @@ const CONSTANTS = {
      * The em dash character (U+2014), e.g. "—".
      */
     EM_DASH: "—",
+
+    /**
+     * Matches a single "word" character, i.e. anything that can appear inside an
+     * identifier or a number (letters, digits, underscore and dollar).
+     */
+    WORD_CHAR: /[\p{L}\p{N}_$]/u,
 } as const
 
 export default CONSTANTS
