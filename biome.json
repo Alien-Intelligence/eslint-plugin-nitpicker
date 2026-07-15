@@ -1,0 +1,65 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+    "files": {
+        "ignoreUnknown": true,
+        "includes": ["**", "!node_modules", "!dist", "!.vscode", "!package-lock.json"]
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "on",
+                "useSortedAttributes": "off",
+                "useSortedKeys": "off",
+                "useSortedProperties": "off"
+            }
+        }
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "javascript": {
+        "formatter": {
+            "arrowParentheses": "asNeeded",
+            "bracketSpacing": true,
+            "enabled": true,
+            "lineEnding": "lf",
+            "lineWidth": 120,
+            "quoteStyle": "double",
+            "semicolons": "asNeeded",
+            "trailingCommas": "all"
+        }
+    },
+    "json": {
+        "formatter": {
+            "enabled": true
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "complexity": {
+                "noForEach": "off"
+            },
+            "correctness": {
+                "noUnusedImports": "warn",
+                "noUnusedVariables": "warn"
+            },
+            "style": {
+                "noNonNullAssertion": "off",
+                "useImportType": "off"
+            },
+            "suspicious": {
+                "noEmptyBlockStatements": "error",
+                "noExplicitAny": "off"
+            }
+        }
+    },
+    "vcs": {
+        "clientKind": "git",
+        "enabled": true,
+        "useIgnoreFile": true
+    }
+}

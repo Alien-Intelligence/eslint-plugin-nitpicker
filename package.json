@@ -1,0 +1,78 @@
+{
+    "name": "@the-alien-club/eslint-plugin-nitpicker",
+    "productName": "Nitpicker",
+    "version": "0.0.0-semantically-released",
+    "description": "A hyper-pedantic ESLint plugin that flags every stylistic and semantic nit, with AI-friendly fix context.",
+    "author": "Alien <contact@alien.club> (https://www.alien.club/)",
+    "license": "MIT",
+    "private": false,
+    "packageManager": "npm@11.4.2",
+    "type": "module",
+    "keywords": [
+        "alien",
+        "eslint",
+        "eslintplugin",
+        "eslint-plugin",
+        "nitpicker",
+        "linting",
+        "code-style",
+        "ai"
+    ],
+    "homepage": "https://github.com/the-alien-club/eslint-plugin-nitpicker",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-alien-club/eslint-plugin-nitpicker.git"
+    },
+    "bugs": {
+        "url": "https://github.com/the-alien-club/eslint-plugin-nitpicker/issues"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public",
+        "tag": "latest"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "files": [
+        "*"
+    ],
+    "main": "./index.js",
+    "module": "./index.js",
+    "types": "./index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "import": "./index.js",
+            "default": "./index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsup",
+        "lint": "biome check",
+        "lint:fix": "biome check --fix && biome format --write",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "release": "npx semantic-release"
+    },
+    "peerDependencies": {
+        "eslint": ">=9.0.0"
+    },
+    "dependencies": {
+        "@typescript-eslint/utils": "^8.18.0"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.5.2",
+        "@types/copyfiles": "^2.4.4",
+        "@types/node": "^24.12.2",
+        "@typescript-eslint/parser": "^8.18.0",
+        "@typescript-eslint/rule-tester": "^8.18.0",
+        "copyfiles": "^2.4.1",
+        "eslint": "^9.17.0",
+        "tsup": "^8.5.1",
+        "typescript": "^5.8.3",
+        "vite-tsconfig-paths": "^6.1.1",
+        "vitest": "^4.1.5"
+    }
+}
