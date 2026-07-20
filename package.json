@@ -51,14 +51,14 @@
         "build": "tsup",
         "lint": "biome check",
         "lint:fix": "biome check --fix && biome format --write",
+        "lint:nitpicker": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
         "test:watch": "vitest",
         "release": "npx semantic-release"
     },
     "peerDependencies": {
-        "eslint": ">=9.0.0",
-        "dedent": "^1.7.2"
+        "eslint": ">=9.0.0"
     },
     "dependencies": {
         "@typescript-eslint/utils": "^8.18.0"
@@ -67,6 +67,7 @@
         "@biomejs/biome": "^2.5.2",
         "@types/copyfiles": "^2.4.4",
         "@types/node": "^24.12.2",
+        "@typescript-eslint/parser": "^8.64.0",
         "copyfiles": "^2.4.1",
         "eslint": "^9.17.0",
         "tsup": "^8.5.1",

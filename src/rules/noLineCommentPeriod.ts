@@ -51,7 +51,7 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
                     for (let index = 0; index < value.length; index++) {
                         if (value[index] !== ".") continue
 
-                        // Group a run of consecutive dots (e.g. an ellipsis) so
+                        // Group a run of consecutive dots (e.g an ellipsis) so
                         // it becomes a single report rather than one per dot
                         let end = index
                         while (value[end + 1] === ".") end++

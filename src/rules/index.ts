@@ -1,14 +1,15 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
 import noEmDash from "@/rules/noEmDash"
+import noJSDocBlankBeforeTags from "@/rules/noJSDocBlankBeforeTags"
 import noLineCommentPeriod from "@/rules/noLineCommentPeriod"
-import noSingleLineJsdoc from "@/rules/noSingleLineJsdoc"
-import requireFunctionJsdoc from "@/rules/requireFunctionJsdoc"
+import noSingleLineJSDoc from "@/rules/noSingleLineJSDoc"
+import requireFunctionJSDoc from "@/rules/requireFunctionJSDoc"
 
 /**
  * Every rule instance registered by the plugin.
  */
-const ruleInstances = [noEmDash, noLineCommentPeriod, noSingleLineJsdoc, requireFunctionJsdoc]
+const ruleInstances = [noEmDash, noJSDocBlankBeforeTags, noLineCommentPeriod, noSingleLineJSDoc, requireFunctionJSDoc]
 
 /**
  * The plugin's rules, keyed by name, as the plain modules ESLint consumes.

@@ -6,7 +6,7 @@ import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
  * @param comment The comment to test.
  * @returns `true` if the comment is a JSDoc block comment.
  */
-export function isJsdocComment(comment: TSESTree.Comment): boolean {
+export function isJSDocComment(comment: TSESTree.Comment): boolean {
     return comment.type === "Block" && comment.value.startsWith("*")
 }
 
@@ -16,9 +16,29 @@ export function isJsdocComment(comment: TSESTree.Comment): boolean {
  * @param node The node to inspect the leading comments of.
  * @returns `true` if the comment right before the node is a JSDoc comment.
  */
-export function hasLeadingJsdoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
+export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
     const commentsBefore = sourceCode.getCommentsBefore(node)
     const closest = commentsBefore.at(-1)
 
-    return closest !== undefined && isJsdocComment(closest)
+    return closest !== undefined && isJSDocComment(closest)
+}
+
+/**
+ * Checks whether a physical JSDoc line is blank, i.e. just a ` * ` with no
+ * content after it.
+ * @param line The physical source line to test.
+ * @returns `true` if the line is an empty JSDoc line.
+ */
+export function isBlankJSDocLine(line: string): boolean {
+    return /^\s*\*\s*$/.test(line)
+}
+
+/**
+ * Checks whether a physical JSDoc line holds a block tag, i.e. a ` * ` followed
+ * by an `@tag` such as `@param` or `@returns`.
+ * @param line The physical source line to test.
+ * @returns `true` if the line starts a JSDoc tag.
+ */
+export function isJSDocTagLine(line: string): boolean {
+    return /^\s*\*\s*@/.test(line)
 }

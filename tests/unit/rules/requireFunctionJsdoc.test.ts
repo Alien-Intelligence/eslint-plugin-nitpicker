@@ -50,7 +50,7 @@ describe("require-function-jsdoc", () => {
         const messages = lintRule(RULE, "function foo() {}")
         expect(messages).toHaveLength(1)
         expect(messages[0]?.ruleId).toBe("nitpicker/require-function-jsdoc")
-        expect(messages[0]?.messageId).toBe("missingJsdoc")
+        expect(messages[0]?.messageId).toBe("missingJSDoc")
     })
 
     test("It should report an undocumented arrow function constant", ({ expect }) => {

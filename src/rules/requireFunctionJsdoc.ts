@@ -2,18 +2,18 @@ import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
 import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
 import { type FunctionNode, getDocumentableNode, getFunctionName, isTopLevel } from "@/lib/utils/functions"
-import { hasLeadingJsdoc } from "@/lib/utils/jsdoc"
+import { hasLeadingJSDoc } from "@/lib/utils/JSDoc"
 import { nitpick } from "@/lib/utils/nitpick"
 import { functionReturnsJsx, isReactComponentName } from "@/lib/utils/react"
 
 type Options = []
-type MessageIds = "missingJsdoc"
+type MessageIds = "missingJSDoc"
 
 /**
  * Requires a JSDoc comment on top-level functions, with React component
  * functions (`PascalCase` name returning JSX) being the sole exception.
  */
-class RequireFunctionJsdoc extends NitpickerRule<MessageIds, Options> {
+class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
     readonly name = "require-function-jsdoc"
 
     readonly defaultOptions: Options = []
@@ -26,7 +26,7 @@ class RequireFunctionJsdoc extends NitpickerRule<MessageIds, Options> {
         },
         schema: [],
         messages: {
-            missingJsdoc: nitpick({
+            missingJSDoc: nitpick({
                 problem: "The function `{{name}}` has no JSDoc comment.",
                 why: "Top-level functions must document their purpose, parameters, and return value, React component functions are the only exception.",
                 fix: "Add a `/** ... */` JSDoc block immediately above the function describing what it does.",
@@ -39,7 +39,7 @@ class RequireFunctionJsdoc extends NitpickerRule<MessageIds, Options> {
 
         const check = (fn: FunctionNode, reportNode: TSESTree.Node): void => {
             const name = getFunctionName(fn)
-            // Anonymous functions (e.g. `export default () => {}`) are skipped
+            // Anonymous functions (e.g `export default () => {}`) are skipped
             if (name === undefined) return
 
             const documentable = getDocumentableNode(fn)
@@ -48,11 +48,11 @@ class RequireFunctionJsdoc extends NitpickerRule<MessageIds, Options> {
             // React component functions are exempt from the JSDoc requirement
             if (isReactComponentName(name) && functionReturnsJsx(fn, sourceCode.visitorKeys)) return
 
-            if (hasLeadingJsdoc(sourceCode, documentable)) return
+            if (hasLeadingJSDoc(sourceCode, documentable)) return
 
             context.report({
                 node: reportNode,
-                messageId: "missingJsdoc",
+                messageId: "missingJSDoc",
                 data: { name },
             })
         }
@@ -72,4 +72,4 @@ class RequireFunctionJsdoc extends NitpickerRule<MessageIds, Options> {
     }
 }
 
-export default new RequireFunctionJsdoc()
+export default new RequireFunctionJSDoc()
