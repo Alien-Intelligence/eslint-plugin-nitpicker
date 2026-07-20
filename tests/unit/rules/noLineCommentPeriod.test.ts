@@ -61,9 +61,14 @@ describe("no-line-comment-period", () => {
         expect(messages).toHaveLength(1)
     })
 
-    test("It should group a run of dots (ellipsis) into a single report", ({ expect }) => {
+    test("It should not report an ellipsis", ({ expect }) => {
         const messages = lintRule(RULE, "// wait...")
-        expect(messages).toHaveLength(1)
+        expect(messages).toHaveLength(0)
+    })
+
+    test("It should not report an ellipsis inside a code reference path", ({ expect }) => {
+        const messages = lintRule(RULE, "// roots like #models/... and #controllers/...")
+        expect(messages).toHaveLength(0)
     })
 
     test("It should remove a trailing period", ({ expect }) => {
@@ -76,9 +81,9 @@ describe("no-line-comment-period", () => {
         expect(output).toBe("// a b")
     })
 
-    test("It should remove an ellipsis run", ({ expect }) => {
+    test("It should leave an ellipsis untouched when fixing", ({ expect }) => {
         const output = fixRule(RULE, "// wait...")
-        expect(output).toBe("// wait")
+        expect(output).toBe("// wait...")
     })
 
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {

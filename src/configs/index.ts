@@ -1,5 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
+import { adonisjs } from "@/configs/adonisjs"
 import { all } from "@/configs/all"
+import { base } from "@/configs/base"
+import { react } from "@/configs/react"
 import { recommended } from "@/configs/recommended"
 
 /**
@@ -12,7 +15,10 @@ import { recommended } from "@/configs/recommended"
  */
 export function buildConfigs(plugin: TSESLint.FlatConfig.Plugin): Record<string, TSESLint.FlatConfig.Config> {
     return {
+        base: base(plugin),
         recommended: recommended(plugin),
+        adonisjs: adonisjs(plugin),
+        react: react(plugin),
         all: all(plugin),
     }
 }

@@ -23,6 +23,17 @@ const CONSTANTS = {
      * identifier or a number (letters, digits, underscore and dollar).
      */
     WORD_CHAR: /[\p{L}\p{N}_$]/u,
+
+    /**
+     * AdonisJS subpath import roots (`#models/...`, `#controllers/...`, etc.).
+     */
+    ADONIS_SUBPATH:
+        /^#(models|controllers|services|middleware|validators|policies|config|start|database|providers|lib)\b/,
+
+    /**
+     * React source files by extension.
+     */
+    REACT_FILE: /\.[jt]sx$/,
 } as const
 
 export default CONSTANTS

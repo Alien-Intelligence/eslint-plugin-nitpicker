@@ -4,12 +4,20 @@ import noEmDash from "@/rules/noEmDash"
 import noJSDocBlankBeforeTags from "@/rules/noJSDocBlankBeforeTags"
 import noLineCommentPeriod from "@/rules/noLineCommentPeriod"
 import noSingleLineJSDoc from "@/rules/noSingleLineJSDoc"
+import requireFrameworkConfig from "@/rules/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/requireFunctionJSDoc"
 
 /**
  * Every rule instance registered by the plugin.
  */
-const ruleInstances = [noEmDash, noJSDocBlankBeforeTags, noLineCommentPeriod, noSingleLineJSDoc, requireFunctionJSDoc]
+const ruleInstances = [
+    noEmDash,
+    noJSDocBlankBeforeTags,
+    noLineCommentPeriod,
+    noSingleLineJSDoc,
+    requireFrameworkConfig,
+    requireFunctionJSDoc,
+]
 
 /**
  * The plugin's rules, keyed by name, as the plain modules ESLint consumes.

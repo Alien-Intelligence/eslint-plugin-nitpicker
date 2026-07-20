@@ -12,7 +12,7 @@ type MessageIds = "period"
  *
  * Line comments should read as short, clear fragments rather than full
  * sentences, so periods are just noise. Dots that are part of a token, such as
- * `foo.bar`, `1.5`, `file.ts` or `.env`, are deliberately left alone.
+ * `foo.bar`, `1.5`, `file.ts` or `.env`, and ellipses (`...`) are left alone.
  */
 class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-line-comment-period"
@@ -23,7 +23,7 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
         type: "layout",
         fixable: "code",
         docs: {
-            description: "Disallow prose periods in `//` line comments (dots inside code references are allowed).",
+            description: "Disallow prose periods in `//` line comments (code-reference dots and ellipses are allowed).",
             recommended: true,
         },
         schema: [],
@@ -51,30 +51,26 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
                     for (let index = 0; index < value.length; index++) {
                         if (value[index] !== ".") continue
 
-                        // Group a run of consecutive dots (e.g an ellipsis) so
-                        // it becomes a single report rather than one per dot
-                        let end = index
-                        while (value[end + 1] === ".") end++
+                        // A run of consecutive dots is an ellipsis, leave it alone
+                        if (value[index + 1] === ".") {
+                            while (value[index + 1] === ".") index++
+                            continue
+                        }
 
                         // A lone dot immediately followed by a word character is
                         // part of a token (`foo.bar`, `1.5`, `.env`), not prose
-                        const isCodeDot = end === index && isWordChar(value[end + 1])
+                        if (isWordChar(value[index + 1])) continue
 
-                        if (!isCodeDot) {
-                            const from = valueStart + index
-                            const to = valueStart + end + 1
+                        const at = valueStart + index
 
-                            context.report({
-                                loc: {
-                                    start: sourceCode.getLocFromIndex(from),
-                                    end: sourceCode.getLocFromIndex(to),
-                                },
-                                messageId: "period",
-                                fix: fixer => fixer.removeRange([from, to]),
-                            })
-                        }
-
-                        index = end
+                        context.report({
+                            loc: {
+                                start: sourceCode.getLocFromIndex(at),
+                                end: sourceCode.getLocFromIndex(at + 1),
+                            },
+                            messageId: "period",
+                            fix: fixer => fixer.removeRange([at, at + 1]),
+                        })
                     }
                 }
             },
