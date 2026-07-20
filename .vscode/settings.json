@@ -45,6 +45,7 @@
         "**/.vscode": true
     },
     "cSpell.words": [
-        "Colorette"
+        "Colorette",
+        "TSES"
     ]
 }

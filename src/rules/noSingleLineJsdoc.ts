@@ -1,6 +1,7 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
 import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
+import { isJsdocComment } from "@/lib/utils/jsdoc"
 import { nitpick } from "@/lib/utils/nitpick"
 
 type Options = []
@@ -43,9 +44,8 @@ class NoSingleLineJsdoc extends NitpickerRule<MessageIds, Options> {
         return {
             Program() {
                 for (const comment of sourceCode.getAllComments()) {
-                    // Only JSDoc block comments (`/**`) that fit on one line
-                    if (comment.type !== "Block") continue
-                    if (!comment.value.startsWith("*")) continue
+                    // Only JSDoc comments (`/**`) that fit on one line
+                    if (!isJsdocComment(comment)) continue
                     if (comment.loc.start.line !== comment.loc.end.line) continue
 
                     // Strip the leading `*` left over from `/**` and normalize

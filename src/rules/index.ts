@@ -3,11 +3,12 @@ import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
 import noEmDash from "@/rules/noEmDash"
 import noLineCommentPeriod from "@/rules/noLineCommentPeriod"
 import noSingleLineJsdoc from "@/rules/noSingleLineJsdoc"
+import requireFunctionJsdoc from "@/rules/requireFunctionJsdoc"
 
 /**
  * Every rule instance registered by the plugin.
  */
-const ruleInstances = [noEmDash, noLineCommentPeriod, noSingleLineJsdoc]
+const ruleInstances = [noEmDash, noLineCommentPeriod, noSingleLineJsdoc, requireFunctionJsdoc]
 
 /**
  * The plugin's rules, keyed by name, as the plain modules ESLint consumes.

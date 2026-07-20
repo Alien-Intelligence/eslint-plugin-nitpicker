@@ -17,6 +17,11 @@ export function lintRule(ruleName: string, code: string, ...options: unknown[]):
 
     return linter.verify(code, [
         {
+            languageOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                parserOptions: { ecmaFeatures: { jsx: true } },
+            },
             plugins: { [CONSTANTS.PLUGIN_NAME]: plugin as unknown as ESLint.Plugin },
             rules: {
                 [ruleId]: options.length > 0 ? ["error", ...options] : "error",
@@ -39,6 +44,11 @@ export function fixRule(ruleName: string, code: string, ...options: unknown[]): 
 
     const { output } = linter.verifyAndFix(code, [
         {
+            languageOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                parserOptions: { ecmaFeatures: { jsx: true } },
+            },
             plugins: { [CONSTANTS.PLUGIN_NAME]: plugin as unknown as ESLint.Plugin },
             rules: {
                 [ruleId]: options.length > 0 ? ["error", ...options] : "error",
