@@ -1,9 +1,9 @@
 import type { TSESLint } from "@typescript-eslint/utils"
-import { adonisjs } from "@/configs/adonisjs"
-import { all } from "@/configs/all"
-import { base } from "@/configs/base"
-import { react } from "@/configs/react"
-import { recommended } from "@/configs/recommended"
+import { all } from "@/configs/presets/all"
+import { recommended } from "@/configs/presets/recommended"
+import { adonisjs } from "@/configs/rulesets/adonisjs"
+import { base } from "@/configs/rulesets/base"
+import { react } from "@/configs/rulesets/react"
 
 /**
  * Builds all shared configs bundled with the plugin.

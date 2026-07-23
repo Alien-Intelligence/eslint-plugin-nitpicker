@@ -1,5 +1,5 @@
+import { lintRule } from "tests/utils/lint"
 import { describe, test } from "vitest"
-import { lintRule } from "../../utils/lint"
 
 const RULE = "no-em-dash"
 

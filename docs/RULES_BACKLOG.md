@@ -1,11 +1,9 @@
 # Nitpicker rules backlog
-
 The goal of this plugin is to **replace the `STYLE.md` and `CLAUDE.md` files** across our
 projects: every lintable convention becomes a rule that both enforces the style and carries
 AI-fixable context in its message, so agents no longer have to be re-told the rules.
 
 This file tracks candidate rules mined from existing convention sources:
-
 - `celk` / `gitgame` agent memory (`~/.claude/projects/.../memory/feedback_*.md`)
 - `web-app` `packages/backend/STYLE.md` and `packages/frontend/STYLE.md`
 - `web-app` agent memory
@@ -18,12 +16,15 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 ## Shipped
 
 | Rule | Enforces | Source |
-|---|---|---|
+|-------|---|---|
 | `no-em-dash` | No em dash character anywhere | code-style, both STYLE.md |
 | `no-line-comment-period` | `//` comments carry no periods | inline-comment-style, BE/FE STYLE.md |
 | `no-single-line-jsdoc` | JSDoc must span multiple lines | FE STYLE.md |
 | `no-jsdoc-blank-before-tags` | No blank line before `@param`/`@returns` | jsdoc-style |
 | `require-function-jsdoc` | JSDoc on top-level functions (React components exempt) | code-style, BE STYLE.md |
+| `no-decorative-comment-separators` | No banner/box-drawing/`--` separators in comments (AdonisJS route files exempt via `allowIn`) | both STYLE.md |
+| `require-framework-config` | Warn when a file uses a framework whose Nitpicker config isn't enabled | plugin meta-rule |
+| `no-property-access-alias` | No `const` that just holds one property access (strict; `let`/exports exempt) | BE STYLE.md, gitgame code-style |
 
 ---
 
@@ -32,7 +33,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `no-comment-semicolons` | Never write `;` inside any comment | E | All | Both STYLE.md "Forbidden Comment Patterns" |
-| `no-decorative-comment-separators` | Ban `─`, box-drawing, `--`/`-` runs used as dividers (`// ── X ──`, `// -- X --`) | E | All | Both STYLE.md; complements `no-em-dash` |
 | `comment-code-ref-quoting` | Code refs use backticks in JSDoc, double quotes in `//` (flag backticks in `//`) | M | All | Both STYLE.md "Code References" |
 | `no-inline-block-comments` | Inline comments use `//`, never `/* */` | E | BE | BE STYLE.md "Inline Comments" |
 | `jsdoc-no-mid-sentence-period` | JSDoc body links clauses with commas; end period OK, mid-sentence periods flagged | M | All | jsdoc-style, BE "Multi-Sentence Paragraphs" |
@@ -55,7 +55,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
-| `no-property-access-alias` | Ban a local whose entire value is one property access (`const user = auth.user!`); allow `let` reassigned later | M | All | BE STYLE.md; gitgame code-style; **original ask** |
 | `no-alias-variables` | Ban a local whose sole purpose is to rename another variable | M | All | BE STYLE.md |
 | `no-body-destructuring` | No object destructuring in variable declarations; allow call/hook returns, params, snake→camel rename | M | All | gitgame `no-destructuring` — **conflicts** with web-app (which allows rename); needs options |
 | `no-redundant-union-cast` | Ban `let x: T \| null = expr as T` | M | BE | BE STYLE.md |

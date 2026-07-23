@@ -20,7 +20,7 @@ export default [
         // These files must contain the em dash character itself (the rule's own
         // constant, description, messages, and test fixtures), so they are
         // exempt from the em dash rule
-        files: ["src/lib/constants.ts", "src/rules/noEmDash.ts", "tests/unit/rules/noEmDash.test.ts"],
+        files: ["src/lib/constants.ts", "src/rules/base/noEmDash.ts", "tests/unit/rules/noEmDash.test.ts"],
         rules: { "nitpicker/no-em-dash": "off" },
     },
 ]

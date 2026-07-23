@@ -1,5 +1,5 @@
+import { lintRule } from "tests/utils/lint"
 import { describe, test } from "vitest"
-import { lintRule } from "../../utils/lint"
 
 const RULE = "require-function-jsdoc"
 
@@ -32,17 +32,19 @@ describe("require-function-jsdoc", () => {
     })
 
     test("It should not report a React component declaration returning JSX", ({ expect }) => {
-        const messages = lintRule(RULE, "function Button() {\n    return <div />\n}")
+        const messages = lintRule(RULE, "function Button() {\n    return <div />\n}", { filename: "Button.tsx" })
         expect(messages).toHaveLength(0)
     })
 
     test("It should not report a React component arrow returning JSX", ({ expect }) => {
-        const messages = lintRule(RULE, "const Card = () => <div />")
+        const messages = lintRule(RULE, "const Card = () => <div />", { filename: "Card.tsx" })
         expect(messages).toHaveLength(0)
     })
 
     test("It should not report a React component returning conditional JSX", ({ expect }) => {
-        const messages = lintRule(RULE, "function Toggle() {\n    return on ? <a /> : <b />\n}")
+        const messages = lintRule(RULE, "function Toggle() {\n    return on ? <a /> : <b />\n}", {
+            filename: "Toggle.tsx",
+        })
         expect(messages).toHaveLength(0)
     })
 
@@ -74,7 +76,7 @@ describe("require-function-jsdoc", () => {
     })
 
     test("It should report a lowercase function that returns JSX", ({ expect }) => {
-        const messages = lintRule(RULE, "const renderIcon = () => <svg />")
+        const messages = lintRule(RULE, "const renderIcon = () => <svg />", { filename: "renderIcon.tsx" })
         expect(messages).toHaveLength(1)
     })
 

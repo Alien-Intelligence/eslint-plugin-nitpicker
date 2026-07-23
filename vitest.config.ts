@@ -11,5 +11,9 @@ export default defineConfig({
     test: {
         globals: true,
         include: ["./tests/unit/**/*.test.ts"],
+
+        // ESLint and its parser are CJS deps, running test files in one worker
+        // avoids a cold dep-optimizer race that intermittently fails their import
+        fileParallelism: false,
     },
 })

@@ -34,6 +34,23 @@ const CONSTANTS = {
      * React source files by extension.
      */
     REACT_FILE: /\.[jt]sx$/,
+
+    /**
+     * Box-drawing and block-element characters, which are always decorative
+     * when found inside a comment.
+     */
+    BOX_DRAWING: /[─-▟]/,
+
+    /**
+     * A comment line made entirely of three or more repeated separator
+     * characters, e.g. `======` or `------`.
+     */
+    PURE_SEPARATOR: /^[-=~*#_+]{3,}$/,
+
+    /**
+     * A short label fenced by separator runs inside a comment, e.g `-- Section --`.
+     */
+    WRAPPED_LABEL: /^[-=~*#_+]{2,}\s.*\s[-=~*#_+]{2,}$/,
 } as const
 
 export default CONSTANTS

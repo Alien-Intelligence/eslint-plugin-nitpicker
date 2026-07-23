@@ -1,5 +1,5 @@
+import { fixRule, lintRule } from "tests/utils/lint"
 import { describe, test } from "vitest"
-import { fixRule, lintRule } from "../../utils/lint"
 
 const RULE = "no-jsdoc-blank-before-tags"
 

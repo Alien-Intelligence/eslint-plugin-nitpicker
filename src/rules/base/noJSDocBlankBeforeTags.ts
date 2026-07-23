@@ -41,17 +41,15 @@ class NoJSDocBlankBeforeTags extends NitpickerRule<MessageIds, Options> {
                 for (const comment of sourceCode.getAllComments()) {
                     if (!isJSDocComment(comment)) continue
 
-                    const firstLine = comment.loc.start.line
-                    const lastLine = comment.loc.end.line
-                    if (firstLine === lastLine) continue
+                    if (comment.loc.start.line === comment.loc.end.line) continue
 
-                    for (let line = firstLine; line <= lastLine; line++) {
+                    for (let line = comment.loc.start.line; line <= comment.loc.end.line; line++) {
                         const text = sourceCode.lines[line - 1]
                         if (text === undefined || !isBlankJSDocLine(text)) continue
 
                         // Grow the run of consecutive blank lines
                         let runEnd = line
-                        while (runEnd < lastLine && isBlankJSDocLine(sourceCode.lines[runEnd] ?? "")) {
+                        while (runEnd < comment.loc.end.line && isBlankJSDocLine(sourceCode.lines[runEnd] ?? "")) {
                             runEnd++
                         }
 

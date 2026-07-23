@@ -1,5 +1,5 @@
 import type { TSESLint } from "@typescript-eslint/utils"
-import { base } from "@/configs/base"
+import { base } from "@/configs/rulesets/base"
 import CONSTANTS from "@/lib/constants"
 
 /**

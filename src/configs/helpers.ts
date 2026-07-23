@@ -4,8 +4,8 @@ import type { RuleCategory } from "@/lib/utils/createRule"
 import { rules } from "@/rules"
 
 /**
- * Builds the rules record for a single category, each enabled as a warning.
- * Rules with no explicit category are treated as `base`.
+ * Builds the rules record for a single category, each enabled as a warning,
+ * rules with no explicit category are treated as `base`.
  * @param category The category to collect rules for.
  * @returns The flat-config rules record for that category.
  */

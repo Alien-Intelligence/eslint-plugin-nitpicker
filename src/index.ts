@@ -2,6 +2,8 @@ import type { TSESLint } from "@typescript-eslint/utils"
 import { buildConfigs } from "@/configs"
 import CONSTANTS from "@/lib/constants"
 import { rules } from "@/rules"
+
+// Import the version from package.json to include in the plugin metadata
 import { version } from "../package.json"
 
 /**
