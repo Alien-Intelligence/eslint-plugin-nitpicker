@@ -25,9 +25,6 @@ const ruleInstances = [
     requireFunctionJSDoc,
 ]
 
-// licence, colours
-const licence = 0
-
 /**
  * The plugin's rules, keyed by name, as the plain modules ESLint consumes.
  */
