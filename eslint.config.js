@@ -23,4 +23,10 @@ export default [
         files: ["src/lib/constants.ts", "src/rules/base/noEmDash.ts", "tests/unit/rules/noEmDash.test.ts"],
         rules: { "nitpicker/no-em-dash": "off" },
     },
+    {
+        // The British-to-American dictionary defines British words as its keys,
+        // so it is exempt from the British-English rule
+        files: ["src/lib/data/britishToAmerican.ts"],
+        rules: { "nitpicker/no-british-english": "off" },
+    },
 ]

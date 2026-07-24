@@ -25,6 +25,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-decorative-comment-separators` | No banner/box-drawing/`--` separators in comments (AdonisJS route files exempt via `allowIn`) | both STYLE.md |
 | `require-framework-config` | Warn when a file uses a framework whose Nitpicker config isn't enabled | plugin meta-rule |
 | `no-property-access-alias` | No `const` that just holds one property access (strict; `let`/exports exempt) | BE STYLE.md, gitgame code-style |
+| `no-british-english` | No British spellings in identifiers/comments; `extra`/`ignore` options + comment autofix | user request |
 
 ---
 

@@ -51,6 +51,12 @@ const CONSTANTS = {
      * A short label fenced by separator runs inside a comment, e.g `-- Section --`.
      */
     WRAPPED_LABEL: /^[-=~*#_+]{2,}\s.*\s[-=~*#_+]{2,}$/,
+
+    /**
+     * Matches a single sub-word: an all-caps acronym, a capitalized word, or a
+     * lowercase run, so `getUserName` splits into "get", "User" and "Name"
+     */
+    SUB_WORD: /[A-Z]+(?![a-z])|[A-Z][a-z]+|[a-z]+/g,
 } as const
 
 export default CONSTANTS
