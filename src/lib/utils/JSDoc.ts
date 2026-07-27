@@ -42,3 +42,23 @@ export function isBlankJSDocLine(line: string): boolean {
 export function isJSDocTagLine(line: string): boolean {
     return /^\s*\*\s*@/.test(line)
 }
+
+/**
+ * Extracts the description prose of a JSDoc comment, i.e. everything before the
+ * first block tag, with the ` * ` markers stripped and wrapped lines joined into
+ * a single space-separated string.
+ * @param comment The JSDoc comment to read.
+ * @returns The description as one collapsed prose string.
+ */
+export function getJSDocDescription(comment: TSESTree.Comment): string {
+    const parts: string[] = []
+
+    for (const line of comment.value.split("\n")) {
+        const content = line.replace(/^\s*\*? ?/, "").trimEnd()
+        if (content.startsWith("@")) break
+
+        parts.push(content)
+    }
+
+    return parts.join(" ").replace(/\s+/g, " ").trim()
+}

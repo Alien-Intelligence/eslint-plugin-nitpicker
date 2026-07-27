@@ -1,12 +1,9 @@
 import type { TSESTree } from "@typescript-eslint/utils"
 
 /**
- * Checks whether an expression is nothing but a property access, i.e. a chain of
- * non-computed member accesses (with any `?.` or trailing `!`) that bottoms out
- * at an identifier or `this`, such as `auth.user!` or `menu.node.path`.
- *
- * Computed access (`arr[0]`), calls (`obj.method()`), and bare identifiers are
- * not property-access aliases.
+ * Checks whether an expression is nothing but a non-computed property access
+ * chain (with any `?.` or `!`) bottoming out at an identifier or `this`, such as
+ * `auth.user!` or `menu.node.path`.
  * @param node The expression to inspect.
  * @returns `true` if the expression is a plain property access.
  */

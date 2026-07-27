@@ -1,8 +1,7 @@
 /**
- * A dictionary of British English spellings mapped to their American English
- * equivalents, keyed in lowercase, focused on the words that show up in code
- * and that AIs most often get wrong, consumers can extend it per project via the
- * `no-british-english` rule's `extra` option.
+ * British English spellings mapped to their American equivalents, keyed in
+ * lowercase. Extend it per project via the `no-british-english` rule's `extra`
+ * option.
  */
 export const BRITISH_TO_AMERICAN: Record<string, string> = {
     // "-our" to "-or"

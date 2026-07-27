@@ -7,10 +7,7 @@ import { rules } from "@/rules"
 import { version } from "../package.json"
 
 /**
- * The `@the-alien-club/eslint-plugin-nitpicker` plugin.
- *
- * A hyper-pedantic ESLint plugin that flags every stylistic and semantic nit,
- * with AI-friendly fix context baked into each message.
+ * Main declaration of the `@alien_intelligence/eslint-plugin-nitpicker` plugin.
  */
 const plugin: TSESLint.FlatConfig.Plugin = {
     meta: {

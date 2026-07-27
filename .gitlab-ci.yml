@@ -1,0 +1,60 @@
+# GitLab CI for @alien_intelligence/eslint-plugin-nitpicker
+#
+# PREREQUISITE (one-time, manual on npmjs.org):
+#   https://www.npmjs.com/package/@alien_intelligence/eslint-plugin-nitpicker ->
+#   Settings -> "Trusted Publishers" -> Add
+#     Provider:           GitLab CI/CD
+#     Repository:         alias3/packages/eslint-plugin-nitpicker
+#     Workflow filename:  .gitlab-ci.yml
+#     Environment:        npmjs
+
+include:
+  - project: "alias3/datastreaming/ci-scripts"
+    ref: main
+    file:
+      - "/templates/jobs/openapi-npmjs.gitlab-ci.yml"
+
+stages:
+  - build
+  - publish
+
+variables:
+  NPMJS_PACKAGE_NAME: "@alien_intelligence/eslint-plugin-nitpicker"
+  NPMJS_PACKAGE_DIR: "."
+  # "PROVENANCE" intentionally NOT set, this repo is private on GitLab
+
+# Build (every push / MR / feature branch)
+build:
+  stage: build
+  image: node:22-slim
+  script:
+    - npm ci --no-audit --no-fund
+    - npm run typecheck
+    - npm test
+    - npm run build
+    - test -f dist/index.js
+    - test -f dist/index.d.ts
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 day
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+
+# Publish to NPM
+openapi-publish-npmjs:
+  environment:
+    name: npmjs
+    url: https://www.npmjs.com/package/@alien_intelligence/eslint-plugin-nitpicker
+  needs:
+    - job: build
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - package.json
+        - src/**/*
+        - tsup.config.ts
+        - .gitlab-ci.yml
