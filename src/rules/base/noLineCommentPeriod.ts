@@ -8,11 +8,9 @@ type Options = []
 type MessageIds = "period"
 
 /**
- * Flags periods used as prose punctuation inside `//` line comments.
- *
- * Line comments should read as short, clear fragments rather than full
- * sentences, so periods are just noise. Dots that are part of a token, such as
- * `foo.bar`, `1.5`, `file.ts` or `.env`, and ellipses (`...`) are left alone.
+ * Flags periods used as prose punctuation inside `//` line comments. Dots that
+ * are part of a token (`foo.bar`, `1.5`, `.env`) and ellipses (`...`) are left
+ * alone.
  */
 class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-line-comment-period"

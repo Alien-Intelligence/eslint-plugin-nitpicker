@@ -9,10 +9,9 @@ type Options = [{ allowIn: string[] }]
 type MessageIds = "decorative"
 
 /**
- * Flags decorative separators inside comments, such as banner rules
- * (`// ======`), box-drawing lines, and labels fenced by repeated dashes
- * (`// -- Section --`). The `allowIn` option lists globs where they are
- * tolerated, which the AdonisJS config uses to permit banners in route files.
+ * Flags decorative separators inside comments: banner rules (`// ======`),
+ * box-drawing lines, and labels fenced by repeated dashes (`// -- Section --`),
+ * the `allowIn` option lists globs where they are tolerated.
  */
 class NoDecorativeCommentSeparators extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-decorative-comment-separators"

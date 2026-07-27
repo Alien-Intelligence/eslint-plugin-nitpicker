@@ -2,12 +2,9 @@ import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils"
 import { createRule, type NitpickerRuleDocs } from "@/lib/utils/createRule"
 
 /**
- * The base class every Nitpicker rule extends.
- *
- * A rule is expressed as a class so that shared behavior, typing, and metadata
- * live in one place, while each concrete rule only has to declare its name,
- * metadata, default options, and visitor logic, and call {@link toRuleModule} to
- * turn an instance into the plain object ESLint expects.
+ * The base class every Nitpicker rule extends, so a rule only declares its name,
+ * metadata, options, and visitor logic. Call {@link toRuleModule} to turn an
+ * instance into the plain object ESLint expects.
  */
 export abstract class NitpickerRule<MessageIds extends string = string, Options extends readonly unknown[] = []> {
     /**

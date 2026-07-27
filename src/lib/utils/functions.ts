@@ -7,10 +7,8 @@ export type FunctionNode = TSESTree.FunctionDeclaration | TSESTree.FunctionExpre
 
 /**
  * Resolves the node whose leading comments would document a function, walking
- * outwards through a variable declaration and/or an export statement.
- *
- * For `export const foo = () => {}` this is the `export` node, whereas for a
- * bare `function foo() {}` it is the declaration itself.
+ * out through a variable declaration and/or an export statement (so
+ * `export const foo = () => {}` resolves to the `export` node).
  * @param fn The function node to resolve from.
  * @returns The node a JSDoc comment would sit above.
  */

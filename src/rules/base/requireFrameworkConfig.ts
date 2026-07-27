@@ -10,9 +10,8 @@ type MessageIds = "missingConfig"
 
 /**
  * Warns when a file uses a framework (AdonisJS, React) whose Nitpicker config is
- * not enabled, so its framework-specific conventions are silently going
- * unchecked. The warning disappears once the matching config is added (each one
- * sets a settings flag), or the rule can be turned off.
+ * not enabled. Enabling the matching config (which sets a settings flag) or
+ * turning off this rule silences it.
  */
 class RequireFrameworkConfig extends NitpickerRule<MessageIds, Options> {
     readonly name = "require-framework-config"

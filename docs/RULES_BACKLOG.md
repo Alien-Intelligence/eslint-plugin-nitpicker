@@ -26,6 +26,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `require-framework-config` | Warn when a file uses a framework whose Nitpicker config isn't enabled | plugin meta-rule |
 | `no-property-access-alias` | No `const` that just holds one property access (strict; `let`/exports exempt) | BE STYLE.md, gitgame code-style |
 | `no-british-english` | No British spellings in identifiers/comments; `extra`/`ignore` options + comment autofix | user request |
+| `max-jsdoc-description-length` | Cap JSDoc description prose (default 250 chars); fix flags usage-note anti-pattern | user request |
 
 ---
 

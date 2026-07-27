@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
+import maxJSDocDescriptionLength from "@/rules/base/maxJSDocDescriptionLength"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
 import noDecorativeCommentSeparators from "@/rules/base/noDecorativeCommentSeparators"
 import noEmDash from "@/rules/base/noEmDash"
@@ -14,6 +15,7 @@ import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
  * Every rule instance registered by the plugin.
  */
 const ruleInstances = [
+    maxJSDocDescriptionLength,
     noBritishEnglish,
     noDecorativeCommentSeparators,
     noEmDash,

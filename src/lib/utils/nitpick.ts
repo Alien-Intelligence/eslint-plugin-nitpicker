@@ -22,11 +22,8 @@ export type Nitpick = {
 }
 
 /**
- * Composes a {@link Nitpick} into a single, richly-contextualized message
- * string suitable for a rule's `meta.messages` entry.
- *
- * ESLint `{{placeholders}}` inside any field are preserved untouched, so they
- * can still be interpolated with `data` at report time.
+ * Composes a {@link Nitpick} into one message string for a rule's
+ * `meta.messages` entry, leaving any ESLint `{{placeholders}}` intact.
  * @param nitpick The problem/why/fix triplet to format.
  * @returns The formatted, multi-line message.
  */
