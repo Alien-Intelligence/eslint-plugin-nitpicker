@@ -1,7 +1,7 @@
 {
-    "name": "@the-alien-club/eslint-plugin-nitpicker",
+    "name": "@alien_intelligence/eslint-plugin-nitpicker",
     "productName": "Nitpicker",
-    "version": "0.0.0-semantically-released",
+    "version": "0.1.0",
     "description": "A hyper-pedantic ESLint plugin that flags every stylistic and semantic nit, with AI-friendly fix context.",
     "author": "Alien <contact@alien.club> (https://www.alien.club/)",
     "license": "MIT",
@@ -35,16 +35,18 @@
         "node": ">=20.0.0"
     },
     "files": [
-        "*"
+        "dist",
+        "README.md",
+        "LICENSE"
     ],
-    "main": "./index.js",
-    "module": "./index.js",
-    "types": "./index.d.ts",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "types": "./index.d.ts",
-            "import": "./index.js",
-            "default": "./index.js"
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
         }
     },
     "scripts": {
@@ -54,8 +56,7 @@
         "lint:nitpicker": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
-        "test:watch": "vitest",
-        "release": "npx semantic-release"
+        "test:watch": "vitest"
     },
     "peerDependencies": {
         "eslint": ">=9.0.0"
@@ -65,10 +66,8 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.5.2",
-        "@types/copyfiles": "^2.4.4",
         "@types/node": "^24.12.2",
         "@typescript-eslint/parser": "^8.64.0",
-        "copyfiles": "^2.4.1",
         "eslint": "^9.17.0",
         "tsup": "^8.5.1",
         "typescript": "^5.8.3",

@@ -48,6 +48,8 @@
         "Colorette",
         "Colour",
         "normalise",
+        "npmjs",
+        "sigstore",
         "TSES"
     ]
 }
