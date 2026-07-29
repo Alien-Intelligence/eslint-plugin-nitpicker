@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { isWordChar } from "@/lib/utils/isWordChar"
-import { nitpick } from "@/lib/utils/nitpick"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
+import { isWordChar } from "@/lib/utils/words"
 
 type Options = []
 type MessageIds = "period"
@@ -35,36 +35,33 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-
         return {
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     if (comment.type !== "Line") continue
 
-                    const { value } = comment
                     // The comment value starts right after the leading `//`
                     const valueStart = comment.range[0] + 2
 
-                    for (let index = 0; index < value.length; index++) {
-                        if (value[index] !== ".") continue
+                    for (let index = 0; index < comment.value.length; index++) {
+                        if (comment.value[index] !== ".") continue
 
                         // A run of consecutive dots is an ellipsis, leave it alone
-                        if (value[index + 1] === ".") {
-                            while (value[index + 1] === ".") index++
+                        if (comment.value[index + 1] === ".") {
+                            while (comment.value[index + 1] === ".") index++
                             continue
                         }
 
                         // A lone dot immediately followed by a word character is
                         // part of a token (`foo.bar`, `1.5`, `.env`), not prose
-                        if (isWordChar(value[index + 1])) continue
+                        if (isWordChar(comment.value[index + 1])) continue
 
                         const at = valueStart + index
 
                         context.report({
                             loc: {
-                                start: sourceCode.getLocFromIndex(at),
-                                end: sourceCode.getLocFromIndex(at + 1),
+                                start: context.sourceCode.getLocFromIndex(at),
+                                end: context.sourceCode.getLocFromIndex(at + 1),
                             },
                             messageId: "period",
                             fix: fixer => fixer.removeRange([at, at + 1]),

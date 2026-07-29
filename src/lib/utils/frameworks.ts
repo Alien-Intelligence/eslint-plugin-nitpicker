@@ -42,14 +42,14 @@ export function detectFrameworks(sourceCode: Readonly<TSESLint.SourceCode>, file
     const detected = new Set<Framework>()
     const sources = importSources(sourceCode)
 
-    if (sources.some(source => source.startsWith("@adonisjs/") || CONSTANTS.ADONIS_SUBPATH.test(source))) {
+    if (sources.some(source => source.startsWith("@adonisjs/") || CONSTANTS.FRAMEWORKS.ADONIS_SUBPATH.test(source))) {
         detected.add("adonisjs")
     }
 
     const importsReact = sources.some(
         source => source === "react" || source.startsWith("react/") || source === "react-dom",
     )
-    if (importsReact || CONSTANTS.REACT_FILE.test(filename)) {
+    if (importsReact || CONSTANTS.FRAMEWORKS.REACT_FILE.test(filename)) {
         detected.add("react")
     }
 

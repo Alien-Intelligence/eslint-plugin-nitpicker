@@ -27,6 +27,9 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-property-access-alias` | No `const` that just holds one property access (strict; `let`/exports exempt) | BE STYLE.md, gitgame code-style |
 | `no-british-english` | No British spellings in identifiers/comments; `extra`/`ignore` options + comment autofix | user request |
 | `max-jsdoc-description-length` | Cap JSDoc description prose (default 250 chars); fix flags usage-note anti-pattern | user request |
+| `no-alias-variables` | No `const x = y` pure rename (`let`/exports exempt) | BE STYLE.md |
+| `no-property-destructuring` | No shorthand destructure off a plain object (`const { a } = obj`); calls/renames/defaults/rest exempt | gitgame convention, user request |
+| `require-migration-jsdoc` | Require a JSDoc above an AdonisJS migration class (adonisjs category) | user request, web-app migrations |
 
 ---
 
@@ -57,8 +60,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
-| `no-alias-variables` | Ban a local whose sole purpose is to rename another variable | M | All | BE STYLE.md |
-| `no-body-destructuring` | No object destructuring in variable declarations; allow call/hook returns, params, snake→camel rename | M | All | gitgame `no-destructuring` — **conflicts** with web-app (which allows rename); needs options |
 | `no-redundant-union-cast` | Ban `let x: T \| null = expr as T` | M | BE | BE STYLE.md |
 | `no-explicit-void-return` | Don't annotate `void`/`Promise<void>` when the body never returns | M | All | code-style |
 
@@ -80,6 +81,9 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
+| `no-migration-section-comments` | No section-label comments (`// Timestamps`, `// Relationships`, …) inside a migration's table builder; keep genuine why-notes | M | proj (AdonisJS) | web-app migrations; deferred (comments-scope undecided) |
+| `anonymous-migration-class` | Migration default-export class must be anonymous (flag `class BaselineMigration extends BaseSchema`) | E | proj (AdonisJS) | web-app migrations; deferred |
+| `migration-id-first` | First `createTable` column must be `increments("id")` | M | proj (AdonisJS) | web-app migrations; deferred (table-dependent) |
 | `no-ctx-httpcontext-param` | Controllers destructure `HttpContext`, never `ctx: HttpContext` | M | proj (AdonisJS) | BE STYLE.md; middleware exempt |
 | `no-optional-user-override` | A route has one subject; no optional `params.user_id` override | H | proj (AdonisJS) | BE STYLE.md |
 | `config-over-magic-numbers` | Timing/threshold values live in `*_CONFIG`, not inline | H | BE | BE STYLE.md |

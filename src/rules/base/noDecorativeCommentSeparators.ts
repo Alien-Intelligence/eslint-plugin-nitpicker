@@ -1,9 +1,9 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { isDecorativeCommentLine } from "@/lib/utils/decoration"
-import { matchesGlob } from "@/lib/utils/matchesGlob"
-import { nitpick } from "@/lib/utils/nitpick"
+import { isDecorativeCommentLine } from "@/lib/utils/decorations"
+import { nitpick } from "@/lib/utils/messages"
+import { matchesGlob } from "@/lib/utils/regex"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = [{ allowIn: string[] }]
 type MessageIds = "decorative"
@@ -52,11 +52,9 @@ class NoDecorativeCommentSeparators extends NitpickerRule<MessageIds, Options> {
             return {}
         }
 
-        const { sourceCode } = context
-
         return {
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     const lines = comment.value.split("\n")
 
                     for (let index = 0; index < lines.length; index++) {
@@ -64,7 +62,7 @@ class NoDecorativeCommentSeparators extends NitpickerRule<MessageIds, Options> {
                         if (line === undefined || !isDecorativeCommentLine(line)) continue
 
                         const reportedLine = comment.loc.start.line + index
-                        const source = sourceCode.lines[reportedLine - 1] ?? ""
+                        const source = context.sourceCode.lines[reportedLine - 1] ?? ""
 
                         context.report({
                             loc: {
