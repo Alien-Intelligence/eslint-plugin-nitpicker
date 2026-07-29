@@ -1,6 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
-import type { RuleCategory } from "@/lib/utils/createRule"
+import type { RuleCategory } from "@/lib/utils/rules"
 import { rules } from "@/rules"
 
 /**

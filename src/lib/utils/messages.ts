@@ -1,12 +1,9 @@
 /**
- * The building blocks of a Nitpicker message, every rule reports its findings
- * through this shape so that the output is consistent and, crucially,
- * self-explanatory enough for an AI (or a human) to fix the issue without
- * opening the rule's documentation.
+ * The building blocks of a Nitpicker message.
  */
 export type Nitpick = {
     /**
-     * What is wrong, stated plainly. May contain ESLint `{{placeholders}}`.
+     * What is wrong, stated plainly, may contain ESLint `{{placeholders}}`.
      */
     problem: string
 

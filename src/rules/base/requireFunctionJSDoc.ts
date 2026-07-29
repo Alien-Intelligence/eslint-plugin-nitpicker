@@ -1,10 +1,10 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
 import { type FunctionNode, getDocumentableNode, getFunctionName, isTopLevel } from "@/lib/utils/functions"
-import { hasLeadingJSDoc } from "@/lib/utils/JSDoc"
-import { nitpick } from "@/lib/utils/nitpick"
+import { hasLeadingJSDoc } from "@/lib/utils/jsdocs"
+import { nitpick } from "@/lib/utils/messages"
 import { functionReturnsJsx, isReactComponentName } from "@/lib/utils/react"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "missingJSDoc"
@@ -35,8 +35,6 @@ class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-
         const check = (fn: FunctionNode, reportNode: TSESTree.Node): void => {
             const name = getFunctionName(fn)
             // Anonymous functions (e.g `export default () => {}`) are skipped
@@ -46,9 +44,9 @@ class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
             if (!isTopLevel(documentable)) return
 
             // React component functions are exempt from the JSDoc requirement
-            if (isReactComponentName(name) && functionReturnsJsx(fn, sourceCode.visitorKeys)) return
+            if (isReactComponentName(name) && functionReturnsJsx(fn, context.sourceCode.visitorKeys)) return
 
-            if (hasLeadingJSDoc(sourceCode, documentable)) return
+            if (hasLeadingJSDoc(context.sourceCode, documentable)) return
 
             context.report({
                 node: reportNode,
@@ -62,11 +60,10 @@ class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
                 check(node, node.id ?? node)
             },
             VariableDeclarator(node) {
-                const { init } = node
-                if (!init) return
-                if (init.type !== "ArrowFunctionExpression" && init.type !== "FunctionExpression") return
+                if (!node.init) return
+                if (node.init.type !== "ArrowFunctionExpression" && node.init.type !== "FunctionExpression") return
 
-                check(init, node.id)
+                check(node.init, node.id)
             },
         }
     }

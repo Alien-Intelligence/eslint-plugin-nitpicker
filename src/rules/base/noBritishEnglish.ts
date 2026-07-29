@@ -1,9 +1,9 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { BRITISH_TO_AMERICAN } from "@/lib/data/britishToAmerican"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { buildDictionary } from "@/lib/utils/dictionary"
-import { nitpick } from "@/lib/utils/nitpick"
+import { buildDictionary } from "@/lib/utils/dictionaries"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 import { extractWords, matchCase } from "@/lib/utils/words"
 
 type Options = [{ extra: Record<string, string>; ignore: string[] }]
@@ -54,7 +54,6 @@ class NoBritishEnglish extends NitpickerRule<MessageIds, Options> {
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const dictionary = buildDictionary(BRITISH_TO_AMERICAN, options[0]?.extra ?? {}, options[0]?.ignore ?? [])
-        const { sourceCode } = context
 
         return {
             Identifier(node) {
@@ -76,7 +75,7 @@ class NoBritishEnglish extends NitpickerRule<MessageIds, Options> {
                 }
             },
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     for (const word of extractWords(comment.value)) {
                         const american = dictionary[word.text.toLowerCase()]
                         if (american === undefined) continue
@@ -89,8 +88,8 @@ class NoBritishEnglish extends NitpickerRule<MessageIds, Options> {
 
                         context.report({
                             loc: {
-                                start: sourceCode.getLocFromIndex(from),
-                                end: sourceCode.getLocFromIndex(to),
+                                start: context.sourceCode.getLocFromIndex(from),
+                                end: context.sourceCode.getLocFromIndex(to),
                             },
                             messageId: "british",
                             data: { british: word.text, american: cased },

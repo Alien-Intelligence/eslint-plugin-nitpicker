@@ -1,5 +1,5 @@
 /**
- * The global set of constants shared across the plugin.
+ * The global set of constants shared across the plugin, grouped by domain.
  */
 const CONSTANTS = {
     /**
@@ -19,44 +19,86 @@ const CONSTANTS = {
     EM_DASH: "—",
 
     /**
-     * Matches a single "word" character, i.e. anything that can appear inside an
-     * identifier or a number (letters, digits, underscore and dollar).
+     * Constants for scanning comments.
      */
-    WORD_CHAR: /[\p{L}\p{N}_$]/u,
+    COMMENTS: {
+        /**
+         * Box-drawing and block-element characters, which are always decorative
+         * when found inside a comment.
+         */
+        BOX_DRAWING: /[─-▟]/,
+
+        /**
+         * A comment line made entirely of three or more repeated separator
+         * characters, e.g. `======` or `------`.
+         */
+        PURE_SEPARATOR: /^[-=~*#_+]{3,}$/,
+
+        /**
+         * A short label fenced by separator runs inside a comment, e.g `-- Section --`.
+         */
+        WRAPPED_LABEL: /^[-=~*#_+]{2,}\s.*\s[-=~*#_+]{2,}$/,
+    },
 
     /**
-     * AdonisJS subpath import roots (`#models/...`, `#controllers/...`, etc.).
+     * Constants for splitting and inspecting words.
      */
-    ADONIS_SUBPATH:
-        /^#(models|controllers|services|middleware|validators|policies|config|start|database|providers|lib)\b/,
+    WORDS: {
+        /**
+         * Matches a single "word" character, i.e. anything that can appear inside
+         * an identifier or a number (letters, digits, underscore and dollar).
+         */
+        WORD_CHAR: /[\p{L}\p{N}_$]/u,
+
+        /**
+         * Matches a single sub-word: an all-caps acronym, a capitalized word, or a
+         * lowercase run, so `getUserName` splits into "get", "User" and "Name"
+         */
+        SUB_WORD: /[A-Z]+(?![a-z])|[A-Z][a-z]+|[a-z]+/g,
+    },
 
     /**
-     * React source files by extension.
+     * Constants for detecting framework usage.
      */
-    REACT_FILE: /\.[jt]sx$/,
+    FRAMEWORKS: {
+        /**
+         * AdonisJS subpath import roots (`#models/...`, `#controllers/...`, etc.).
+         */
+        ADONIS_SUBPATH:
+            /^#(models|controllers|services|middleware|validators|policies|config|start|database|providers|lib)\b/,
+
+        /**
+         * React source files by extension.
+         */
+        REACT_FILE: /\.[jt]sx$/,
+    },
 
     /**
-     * Box-drawing and block-element characters, which are always decorative
-     * when found inside a comment.
+     * Constants for AdonisJS migrations.
      */
-    BOX_DRAWING: /[─-▟]/,
+    MIGRATIONS: {
+        /**
+         * Table-builder methods that declare an index or a constraint.
+         */
+        INDEX_METHODS: new Set(["index", "unique", "primary", "foreign"]),
 
-    /**
-     * A comment line made entirely of three or more repeated separator
-     * characters, e.g. `======` or `------`.
-     */
-    PURE_SEPARATOR: /^[-=~*#_+]{3,}$/,
+        /**
+         * Table-builder methods that declare a timestamp column.
+         */
+        TIMESTAMP_METHODS: new Set(["timestamp", "dateTime", "datetime"]),
 
-    /**
-     * A short label fenced by separator runs inside a comment, e.g `-- Section --`.
-     */
-    WRAPPED_LABEL: /^[-=~*#_+]{2,}\s.*\s[-=~*#_+]{2,}$/,
+        /**
+         * Audit timestamp column names that form a migration's dedicated
+         * timestamps group.
+         */
+        AUDIT_TIMESTAMPS: new Set(["created_at", "updated_at", "deleted_at"]),
 
-    /**
-     * Matches a single sub-word: an all-caps acronym, a capitalized word, or a
-     * lowercase run, so `getUserName` splits into "get", "User" and "Name"
-     */
-    SUB_WORD: /[A-Z]+(?![a-z])|[A-Z][a-z]+|[a-z]+/g,
+        /**
+         * The order table statements must be grouped in: columns first, then
+         * timestamps, then indexes and constraints.
+         */
+        CATEGORY_ORDER: ["column", "timestamp", "index"],
+    },
 } as const
 
 export default CONSTANTS

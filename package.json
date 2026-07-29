@@ -55,6 +55,7 @@
         "lint:fix": "biome check --fix && biome format --write",
         "lint:nitpicker": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
         "typecheck": "tsc --noEmit",
+        "pretest": "node -e \"require('node:fs').rmSync('node_modules/.vite', { recursive: true, force: true })\"",
         "test": "vitest run",
         "test:watch": "vitest"
     },

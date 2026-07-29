@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { isBlankJSDocLine, isJSDocComment, isJSDocTagLine } from "@/lib/utils/JSDoc"
-import { nitpick } from "@/lib/utils/nitpick"
+import { isBlankJSDocLine, isJSDocComment, isJSDocTagLine } from "@/lib/utils/jsdocs"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "blankBeforeTag"
@@ -34,30 +34,31 @@ class NoJSDocBlankBeforeTags extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-
         return {
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     if (!isJSDocComment(comment)) continue
 
                     if (comment.loc.start.line === comment.loc.end.line) continue
 
                     for (let line = comment.loc.start.line; line <= comment.loc.end.line; line++) {
-                        const text = sourceCode.lines[line - 1]
+                        const text = context.sourceCode.lines[line - 1]
                         if (text === undefined || !isBlankJSDocLine(text)) continue
 
                         // Grow the run of consecutive blank lines
                         let runEnd = line
-                        while (runEnd < comment.loc.end.line && isBlankJSDocLine(sourceCode.lines[runEnd] ?? "")) {
+                        while (
+                            runEnd < comment.loc.end.line &&
+                            isBlankJSDocLine(context.sourceCode.lines[runEnd] ?? "")
+                        ) {
                             runEnd++
                         }
 
                         // Only a blank run immediately before a tag is a problem
-                        const nextLine = sourceCode.lines[runEnd]
+                        const nextLine = context.sourceCode.lines[runEnd]
                         if (nextLine !== undefined && isJSDocTagLine(nextLine)) {
-                            const from = sourceCode.getIndexFromLoc({ line, column: 0 })
-                            const to = sourceCode.getIndexFromLoc({ line: runEnd + 1, column: 0 })
+                            const from = context.sourceCode.getIndexFromLoc({ line, column: 0 })
+                            const to = context.sourceCode.getIndexFromLoc({ line: runEnd + 1, column: 0 })
 
                             context.report({
                                 loc: {
