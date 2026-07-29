@@ -1,5 +1,5 @@
 import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils"
-import { createRule, type NitpickerRuleDocs } from "@/lib/utils/createRule"
+import { createRule, type NitpickerRuleDocs } from "@/lib/utils/rules"
 
 /**
  * The base class every Nitpicker rule extends, so a rule only declares its name,

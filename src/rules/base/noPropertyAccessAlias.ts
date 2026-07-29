@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
 import { isPropertyAccessAlias } from "@/lib/utils/aliases"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { nitpick } from "@/lib/utils/nitpick"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "propertyAccessAlias"
@@ -36,8 +36,6 @@ class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-
         return {
             VariableDeclarator(node) {
                 if (node.parent.type !== "VariableDeclaration" || node.parent.kind !== "const") return
@@ -53,7 +51,7 @@ class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
                     messageId: "propertyAccessAlias",
                     data: {
                         name: node.id.name,
-                        expression: sourceCode.getText(node.init),
+                        expression: context.sourceCode.getText(node.init),
                     },
                 })
             },

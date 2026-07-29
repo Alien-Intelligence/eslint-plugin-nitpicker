@@ -11,8 +11,8 @@ export function isDecorativeCommentLine(line: string): boolean {
     if (content.length === 0) return false
 
     return (
-        CONSTANTS.BOX_DRAWING.test(content) ||
-        CONSTANTS.PURE_SEPARATOR.test(content) ||
-        CONSTANTS.WRAPPED_LABEL.test(content)
+        CONSTANTS.COMMENTS.BOX_DRAWING.test(content) ||
+        CONSTANTS.COMMENTS.PURE_SEPARATOR.test(content) ||
+        CONSTANTS.COMMENTS.WRAPPED_LABEL.test(content)
     )
 }

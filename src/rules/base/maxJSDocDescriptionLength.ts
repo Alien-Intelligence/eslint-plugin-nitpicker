@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { getJSDocDescription, isJSDocComment } from "@/lib/utils/JSDoc"
-import { nitpick } from "@/lib/utils/nitpick"
+import { getJSDocDescription, isJSDocComment } from "@/lib/utils/jsdocs"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = [{ max: number }]
 type MessageIds = "tooLong"
@@ -46,11 +46,10 @@ class MaxJSDocDescriptionLength extends NitpickerRule<MessageIds, Options> {
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const max = options[0]?.max ?? DEFAULT_MAX
-        const { sourceCode } = context
 
         return {
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     if (!isJSDocComment(comment)) continue
 
                     const length = getJSDocDescription(comment).length

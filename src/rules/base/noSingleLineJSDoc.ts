@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { isJSDocComment } from "@/lib/utils/JSDoc"
-import { nitpick } from "@/lib/utils/nitpick"
+import { isJSDocComment } from "@/lib/utils/jsdocs"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "singleLine"
@@ -39,11 +39,9 @@ class NoSingleLineJSDoc extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-
         return {
             Program() {
-                for (const comment of sourceCode.getAllComments()) {
+                for (const comment of context.sourceCode.getAllComments()) {
                     // Only JSDoc comments (`/**`) that fit on one line
                     if (!isJSDocComment(comment)) continue
                     if (comment.loc.start.line !== comment.loc.end.line) continue

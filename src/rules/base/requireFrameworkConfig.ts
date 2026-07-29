@@ -1,9 +1,9 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { detectFrameworks, FRAMEWORK_LABELS, type Framework } from "@/lib/utils/framework"
-import { nitpick } from "@/lib/utils/nitpick"
+import { detectFrameworks, FRAMEWORK_LABELS, type Framework } from "@/lib/utils/frameworks"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = [{ ignore: Framework[] }]
 type MessageIds = "missingConfig"

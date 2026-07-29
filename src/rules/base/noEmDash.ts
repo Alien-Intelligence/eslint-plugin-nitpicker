@@ -1,8 +1,8 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
-import type { NitpickerRuleDocs } from "@/lib/utils/createRule"
-import { nitpick } from "@/lib/utils/nitpick"
+import { nitpick } from "@/lib/utils/messages"
+import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "emDash"
@@ -32,8 +32,7 @@ class NoEmDash extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        const { sourceCode } = context
-        const text = sourceCode.getText()
+        const text = context.sourceCode.getText()
 
         return {
             Program() {
@@ -44,8 +43,8 @@ class NoEmDash extends NitpickerRule<MessageIds, Options> {
 
                     context.report({
                         loc: {
-                            start: sourceCode.getLocFromIndex(index),
-                            end: sourceCode.getLocFromIndex(index + 1),
+                            start: context.sourceCode.getLocFromIndex(index),
+                            end: context.sourceCode.getLocFromIndex(index + 1),
                         },
                         messageId: "emDash",
                     })
