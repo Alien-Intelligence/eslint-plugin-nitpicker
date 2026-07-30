@@ -58,7 +58,7 @@ export function matchCase(source: string, replacement: string): string {
  * appear inside an identifier or a number (letters, digits, underscore, dollar).
  * @param char The single character to test, or `undefined` (e.g. past the end
  * of a string).
- * @returns `true` if the character is a word character, `false` otherwise.
+ * @returns True if the character is a word character, false otherwise.
  */
 export function isWordChar(char: string | undefined): boolean {
     return char !== undefined && CONSTANTS.WORDS.WORD_CHAR.test(char)

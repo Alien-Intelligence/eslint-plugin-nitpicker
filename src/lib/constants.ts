@@ -41,6 +41,17 @@ const CONSTANTS = {
     },
 
     /**
+     * Constants for inspecting JSDoc structure.
+     */
+    JSDOC: {
+        /**
+         * Matches a JSDoc block-tag line, capturing the tag name so callers can
+         * find any tag (`param`, `returns`, `throws`, etc.).
+         */
+        TAG: /^\s*\*?\s*@(\w+)/,
+    },
+
+    /**
      * Constants for splitting and inspecting words.
      */
     WORDS: {
@@ -55,6 +66,33 @@ const CONSTANTS = {
          * lowercase run, so `getUserName` splits into "get", "User" and "Name"
          */
         SUB_WORD: /[A-Z]+(?![a-z])|[A-Z][a-z]+|[a-z]+/g,
+    },
+
+    /**
+     * Constants for object literals.
+     */
+    OBJECTS: {
+        /**
+         * The default maximum number of properties an object literal may keep on
+         * a single line before it must be broken across multiple lines.
+         */
+        MAX_INLINE_KEYS: 2,
+
+        /**
+         * The default number of spaces per indentation level used when expanding
+         * an object literal across multiple lines.
+         */
+        INDENT_WIDTH: 4,
+    },
+
+    /**
+     * Constants for inspecting functions.
+     */
+    FUNCTIONS: {
+        /**
+         * The AST node types that introduce a new function scope.
+         */
+        NODE_TYPES: new Set(["FunctionDeclaration", "FunctionExpression", "ArrowFunctionExpression"]),
     },
 
     /**
