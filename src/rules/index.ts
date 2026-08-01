@@ -18,6 +18,8 @@ import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
+import requireContextHookDestructure from "@/rules/react/requireContextHookDestructure"
+import requireHookObjectReturn from "@/rules/react/requireHookObjectReturn"
 
 /**
  * Every rule instance registered by the plugin.
@@ -40,6 +42,8 @@ const ruleInstances = [
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,
+    requireContextHookDestructure,
+    requireHookObjectReturn,
 ]
 
 /**

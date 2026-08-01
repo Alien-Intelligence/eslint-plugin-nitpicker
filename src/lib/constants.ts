@@ -112,6 +112,23 @@ const CONSTANTS = {
     },
 
     /**
+     * Constants for React semantics.
+     */
+    REACT: {
+        /**
+         * A React hook name: `use` followed by a capitalized word, e.g.
+         * `useState` or `useMenuActions`.
+         */
+        HOOK: /^use[A-Z]/,
+
+        /**
+         * A context-consumer hook name, i.e. a `use…Context` wrapper such as
+         * `useTreeViewContext` (the bare `useContext` is excluded).
+         */
+        CONTEXT_HOOK: /^use[A-Z]\w*Context$/,
+    },
+
+    /**
      * Constants for AdonisJS migrations.
      */
     MIGRATIONS: {

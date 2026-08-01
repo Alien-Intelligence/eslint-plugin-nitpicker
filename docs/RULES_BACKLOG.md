@@ -34,6 +34,8 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `require-migration-jsdoc` | Require a JSDoc above an AdonisJS migration class (adonisjs category) | user request, web-app migrations |
 | `migration-table-order` | Table-builder statements grouped columns → timestamps → indexes/constraints (adonisjs category) | user request, web-app migrations |
 | `require-controller-jsdoc` | Require a JSDoc above an AdonisJS controller (default-exported `*Controller` class) (adonisjs category) | user request |
+| `require-hook-object-return` | Custom `use*` hook must return an object, not a bare function; autofix wraps a returned identifier (react category) | user request |
+| `require-context-hook-destructure` | Result of a `use*Context` consumer hook must be destructured, not bound whole (react category) | user request |
 
 ---
 
@@ -83,6 +85,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-functions-in-component-files` | Component files contain only components; helpers go to `lib/`/`lib/utils/` | M | FE | gitgame + FE STYLE.md |
 | `function-declaration-order` | Bottom-up ordering: helpers above callers, declared before used | H | All | gitgame `function-declaration-order` |
 | `component-locals-usememo` | Inline trivial boolean predicates; wrap other derived values in `useMemo` | H | FE | gitgame `component-locals-style`; opinionated |
+| `context-provider-value-object` | A `<SomeContext.Provider value={…}>` value must be an object literal, not a bare function/value | M | FE | user request; JSX-side sibling of shipped `require-hook-object-return` |
 
 ## Candidate — Project-specific (lower priority)
 
