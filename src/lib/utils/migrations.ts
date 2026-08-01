@@ -11,7 +11,7 @@ export type TableCategory = "column" | "timestamp" | "index"
  * Checks whether a class is an AdonisJS migration, i.e. a default-exported class
  * that extends `BaseSchema`.
  * @param node The class declaration to inspect.
- * @returns `true` if the class is a migration.
+ * @returns True if the class is a migration.
  */
 export function isMigrationClass(node: TSESTree.ClassDeclaration): boolean {
     return (

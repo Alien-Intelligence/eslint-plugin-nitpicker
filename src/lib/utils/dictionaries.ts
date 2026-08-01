@@ -12,7 +12,12 @@ export function buildDictionary(
     extra: Record<string, string>,
     ignore: string[],
 ): Record<string, string> {
-    const dictionary: Record<string, string> = {}
+    /**
+     * A null-prototype object so lookups like `dictionary["constructor"]` return
+     * undefined instead of Object.prototype.constructor, which would otherwise
+     * treat identifiers such as `BrowserWindowConstructorOptions` as matches.
+     */
+    const dictionary: Record<string, string> = Object.create(null)
 
     for (const [key, value] of Object.entries(base)) {
         dictionary[key.toLowerCase()] = value

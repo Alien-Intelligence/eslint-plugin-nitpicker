@@ -5,7 +5,7 @@ import type { TSESTree } from "@typescript-eslint/utils"
  * chain (with any `?.` or `!`) bottoming out at an identifier or `this`, such as
  * `auth.user!` or `menu.node.path`.
  * @param node The expression to inspect.
- * @returns `true` if the expression is a plain property access.
+ * @returns True if the expression is a plain property access.
  */
 export function isPropertyAccessAlias(node: TSESTree.Expression): boolean {
     let expression: TSESTree.Node = node
@@ -29,4 +29,23 @@ export function isPropertyAccessAlias(node: TSESTree.Expression): boolean {
     }
 
     return sawMemberAccess && (expression.type === "Identifier" || expression.type === "ThisExpression")
+}
+
+/**
+ * Checks whether an object pattern is nothing but plain shorthand properties,
+ * i.e. `{ a, b }` with no rename, default, computed key, or rest element, which
+ * makes it a pure alias of the object it destructures.
+ * @param pattern The object pattern to inspect.
+ * @returns True if every property is a pure shorthand grab.
+ */
+export function isAllShorthand(pattern: TSESTree.ObjectPattern): boolean {
+    if (pattern.properties.length === 0) return false
+
+    return pattern.properties.every(
+        property =>
+            property.type === "Property" &&
+            property.shorthand &&
+            !property.computed &&
+            property.value.type === "Identifier",
+    )
 }

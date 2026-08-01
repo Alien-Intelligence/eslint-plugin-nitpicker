@@ -28,8 +28,14 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-british-english` | No British spellings in identifiers/comments; `extra`/`ignore` options + comment autofix | user request |
 | `max-jsdoc-description-length` | Cap JSDoc description prose (default 250 chars); fix flags usage-note anti-pattern | user request |
 | `no-alias-variables` | No `const x = y` pure rename (`let`/exports exempt) | BE STYLE.md |
+| `require-multiline-object` | Object literal with more than N properties (default 2) must span multiple lines; autofix expands it one-per-line | user request |
 | `no-property-destructuring` | No shorthand destructure off a plain object (`const { a } = obj`); calls/renames/defaults/rest exempt | gitgame convention, user request |
+| `no-jsdoc-returns-on-void` | No `@returns` tag on a function that returns nothing (void type, or a body with no/only-bare `return`); autofix removes the tag | user request |
 | `require-migration-jsdoc` | Require a JSDoc above an AdonisJS migration class (adonisjs category) | user request, web-app migrations |
+| `migration-table-order` | Table-builder statements grouped columns → timestamps → indexes/constraints (adonisjs category) | user request, web-app migrations |
+| `require-controller-jsdoc` | Require a JSDoc above an AdonisJS controller (default-exported `*Controller` class) (adonisjs category) | user request |
+| `require-hook-object-return` | Custom `use*` hook must return an object, not a bare function; autofix wraps a returned identifier (react category) | user request |
+| `require-context-hook-destructure` | Result of a `use*Context` consumer hook must be destructured, not bound whole (react category) | user request |
 
 ---
 
@@ -43,7 +49,8 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `jsdoc-no-mid-sentence-period` | JSDoc body links clauses with commas; end period OK, mid-sentence periods flagged | M | All | jsdoc-style, BE "Multi-Sentence Paragraphs" |
 | `require-declaration-jsdoc` | JSDoc on **all** top-level decls (`const`/`type`/`interface`/`enum`), React components + `XProps` exempt | M | All | code-style (extends `require-function-jsdoc`) |
 | `jsdoc-param-descriptions` | Every `@param`/`@returns` has a description (not a bare type); `@param` for every param, `@returns` for non-void | H | All | BE STYLE.md "Private Methods" |
-| `jsdoc-returns-not-return` | Use `@returns`, never `@return` | E | All | BE STYLE.md |
+| `jsdoc-returns-not-return` | Use `@returns`, never `@return` | E | All | BE STYLE.md; next up — can reuse `getJSDocLineTag` |
+| `jsdoc-boolean-returns-capital-true` | A boolean `@returns` description starts with `True…` (no backticks), e.g. "True if the class is a migration" | E | All | user request; dogfood convention |
 | `no-section-comments-in-components` | No comments labeling JSX/logic sections; extract a sub-component instead | M | FE | FE STYLE.md |
 | `no-convention-exception-preamble` | No top-of-file blocks restating a convention / "See STYLE.md …" | M | All | web-app memory |
 
@@ -73,9 +80,12 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
+| `constants-in-constants-file` | Top-level `SCREAMING_SNAKE_CASE` consts (actual constants) don't live at the root of a code file; move them to a `lib/constants.ts` (or `constants/`). Flag by declaration location; can't autofix the move, message points where to relocate | M | All | user request; mirrors this plugin's own `CONSTANTS` convention |
+| `helpers-in-lib` | Non-trivial module-level helper functions don't live in a "leaf" file (rule/route/component); extract to a `lib/`/`lib/utils/` module. Needs a size/complexity threshold so tiny local predicates stay put | H | All | user request; mirrors this plugin's own `lib/utils/` convention |
 | `no-functions-in-component-files` | Component files contain only components; helpers go to `lib/`/`lib/utils/` | M | FE | gitgame + FE STYLE.md |
 | `function-declaration-order` | Bottom-up ordering: helpers above callers, declared before used | H | All | gitgame `function-declaration-order` |
 | `component-locals-usememo` | Inline trivial boolean predicates; wrap other derived values in `useMemo` | H | FE | gitgame `component-locals-style`; opinionated |
+| `context-provider-value-object` | A `<SomeContext.Provider value={…}>` value must be an object literal, not a bare function/value | M | FE | user request; JSX-side sibling of shipped `require-hook-object-return` |
 
 ## Candidate — Project-specific (lower priority)
 

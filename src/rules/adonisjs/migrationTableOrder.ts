@@ -49,7 +49,11 @@ class MigrationTableOrder extends NitpickerRule<MessageIds, Options> {
 
                     const rank = CONSTANTS.MIGRATIONS.CATEGORY_ORDER.indexOf(category)
                     if (rank < maxRank) {
-                        context.report({ node: statement, messageId: "outOfOrder", data: { category } })
+                        context.report({
+                            node: statement,
+                            messageId: "outOfOrder",
+                            data: { category },
+                        })
                     }
 
                     maxRank = Math.max(maxRank, rank)

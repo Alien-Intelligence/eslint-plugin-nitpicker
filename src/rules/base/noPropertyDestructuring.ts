@@ -1,6 +1,6 @@
-import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
+import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import { isPropertyAccessAlias } from "@/lib/utils/aliases"
+import { isAllShorthand, isPropertyAccessAlias } from "@/lib/utils/aliases"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
@@ -57,24 +57,6 @@ class NoPropertyDestructuring extends NitpickerRule<MessageIds, Options> {
             },
         }
     }
-}
-
-/**
- * Checks whether an object pattern is nothing but plain shorthand properties,
- * i.e. `{ a, b }` with no rename, default, computed key, or rest element.
- * @param pattern The object pattern to inspect.
- * @returns `true` if every property is a pure shorthand grab.
- */
-function isAllShorthand(pattern: TSESTree.ObjectPattern): boolean {
-    if (pattern.properties.length === 0) return false
-
-    return pattern.properties.every(
-        property =>
-            property.type === "Property" &&
-            property.shorthand &&
-            !property.computed &&
-            property.value.type === "Identifier",
-    )
 }
 
 export default new NoPropertyDestructuring()

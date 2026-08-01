@@ -1,9 +1,21 @@
 import type { TSESTree } from "@typescript-eslint/utils"
+import CONSTANTS from "@/lib/constants"
 
 /**
  * Any node that introduces a callable function.
  */
 export type FunctionNode = TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression
+
+/**
+ * A lookup of AST node type to the property keys that hold its child nodes.
+ */
+export type VisitorKeys = Record<string, readonly string[] | undefined>
+
+/**
+ * Predicate applied to a `return` statement's argument (which is `null` for a
+ * bare `return`).
+ */
+type ReturnPredicate = (argument: TSESTree.Expression | null) => boolean
 
 /**
  * Resolves the node whose leading comments would document a function, walking
@@ -29,7 +41,7 @@ export function getDocumentableNode(fn: FunctionNode): TSESTree.Node {
 /**
  * Checks whether a node sits directly at the top level of the module.
  * @param node The node to test.
- * @returns `true` if the node's parent is the program root.
+ * @returns True if the node's parent is the program root.
  */
 export function isTopLevel(node: TSESTree.Node): boolean {
     return node.parent?.type === "Program"
@@ -51,4 +63,84 @@ export function getFunctionName(fn: FunctionNode): string | undefined {
     }
 
     return undefined
+}
+
+/**
+ * Checks whether any `return` in a subtree satisfies a predicate, without
+ * crossing into nested functions (whose returns belong to them, not us).
+ * @param node The AST node to search from.
+ * @param visitorKeys The AST visitor keys, used to walk the subtree.
+ * @param predicate The test applied to each `return` argument.
+ * @returns True if a matching `return` is found.
+ */
+export function someReturn(node: TSESTree.Node, visitorKeys: VisitorKeys, predicate: ReturnPredicate): boolean {
+    if (node.type === "ReturnStatement") {
+        return predicate(node.argument)
+    }
+
+    for (const key of visitorKeys[node.type] ?? []) {
+        const value = (node as unknown as Record<string, unknown>)[key]
+        const children = Array.isArray(value) ? value : [value]
+
+        for (const child of children) {
+            const childNode = child as TSESTree.Node | null | undefined
+            if (!childNode || typeof childNode.type !== "string") continue
+            if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(childNode.type)) continue
+            if (someReturn(childNode, visitorKeys, predicate)) return true
+        }
+    }
+
+    return false
+}
+
+/**
+ * Checks whether a function returns a value, i.e. an arrow with an expression
+ * body or a body with a non-empty `return`.
+ * @param fn The function node to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the function body.
+ * @returns True if the function returns a value.
+ */
+export function functionReturnsValue(fn: FunctionNode, visitorKeys: VisitorKeys): boolean {
+    if (fn.type === "ArrowFunctionExpression" && fn.body.type !== "BlockStatement") {
+        return true
+    }
+
+    return someReturn(fn.body, visitorKeys, argument => argument !== null)
+}
+
+/**
+ * Checks whether a return-type annotation is `void` or `Promise<void>`.
+ * @param annotation The return-type annotation to inspect.
+ * @returns True if the annotation is a void type.
+ */
+export function isVoidReturnType(annotation: TSESTree.TSTypeAnnotation): boolean {
+    if (annotation.typeAnnotation.type === "TSVoidKeyword") return true
+
+    if (
+        annotation.typeAnnotation.type === "TSTypeReference" &&
+        annotation.typeAnnotation.typeName.type === "Identifier" &&
+        annotation.typeAnnotation.typeName.name === "Promise"
+    ) {
+        return (
+            annotation.typeAnnotation.typeArguments?.params.length === 1 &&
+            annotation.typeAnnotation.typeArguments?.params[0]?.type === "TSVoidKeyword"
+        )
+    }
+
+    return false
+}
+
+/**
+ * Checks whether a function returns nothing, judged by its return-type
+ * annotation when present, otherwise by its body.
+ * @param fn The function node to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the function body.
+ * @returns True if the function is void.
+ */
+export function isVoidFunction(fn: FunctionNode, visitorKeys: VisitorKeys): boolean {
+    if (fn.returnType) {
+        return isVoidReturnType(fn.returnType)
+    }
+
+    return !functionReturnsValue(fn, visitorKeys)
 }

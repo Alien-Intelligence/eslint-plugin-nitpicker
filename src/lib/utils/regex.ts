@@ -37,7 +37,7 @@ function globToRegExp(glob: string): RegExp {
  * with forward slashes so it works the same on every platform.
  * @param filename The file path to test.
  * @param patterns The glob patterns to match against.
- * @returns `true` if the path matches at least one pattern.
+ * @returns True if the path matches at least one pattern.
  */
 export function matchesGlob(filename: string, patterns: string[]): boolean {
     const path = filename.replace(/\\/g, "/")
