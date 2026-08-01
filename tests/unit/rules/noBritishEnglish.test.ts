@@ -71,4 +71,18 @@ describe("no-british-english", () => {
         expect(messages[0]?.message).toContain("why:")
         expect(messages[0]?.message).toContain("fix:")
     })
+
+    test("It should not crash on identifiers containing Object.prototype names", ({ expect }) => {
+        const messages = lintRule(
+            RULE,
+            'import type { BrowserWindowConstructorOptions, WebPreferences } from "electron"',
+        )
+        expect(messages.every(m => !m.fatal)).toBe(true)
+        expect(messages).toHaveLength(0)
+    })
+
+    test("It should not report sub-words that only exist on Object.prototype", ({ expect }) => {
+        const messages = lintRule(RULE, "const toStringValue = 1")
+        expect(messages).toHaveLength(0)
+    })
 })
