@@ -45,6 +45,13 @@ const CONSTANTS = {
          * A short label fenced by separator runs inside a comment, e.g `-- Section --`.
          */
         WRAPPED_LABEL: /^[-=~*#_+]{2,}\s.*\s[-=~*#_+]{2,}$/,
+
+        /**
+         * A tooling directive comment (eslint, ts-, biome-ignore, etc.) rather
+         * than prose, matched against the comment text.
+         */
+        DIRECTIVE:
+            /^\s*(?:eslint\b|eslint-|globals?\b|exported\b|jshint\b|jslint\b|istanbul\b|[cv]8\b|ts-|prettier-ignore|biome-ignore|webpack\b|noinspection\b|@)/,
     },
 
     /**

@@ -16,6 +16,7 @@ import noLineCommentPeriod from "@/rules/base/noLineCommentPeriod"
 import noPropertyAccessAlias from "@/rules/base/noPropertyAccessAlias"
 import noPropertyDestructuring from "@/rules/base/noPropertyDestructuring"
 import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
+import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
@@ -41,6 +42,7 @@ const ruleInstances = [
     noPropertyAccessAlias,
     noPropertyDestructuring,
     noSingleLineJSDoc,
+    requireCapitalizedComments,
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,
