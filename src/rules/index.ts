@@ -9,6 +9,7 @@ import noAliasVariables from "@/rules/base/noAliasVariables"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
 import noDecorativeCommentSeparators from "@/rules/base/noDecorativeCommentSeparators"
 import noEmDash from "@/rules/base/noEmDash"
+import noEmojis from "@/rules/base/noEmojis"
 import noJSDocBlankBeforeTags from "@/rules/base/noJSDocBlankBeforeTags"
 import noJSDocReturnsOnVoid from "@/rules/base/noJSDocReturnsOnVoid"
 import noLineCommentPeriod from "@/rules/base/noLineCommentPeriod"
@@ -33,6 +34,7 @@ const ruleInstances = [
     noBritishEnglish,
     noDecorativeCommentSeparators,
     noEmDash,
+    noEmojis,
     noJSDocBlankBeforeTags,
     noJSDocReturnsOnVoid,
     noLineCommentPeriod,

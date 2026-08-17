@@ -19,6 +19,13 @@ const CONSTANTS = {
     EM_DASH: "—",
 
     /**
+     * Matches a single emoji as one unit: flag pairs, skin-tone and
+     * variation-selector modifiers, and ZWJ sequences. Text-default pictographs
+     * like © match only when emoji-styled with a variation selector.
+     */
+    EMOJI: /\p{Regional_Indicator}\p{Regional_Indicator}|\p{Emoji_Presentation}(?:\uFE0F|\p{Emoji_Modifier})?(?:\u200D\p{Emoji_Presentation}(?:\uFE0F|\p{Emoji_Modifier})?)*|\p{Extended_Pictographic}\uFE0F/gu,
+
+    /**
      * Constants for scanning comments.
      */
     COMMENTS: {

@@ -18,6 +18,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | Rule | Enforces | Source |
 |-------|---|---|
 | `no-em-dash` | No em dash character anywhere | code-style, both STYLE.md |
+| `no-emojis` | No emoji anywhere (comments/strings/identifiers); flags flags, skin-tone and ZWJ sequences as one unit; autofix removes them | user request |
 | `no-line-comment-period` | `//` comments carry no periods | inline-comment-style, BE/FE STYLE.md |
 | `no-single-line-jsdoc` | JSDoc must span multiple lines | FE STYLE.md |
 | `no-jsdoc-blank-before-tags` | No blank line before `@param`/`@returns` | jsdoc-style |
