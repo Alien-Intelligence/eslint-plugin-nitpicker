@@ -9,12 +9,14 @@ import noAliasVariables from "@/rules/base/noAliasVariables"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
 import noDecorativeCommentSeparators from "@/rules/base/noDecorativeCommentSeparators"
 import noEmDash from "@/rules/base/noEmDash"
+import noEmojis from "@/rules/base/noEmojis"
 import noJSDocBlankBeforeTags from "@/rules/base/noJSDocBlankBeforeTags"
 import noJSDocReturnsOnVoid from "@/rules/base/noJSDocReturnsOnVoid"
 import noLineCommentPeriod from "@/rules/base/noLineCommentPeriod"
 import noPropertyAccessAlias from "@/rules/base/noPropertyAccessAlias"
 import noPropertyDestructuring from "@/rules/base/noPropertyDestructuring"
 import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
+import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
@@ -33,12 +35,14 @@ const ruleInstances = [
     noBritishEnglish,
     noDecorativeCommentSeparators,
     noEmDash,
+    noEmojis,
     noJSDocBlankBeforeTags,
     noJSDocReturnsOnVoid,
     noLineCommentPeriod,
     noPropertyAccessAlias,
     noPropertyDestructuring,
     noSingleLineJSDoc,
+    requireCapitalizedComments,
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,

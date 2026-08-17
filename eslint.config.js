@@ -24,6 +24,12 @@ export default [
         rules: { "nitpicker/no-em-dash": "off" },
     },
     {
+        // This test fixture must contain emoji characters, so it is exempt from
+        // the emoji rule
+        files: ["tests/unit/rules/noEmojis.test.ts"],
+        rules: { "nitpicker/no-emojis": "off" },
+    },
+    {
         // The British-to-American dictionary defines British words as its keys,
         // so it is exempt from the British-English rule
         files: ["src/lib/data/britishToAmerican.ts"],
