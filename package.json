@@ -1,7 +1,7 @@
 {
     "name": "@alien_intelligence/eslint-plugin-nitpicker",
     "productName": "Nitpicker",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "A hyper-pedantic ESLint plugin that flags every stylistic and semantic nit, with AI-friendly fix context.",
     "author": "Alien <contact@alien.club> (https://www.alien.club/)",
     "license": "MIT",
