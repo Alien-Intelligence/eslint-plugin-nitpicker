@@ -42,14 +42,14 @@ class NoSingleLineJSDoc extends NitpickerRule<MessageIds, Options> {
         return {
             Program() {
                 for (const comment of context.sourceCode.getAllComments()) {
-                    // Only JSDoc comments (`/**`) that fit on one line
+                    // Only JSDoc comments ("/**") that fit on one line
                     if (!isJSDocComment(comment)) continue
                     if (comment.loc.start.line !== comment.loc.end.line) continue
 
-                    // Strip the leading `*` left over from `/**` and normalize
+                    // Strip the leading "*" left over from "/**" and normalize
                     const content = comment.value.replace(/^\*/, "").trim()
 
-                    // An empty JSDoc (`/** */`) has nothing to expand onto its
+                    // An empty JSDoc ("/** */") has nothing to expand onto its
                     // own line, so it is left alone
                     if (content.length === 0) continue
 

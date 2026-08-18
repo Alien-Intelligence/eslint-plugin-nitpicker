@@ -37,7 +37,7 @@ class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
         const check = (fn: FunctionNode, reportNode: TSESTree.Node): void => {
             const name = getFunctionName(fn)
-            // Anonymous functions (e.g `export default () => {}`) are skipped
+            // Anonymous functions (e.g "export default () => {}") are skipped
             if (name === undefined) return
 
             const documentable = getDocumentableNode(fn)

@@ -49,7 +49,9 @@ export function getCreateTableBuilder(node: TSESTree.CallExpression): {
  * Resolves the category of a single `createTable` builder statement.
  * @param statement The statement to categorize.
  * @param builderName The name of the table builder parameter.
- * @returns The category, or `null` if the statement is not a builder call.
+ * @returns The category, or `null` when the statement is not ordered: either it
+ * is not a builder call, or it is a domain timestamp such as `expires_at`, which
+ * reads fine among the columns or beside the audit timestamps.
  */
 export function getTableStatementCategory(statement: TSESTree.Statement, builderName: string): TableCategory | null {
     if (statement.type !== "ExpressionStatement") return null
@@ -59,12 +61,15 @@ export function getTableStatementCategory(statement: TSESTree.Statement, builder
 
     if (CONSTANTS.MIGRATIONS.INDEX_METHODS.has(root.method)) return "index"
     if (root.method === "timestamps") return "timestamp"
-    if (
-        CONSTANTS.MIGRATIONS.TIMESTAMP_METHODS.has(root.method) &&
-        root.firstArgument !== undefined &&
-        CONSTANTS.MIGRATIONS.AUDIT_TIMESTAMPS.has(root.firstArgument)
-    ) {
-        return "timestamp"
+
+    if (CONSTANTS.MIGRATIONS.TIMESTAMP_METHODS.has(root.method)) {
+        if (root.firstArgument !== undefined && CONSTANTS.MIGRATIONS.AUDIT_TIMESTAMPS.has(root.firstArgument)) {
+            return "timestamp"
+        }
+
+        // A domain timestamp carries meaning of its own rather than tracking a
+        // row's lifecycle, so it is not forced into either group
+        return null
     }
 
     return "column"

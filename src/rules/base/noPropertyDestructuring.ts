@@ -45,7 +45,7 @@ class NoPropertyDestructuring extends NitpickerRule<MessageIds, Options> {
                 // result is a computed value worth destructuring
                 if (node.init.type !== "Identifier" && !isPropertyAccessAlias(node.init)) return
 
-                // Only pure shorthand grabs (`{ a }`) are aliases, renames,
+                // Only pure shorthand grabs ("{ a }") are aliases, renames,
                 // defaults, and rest elements are deliberate
                 if (!isAllShorthand(node.id)) return
 

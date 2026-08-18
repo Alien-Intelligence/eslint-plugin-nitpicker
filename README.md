@@ -78,7 +78,8 @@ Every rule is part of `recommended` and enabled as a warning. The Fixable column
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.          |
 | `nitpicker/no-em-dash`                       |         | Disallow the em dash character anywhere in the source.                                           |
 | `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                           |
-| `nitpicker/no-line-comment-period`           | yes     | Disallow prose periods in `//` line comments (code-reference dots and ellipses are allowed).     |
+| `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments, rewriting code references with double quotes.           |
+| `nitpicker/no-line-comment-period`           | yes     | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK). |
 | `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead. |
 | `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                         |
 | `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                         |
@@ -111,6 +112,35 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 ```js
 "nitpicker/require-framework-config": ["warn", { ignore: ["react"] }],
 ```
+
+`no-em-dash` takes `{ allow: ("strings" | "templates" | "jsx" | "comments")[] }`, the places an em dash is deliberate rather than AI residue, such as user-facing copy, prompt text, or a glyph standing in for an empty value. It defaults to `[]`, i.e. an em dash is reported anywhere. Scope it to the files that hold copy rather than enabling it globally:
+```js
+{
+    files: ["app/legal/**/*.tsx", "app/prompts/**/*.ts"],
+    rules: {
+        "nitpicker/no-em-dash": ["warn", { allow: ["strings", "templates", "jsx"] }],
+    },
+}
+```
+
+### Line comment code references
+A backtick renders as code inside a JSDoc block, but in a `//` comment it is just a literal character, so `no-line-comment-backticks` rewrites those references with double quotes:
+```js
+// Reads `auth.user` from the context  ->  // Reads "auth.user" from the context
+```
+Backticks are left alone in JSDoc and block comments, in tooling directives, when unpaired, in a run (a ```` ``` ```` fence), and when the span already holds a double quote, since `` `split(".")` `` cannot be requoted without nesting.
+
+### Line comment periods
+`no-line-comment-period` only treats a dot as prose when whitespace or the end of the comment follows it, so dots inside code (`foo.bar`, `subagent.*`, `split(".")`), inside a quoted or back-ticked span, in an ellipsis, or closing an abbreviation (`e.g.`, `i.e.`, `etc.`) are left alone.
+
+The two prose cases are fixed differently, since removing a period is only safe at the end of a comment:
+```js
+// Reads the token.                     ->  // Reads the token
+// Reads the token. It is cached        ->  // Reads the token
+                                        //  // It is cached
+const a = 1 // Reads the token. Cached  ->  reported, not fixed
+```
+A mid-comment period is split onto its own line rather than deleted, which would leave a run-on. A trailing comment is reported without a fix, as splitting it would break the line it sits on.
 
 ## Framework configs
 Some conventions only make sense for a given framework. Nitpicker detects when a file uses React or AdonisJS and, through `require-framework-config`, nudges you to opt into the matching config for those files. Opting in silences that nudge and applies any framework-specific tweaks.

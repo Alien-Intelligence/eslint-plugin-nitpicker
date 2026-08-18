@@ -38,7 +38,7 @@ class RequireHookObjectReturn extends NitpickerRule<MessageIds, Options> {
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
         // Whether a returned expression is a function, resolving a returned
-        // identifier through its local declaration such as a `useCallback` const
+        // identifier through its local declaration such as a "useCallback" const
         const returnsFunction = (argument: TSESTree.Expression): boolean => {
             if (isFunctionValue(argument)) return true
             if (argument.type !== "Identifier") return false

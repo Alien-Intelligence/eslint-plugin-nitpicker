@@ -10,6 +10,22 @@ describe("require-controller-jsdoc", () => {
         expect(lintRule(RULE, code)).toHaveLength(0)
     })
 
+    test("It should not report a controller documented above its decorator", ({ expect }) => {
+        const code =
+            "/**\n * The base controller every controller extends.\n */\n@inject()\nexport default class BaseController {}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report a controller documented above stacked decorators", ({ expect }) => {
+        const code =
+            "/**\n * Proxy requests to client clusters.\n */\n@inject()\n@middleware()\nexport default class ClusterProxyController {}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should report a decorated controller with no JSDoc", ({ expect }) => {
+        expect(lintRule(RULE, "@inject()\nexport default class UsersController {}")).toHaveLength(1)
+    })
+
     test("It should not report a default-exported class not named `*Controller`", ({ expect }) => {
         expect(lintRule(RULE, "export default class ClusterProxy extends BaseController {}")).toHaveLength(0)
     })

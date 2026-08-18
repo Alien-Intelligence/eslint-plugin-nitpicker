@@ -52,7 +52,7 @@ class RequireFrameworkConfig extends NitpickerRule<MessageIds, Options> {
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const ignored = new Set(options[0]?.ignore ?? [])
 
-        // Each framework config stamps `settings.nitpicker<framework> = true`
+        // Each framework config stamps "settings.nitpicker<framework> = true"
         const enabled = (context.settings[CONSTANTS.PLUGIN_NAME] ?? {}) as Partial<Record<Framework, boolean>>
 
         return {

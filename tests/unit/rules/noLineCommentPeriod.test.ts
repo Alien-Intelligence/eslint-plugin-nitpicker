@@ -76,9 +76,66 @@ describe("no-line-comment-period", () => {
         expect(output).toBe("// trailing dot")
     })
 
-    test("It should remove a mid-comment period without collapsing spacing", ({ expect }) => {
+    test("It should split a mid-comment sentence onto its own line", ({ expect }) => {
         const output = fixRule(RULE, "// a. b")
-        expect(output).toBe("// a b")
+        expect(output).toBe("// a\n// b")
+    })
+
+    test("It should keep the indentation when splitting a sentence", ({ expect }) => {
+        const output = fixRule(RULE, "function f() {\n    // Does a thing. Then another\n}")
+        expect(output).toBe("function f() {\n    // Does a thing\n    // Then another\n}")
+    })
+
+    test("It should split every sentence of a run-on comment", ({ expect }) => {
+        const output = fixRule(RULE, "// One. Two. Three.")
+        expect(output).toBe("// One\n// Two\n// Three")
+    })
+
+    test("It should report a mid-comment sentence as a run-on", ({ expect }) => {
+        const messages = lintRule(RULE, "// Handles interaction. They are inlined")
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("sentence")
+    })
+
+    test("It should not fix a trailing comment, splitting it would break the line", ({ expect }) => {
+        const output = fixRule(RULE, "const a = 1 // Does a thing. Then another")
+        expect(output).toBe("const a = 1 // Does a thing. Then another")
+    })
+
+    test("It should still remove the closing period of a trailing comment", ({ expect }) => {
+        const output = fixRule(RULE, "const a = 1 // Does a thing.")
+        expect(output).toBe("const a = 1 // Does a thing")
+    })
+
+    test("It should not touch a quoted period", ({ expect }) => {
+        expect(fixRule(RULE, '// Cannot start with "."')).toBe('// Cannot start with "."')
+        expect(fixRule(RULE, '// Calls split(".") on it')).toBe('// Calls split(".") on it')
+    })
+
+    test("It should not touch a period inside a back-ticked code reference", ({ expect }) => {
+        expect(fixRule(RULE, "// Matches `a. b` exactly")).toBe("// Matches `a. b` exactly")
+    })
+
+    test("It should not treat an apostrophe as a quote", ({ expect }) => {
+        const messages = lintRule(RULE, "// It doesn't matter.")
+        expect(messages).toHaveLength(1)
+    })
+
+    test("It should not touch a dot followed by a glob or a path separator", ({ expect }) => {
+        expect(fixRule(RULE, "// Emits subagent.* events")).toBe("// Emits subagent.* events")
+        expect(fixRule(RULE, "// Resolves ./config first")).toBe("// Resolves ./config first")
+        expect(fixRule(RULE, "// Walks up ../src too")).toBe("// Walks up ../src too")
+    })
+
+    test("It should not touch an abbreviation", ({ expect }) => {
+        expect(fixRule(RULE, "// Wraps a value, e.g. a string")).toBe("// Wraps a value, e.g. a string")
+        expect(fixRule(RULE, "// One thing, i.e. the other")).toBe("// One thing, i.e. the other")
+        expect(fixRule(RULE, "// Tokens, headers, etc. are kept")).toBe("// Tokens, headers, etc. are kept")
+    })
+
+    test("It should report an abbreviation-looking word that is not one", ({ expect }) => {
+        const messages = lintRule(RULE, "// Reads the manual.")
+        expect(messages).toHaveLength(1)
     })
 
     test("It should leave an ellipsis untouched when fixing", ({ expect }) => {

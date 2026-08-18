@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
+import { isReassigned } from "@/lib/utils/aliases"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
@@ -8,8 +9,9 @@ type MessageIds = "alias"
 
 /**
  * Flags a `const` whose entire value is another variable, such as
- * `const accessTokens = rawAccessTokens`, since it just renames the source and
- * adds a name to track. `let` and exported bindings are exempt.
+ * `const accessTokens = rawAccessTokens`, since it just renames the source. `let`,
+ * exported bindings, annotated declarations, and snapshots of a reassigned source
+ * are exempt.
  */
 class NoAliasVariables extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-alias-variables"
@@ -42,6 +44,14 @@ class NoAliasVariables extends NitpickerRule<MessageIds, Options> {
                 if (node.parent.parent.type === "ExportNamedDeclaration") return
 
                 if (node.id.type !== "Identifier" || node.init?.type !== "Identifier") return
+
+                // A type annotation is a reason of its own to keep the binding, as
+                // inlining it would drop the narrowing it applies
+                if (node.id.typeAnnotation !== undefined) return
+
+                // A reassigned source makes this a snapshot of its value here, not
+                // a rename, so inlining it would change what the code does
+                if (isReassigned(context.sourceCode.getScope(node), node.init.name)) return
 
                 context.report({
                     node,

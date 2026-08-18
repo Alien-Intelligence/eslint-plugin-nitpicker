@@ -25,6 +25,7 @@ export const BRITISH_TO_AMERICAN: Record<string, string> = {
     normalising: "normalizing",
     normalisation: "normalization",
     initialise: "initialize",
+    initialises: "initializes",
     initialised: "initialized",
     initialising: "initializing",
     initialisation: "initialization",
