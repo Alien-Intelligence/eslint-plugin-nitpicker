@@ -1,7 +1,7 @@
 {
     "name": "@alien_intelligence/eslint-plugin-nitpicker",
     "productName": "Nitpicker",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "A hyper-pedantic ESLint plugin that flags every stylistic and semantic nit, with AI-friendly fix context.",
     "author": "Alien <contact@alien.club> (https://www.alien.club/)",
     "license": "MIT",
@@ -18,13 +18,13 @@
         "code-style",
         "ai"
     ],
-    "homepage": "https://github.com/the-alien-club/eslint-plugin-nitpicker",
+    "homepage": "https://github.com/Alien-Intelligence/eslint-plugin-nitpicker",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/the-alien-club/eslint-plugin-nitpicker.git"
+        "url": "git+https://github.com/Alien-Intelligence/eslint-plugin-nitpicker.git"
     },
     "bugs": {
-        "url": "https://github.com/the-alien-club/eslint-plugin-nitpicker/issues"
+        "url": "https://github.com/Alien-Intelligence/eslint-plugin-nitpicker/issues"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",

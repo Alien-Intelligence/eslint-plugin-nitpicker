@@ -11,7 +11,7 @@ const CONSTANTS = {
     /**
      * The base URL of the plugin's repository.
      */
-    REPO_URL: "https://github.com/the-alien-club/eslint-plugin-nitpicker",
+    REPO_URL: "https://github.com/Alien-Intelligence/eslint-plugin-nitpicker",
 
     /**
      * The em dash character (U+2014), e.g. "—".
