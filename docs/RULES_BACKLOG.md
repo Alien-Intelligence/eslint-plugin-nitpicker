@@ -19,7 +19,8 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 |-------|---|---|
 | `no-em-dash` | No em dash character anywhere | code-style, both STYLE.md |
 | `no-emojis` | No emoji anywhere (comments/strings/identifiers); flags flags, skin-tone and ZWJ sequences as one unit; autofix removes them | user request |
-| `no-line-comment-period` | `//` comments carry no periods | inline-comment-style, BE/FE STYLE.md |
+| `no-line-comment-period` | `//` comments carry no periods; code dots, quoted spans, ellipses and abbreviations exempt; a closing period is removed, a mid-comment one splits onto its own line | inline-comment-style, BE/FE STYLE.md |
+| `no-line-comment-backticks` | Code refs in `//` comments use double quotes, not backticks; autofix re-quotes them (fences, unpaired, directives and spans already holding a `"` exempt) | user request; Both STYLE.md "Code References" |
 | `require-capitalized-comments` | Comments start with an uppercase letter; wrapped `//` continuations, directives, and comments opening with code/symbol/URL are exempt; autofix capitalizes | user request |
 | `no-single-line-jsdoc` | JSDoc must span multiple lines | FE STYLE.md |
 | `no-jsdoc-blank-before-tags` | No blank line before `@param`/`@returns` | jsdoc-style |
@@ -46,13 +47,13 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `no-comment-semicolons` | Never write `;` inside any comment | E | All | Both STYLE.md "Forbidden Comment Patterns" |
-| `comment-code-ref-quoting` | Code refs use backticks in JSDoc, double quotes in `//` (flag backticks in `//`) | M | All | Both STYLE.md "Code References" |
+| `require-jsdoc-code-ref-backticks` | The JSDoc half of the shipped `no-line-comment-backticks`: a code ref in a JSDoc body is fenced in backticks (needs a way to tell a code ref from prose) | H | All | Both STYLE.md "Code References" |
 | `no-inline-block-comments` | Inline comments use `//`, never `/* */` | E | BE | BE STYLE.md "Inline Comments" |
 | `jsdoc-no-mid-sentence-period` | JSDoc body links clauses with commas; end period OK, mid-sentence periods flagged | M | All | jsdoc-style, BE "Multi-Sentence Paragraphs" |
 | `require-declaration-jsdoc` | JSDoc on **all** top-level decls (`const`/`type`/`interface`/`enum`), React components + `XProps` exempt | M | All | code-style (extends `require-function-jsdoc`) |
 | `jsdoc-param-descriptions` | Every `@param`/`@returns` has a description (not a bare type); `@param` for every param, `@returns` for non-void | H | All | BE STYLE.md "Private Methods" |
 | `jsdoc-returns-not-return` | Use `@returns`, never `@return` | E | All | BE STYLE.md; next up — can reuse `getJSDocLineTag` |
-| `jsdoc-boolean-returns-capital-true` | A boolean `@returns` description starts with `True…` (no backticks), e.g. "True if the class is a migration" | E | All | user request; dogfood convention |
+| `jsdoc-boolean-returns-capital-true` | A boolean `@returns` description starts with `True…` (no backticks), e.g. "True if the class is a migration" | E | All | user request; dog-food convention |
 | `no-section-comments-in-components` | No comments labeling JSX/logic sections; extract a sub-component instead | M | FE | FE STYLE.md |
 | `no-convention-exception-preamble` | No top-of-file blocks restating a convention / "See STYLE.md …" | M | All | web-app memory |
 

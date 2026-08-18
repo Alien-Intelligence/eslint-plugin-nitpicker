@@ -17,7 +17,7 @@ function globToRegExp(glob: string): RegExp {
                 pattern += ".*"
                 index++
 
-                // If the `**` is followed by a `/`, skip it so that `**/` and `**` are equivalent
+                // If the "**" is followed by a "/", skip it so that "**/" and "**" are equivalent
                 if (normalized[index + 1] === "/") index++
             } else {
                 pattern += "[^/]*"

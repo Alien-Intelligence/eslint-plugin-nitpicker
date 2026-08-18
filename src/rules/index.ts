@@ -12,6 +12,7 @@ import noEmDash from "@/rules/base/noEmDash"
 import noEmojis from "@/rules/base/noEmojis"
 import noJSDocBlankBeforeTags from "@/rules/base/noJSDocBlankBeforeTags"
 import noJSDocReturnsOnVoid from "@/rules/base/noJSDocReturnsOnVoid"
+import noLineCommentBackticks from "@/rules/base/noLineCommentBackticks"
 import noLineCommentPeriod from "@/rules/base/noLineCommentPeriod"
 import noPropertyAccessAlias from "@/rules/base/noPropertyAccessAlias"
 import noPropertyDestructuring from "@/rules/base/noPropertyDestructuring"
@@ -38,6 +39,7 @@ const ruleInstances = [
     noEmojis,
     noJSDocBlankBeforeTags,
     noJSDocReturnsOnVoid,
+    noLineCommentBackticks,
     noLineCommentPeriod,
     noPropertyAccessAlias,
     noPropertyDestructuring,

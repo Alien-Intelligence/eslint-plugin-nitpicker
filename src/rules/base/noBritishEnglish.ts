@@ -82,7 +82,7 @@ class NoBritishEnglish extends NitpickerRule<MessageIds, Options> {
 
                         const cased = matchCase(word.text, american)
 
-                        // The comment value starts right after the `//` or `/*`
+                        // The comment value starts right after the "//" or "/*"
                         const from = comment.range[0] + 2 + word.index
                         const to = from + word.text.length
 

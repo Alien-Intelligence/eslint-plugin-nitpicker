@@ -24,7 +24,7 @@ export type LintOptions = {
     filename?: string
 }
 
-// A filename is always supplied so the config `files` glob matches the run
+// A filename is always supplied so the config "files" glob matches the run
 const DEFAULT_FILENAME = "file.ts"
 
 /**
