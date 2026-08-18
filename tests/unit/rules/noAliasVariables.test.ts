@@ -24,6 +24,25 @@ describe("no-alias-variables", () => {
         expect(messages).toHaveLength(0)
     })
 
+    test("It should not report a snapshot of a reassigned source", ({ expect }) => {
+        const code = "let nextIndex = 0\nconst index = nextIndex\nnextIndex += 1\nuse(index, nextIndex)"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report a snapshot of a source assigned later", ({ expect }) => {
+        const code = "let current\ncurrent = load()\nconst first = current\ncurrent = load()\nuse(first)"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should report a rename of a `let` that is never reassigned", ({ expect }) => {
+        expect(lintRule(RULE, "let source = 1\nconst alias = source\nuse(alias)")).toHaveLength(1)
+    })
+
+    test("It should not report a declaration kept for its type annotation", ({ expect }) => {
+        const code = "const result = load()\nconst incoming: Record<string, unknown> = result\nuse(incoming)"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
     test("It should report a bare rename", ({ expect }) => {
         const messages = lintRule(RULE, "const accessTokens = rawAccessTokens")
         expect(messages).toHaveLength(1)

@@ -12,13 +12,39 @@ export function isJSDocComment(comment: TSESTree.Comment): boolean {
 }
 
 /**
+ * Resolves the node a JSDoc comment sits above, which for a decorated
+ * declaration is its earliest decorator, since decorators are written between the
+ * JSDoc and the declaration they belong to.
+ * @param node The node to anchor the JSDoc lookup on.
+ * @returns The node whose leading comments hold the JSDoc.
+ */
+export function jsDocAnchor(node: TSESTree.Node): TSESTree.Node {
+    const declaration =
+        (node.type === "ExportDefaultDeclaration" || node.type === "ExportNamedDeclaration") &&
+        node.declaration !== null
+            ? node.declaration
+            : node
+
+    const decorators = "decorators" in declaration ? declaration.decorators : undefined
+
+    // Only a decorator written before the declaration shifts the anchor, the
+    // "export default @dec class" form leaves the JSDoc above the export
+    const earliest = decorators?.reduce<TSESTree.Decorator | undefined>(
+        (found, decorator) => (found === undefined || decorator.range[0] < found.range[0] ? decorator : found),
+        undefined,
+    )
+
+    return earliest !== undefined && earliest.range[0] < node.range[0] ? earliest : node
+}
+
+/**
  * Checks whether a node is immediately preceded by a JSDoc comment.
  * @param sourceCode The source code of the linted file.
  * @param node The node to inspect the leading comments of.
  * @returns True if the comment right before the node is a JSDoc comment.
  */
 export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
-    const commentsBefore = sourceCode.getCommentsBefore(node)
+    const commentsBefore = sourceCode.getCommentsBefore(jsDocAnchor(node))
     const closest = commentsBefore.at(-1)
 
     return closest !== undefined && isJSDocComment(closest)

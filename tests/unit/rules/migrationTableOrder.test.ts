@@ -24,7 +24,7 @@ describe("migration-table-order", () => {
         expect(lintRule(RULE, code)).toHaveLength(0)
     })
 
-    test("It should treat a non-audit timestamp as a column", ({ expect }) => {
+    test("It should accept a domain timestamp among the columns", ({ expect }) => {
         const code = migration(
             [
                 '        table.increments("id")',
@@ -35,6 +35,48 @@ describe("migration-table-order", () => {
             ].join("\n"),
         )
         expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should accept a domain timestamp after the audit timestamps", ({ expect }) => {
+        const code = migration(
+            [
+                '        table.increments("id")',
+                '        table.timestamp("created_at", { useTz: true }).notNullable()',
+                '        table.timestamp("updated_at", { useTz: true }).notNullable()',
+                '        table.timestamp("expires_at", { useTz: true }).nullable()',
+                '        table.timestamp("last_used_at", { useTz: true }).nullable()',
+                '        table.index(["id"], "x")',
+            ].join("\n"),
+        )
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should accept a domain timestamp with a `dateTime` builder", ({ expect }) => {
+        const code = migration(
+            [
+                '        table.timestamp("created_at").notNullable()',
+                '        table.dateTime("scheduled_for").nullable()',
+            ].join("\n"),
+        )
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should still report a plain column after a domain timestamp and the audit ones", ({ expect }) => {
+        const code = migration(
+            [
+                '        table.timestamp("created_at").notNullable()',
+                '        table.timestamp("expires_at").nullable()',
+                '        table.string("late")',
+            ].join("\n"),
+        )
+        expect(lintRule(RULE, code)).toHaveLength(1)
+    })
+
+    test("It should report a soft-delete timestamp placed after an index", ({ expect }) => {
+        const code = migration(
+            ['        table.index(["id"], "x")', '        table.timestamp("deleted_at").nullable()'].join("\n"),
+        )
+        expect(lintRule(RULE, code)).toHaveLength(1)
     })
 
     test("It should not report a non-migration createTable call", ({ expect }) => {

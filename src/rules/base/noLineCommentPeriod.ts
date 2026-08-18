@@ -1,16 +1,16 @@
-import type { TSESLint } from "@typescript-eslint/utils"
+import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
+import { findProsePeriods } from "@/lib/utils/comments"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
-import { isWordChar } from "@/lib/utils/words"
 
 type Options = []
-type MessageIds = "period"
+type MessageIds = "period" | "sentence"
 
 /**
  * Flags periods used as prose punctuation inside `//` line comments. Dots that
- * are part of a token (`foo.bar`, `1.5`, `.env`) and ellipses (`...`) are left
- * alone.
+ * are part of a token (`foo.bar`, `1.5`, `.env`, `subagent.*`), dots inside a
+ * quoted span, ellipses, and abbreviations like `e.g.` are left alone.
  */
 class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-line-comment-period"
@@ -27,44 +27,69 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
         schema: [],
         messages: {
             period: nitpick({
-                problem: "This line comment contains a period.",
-                why: "Line comments should be short, clear fragments, not full sentences, so periods are just noise, dots inside code references like `foo.bar` are allowed.",
+                problem: "This line comment ends with a period.",
+                why: "Line comments should be short, clear fragments, not full sentences, so a closing period is just noise, dots inside code references like `foo.bar` are allowed.",
                 fix: "Remove the period and keep the comment terse.",
+            }),
+            sentence: nitpick({
+                problem: "This line comment runs two sentences together with a period.",
+                why: "Line comments should be short, clear fragments, dropping the period on its own would leave a run-on, so the sentences belong on separate lines",
+                fix: "Split it into one `//` line per fragment, or reword it as a single fragment",
             }),
         },
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
+        // The indentation of a comment that sits alone on its line, or "null" when
+        // code precedes it, as splitting a trailing comment would break that line
+        const ownLineIndent = (comment: TSESTree.Comment): string | null => {
+            const before = (context.sourceCode.lines[comment.loc.start.line - 1] ?? "").slice(
+                0,
+                comment.loc.start.column,
+            )
+
+            return before.trim() === "" ? before : null
+        }
+
         return {
             Program() {
                 for (const comment of context.sourceCode.getAllComments()) {
                     if (comment.type !== "Line") continue
 
-                    // The comment value starts right after the leading `//`
-                    const valueStart = comment.range[0] + 2
+                    const indent = ownLineIndent(comment)
 
-                    for (let index = 0; index < comment.value.length; index++) {
-                        if (comment.value[index] !== ".") continue
+                    for (const period of findProsePeriods(comment)) {
+                        const loc = {
+                            start: context.sourceCode.getLocFromIndex(period.index),
+                            end: context.sourceCode.getLocFromIndex(period.index + 1),
+                        }
 
-                        // A run of consecutive dots is an ellipsis, leave it alone
-                        if (comment.value[index + 1] === ".") {
-                            while (comment.value[index + 1] === ".") index++
+                        // A period that closes the comment can simply go, nothing
+                        // follows it to run together
+                        if (period.terminal) {
+                            context.report({
+                                loc,
+                                messageId: "period",
+                                fix: fixer => fixer.removeRange([period.index, period.index + 1]),
+                            })
+
                             continue
                         }
 
-                        // A lone dot immediately followed by a word character is
-                        // part of a token (`foo.bar`, `1.5`, `.env`), not prose
-                        if (isWordChar(comment.value[index + 1])) continue
-
-                        const at = valueStart + index
+                        // Mid-comment, the period separates two fragments, so the
+                        // fix moves the second one onto its own comment line,
+                        // swallowing the spacing that followed the period
+                        const offset = period.index - comment.range[0] - 2
+                        const spacing = comment.value.slice(offset + 1).match(/^\s*/u)?.[0] ?? ""
+                        const end = period.index + 1 + spacing.length
 
                         context.report({
-                            loc: {
-                                start: context.sourceCode.getLocFromIndex(at),
-                                end: context.sourceCode.getLocFromIndex(at + 1),
-                            },
-                            messageId: "period",
-                            fix: fixer => fixer.removeRange([at, at + 1]),
+                            loc,
+                            messageId: "sentence",
+                            fix:
+                                indent === null
+                                    ? null
+                                    : fixer => fixer.replaceTextRange([period.index, end], `\n${indent}// `),
                         })
                     }
                 }

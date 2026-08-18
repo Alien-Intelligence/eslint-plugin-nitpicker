@@ -52,6 +52,19 @@ const CONSTANTS = {
          */
         DIRECTIVE:
             /^\s*(?:eslint\b|eslint-|globals?\b|exported\b|jshint\b|jslint\b|istanbul\b|[cv]8\b|ts-|prettier-ignore|biome-ignore|webpack\b|noinspection\b|@)/,
+
+        /**
+         * Quote characters that fence a verbatim span inside a comment, whose
+         * dots belong to the quoted text rather than the surrounding prose. The
+         * apostrophe is absent, as it appears unpaired in words like "don't".
+         */
+        QUOTES: new Set(['"', "`"]),
+
+        /**
+         * Abbreviations whose trailing dot is part of the word itself, so it must
+         * survive even though it looks like the end of a sentence.
+         */
+        ABBREVIATIONS: ["e.g.", "i.e.", "etc.", "vs.", "cf.", "al.", "approx.", "resp."],
     },
 
     /**

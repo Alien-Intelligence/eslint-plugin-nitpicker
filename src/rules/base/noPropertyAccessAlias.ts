@@ -1,6 +1,6 @@
-import type { TSESLint } from "@typescript-eslint/utils"
+import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import { isPropertyAccessAlias } from "@/lib/utils/aliases"
+import { isPathWritten, isReassigned, propertyAccessPath } from "@/lib/utils/aliases"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
@@ -8,9 +8,36 @@ type Options = []
 type MessageIds = "propertyAccessAlias"
 
 /**
+ * A `const` that reads like a property alias, held back until the whole file has
+ * been walked so writes to the same property can exempt it.
+ */
+type Candidate = {
+    /**
+     * The declarator to report.
+     */
+    node: TSESTree.VariableDeclarator
+
+    /**
+     * The name the property is aliased under.
+     */
+    name: string
+
+    /**
+     * The dotted path the alias reads, e.g. `auth.user`.
+     */
+    path: string
+
+    /**
+     * The source text of the aliased expression.
+     */
+    expression: string
+}
+
+/**
  * Flags a `const` whose entire value is a single property access, such as
- * `const user = auth.user!`, since it just renames a property and hides where
- * the value comes from, `let` is exempt, as it may be reassigned later.
+ * `const user = auth.user!`, since it just renames a property. `let`, exported
+ * bindings, annotated declarations, and snapshots of a value written to later are
+ * exempt.
  */
 class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-property-access-alias"
@@ -36,7 +63,27 @@ class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
+        const candidates: Candidate[] = []
+        const written = new Set<string>()
+
+        // Track the properties the file writes to, so an alias taken before one of
+        // those writes is understood as a snapshot
+        const recordWrite = (target: TSESTree.Node): void => {
+            if (target.type !== "MemberExpression") return
+
+            const path = propertyAccessPath(target)
+            if (path !== null) written.add(path)
+        }
+
         return {
+            AssignmentExpression(node) {
+                recordWrite(node.left)
+            },
+
+            UpdateExpression(node) {
+                recordWrite(node.argument)
+            },
+
             VariableDeclarator(node) {
                 if (node.parent.type !== "VariableDeclaration" || node.parent.kind !== "const") return
 
@@ -44,16 +91,40 @@ class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
                 if (node.parent.parent.type === "ExportNamedDeclaration") return
 
                 if (node.id.type !== "Identifier" || node.init === null) return
-                if (!isPropertyAccessAlias(node.init)) return
 
-                context.report({
+                // A type annotation is a reason of its own to keep the binding, as
+                // inlining it would drop the narrowing it applies
+                if (node.id.typeAnnotation !== undefined) return
+
+                const path = propertyAccessPath(node.init)
+                if (path === null) return
+
+                // A reassigned root object makes this a snapshot of what it held
+                // here, so inlining it would change what the code does
+                const root = path.slice(0, path.indexOf("."))
+                if (root !== "this" && isReassigned(context.sourceCode.getScope(node), root)) return
+
+                candidates.push({
                     node,
-                    messageId: "propertyAccessAlias",
-                    data: {
-                        name: node.id.name,
-                        expression: context.sourceCode.getText(node.init),
-                    },
+                    name: node.id.name,
+                    path,
+                    expression: context.sourceCode.getText(node.init),
                 })
+            },
+
+            "Program:exit"() {
+                for (const candidate of candidates) {
+                    if (isPathWritten(written, candidate.path)) continue
+
+                    context.report({
+                        node: candidate.node,
+                        messageId: "propertyAccessAlias",
+                        data: {
+                            name: candidate.name,
+                            expression: candidate.expression,
+                        },
+                    })
+                }
             },
         }
     }

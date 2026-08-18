@@ -44,4 +44,44 @@ describe("no-em-dash", () => {
         expect(messages[0]?.message).toContain("why:")
         expect(messages[0]?.message).toContain("fix:")
     })
+
+    test("It should allow an em dash in a string when strings are allowed", ({ expect }) => {
+        const code = 'const empty = "—"\nconst notice = "Your data — including logs — is deleted"'
+        expect(lintRule(RULE, code, { options: [{ allow: ["strings"] }] })).toHaveLength(0)
+    })
+
+    test("It should allow an em dash in a template literal when templates are allowed", ({ expect }) => {
+        const code = "const prompt = `You are an agent — be terse`"
+        expect(lintRule(RULE, code, { options: [{ allow: ["templates"] }] })).toHaveLength(0)
+    })
+
+    test("It should allow an em dash in an interpolated template literal", ({ expect }) => {
+        const code = `const prompt = \`Role: \${role} — be terse\``
+        expect(lintRule(RULE, code, { options: [{ allow: ["templates"] }] })).toHaveLength(0)
+    })
+
+    test("It should allow an em dash in JSX text when jsx is allowed", ({ expect }) => {
+        const code = "const page = <p>We store your data — securely</p>"
+        const opts = {
+            options: [{ allow: ["jsx"] }],
+            filename: "page.tsx",
+        }
+        expect(lintRule(RULE, code, opts)).toHaveLength(0)
+    })
+
+    test("It should allow an em dash in a comment when comments are allowed", ({ expect }) => {
+        expect(lintRule(RULE, "// dash — here", { options: [{ allow: ["comments"] }] })).toHaveLength(0)
+    })
+
+    test("It should still report an em dash outside the allowed locations", ({ expect }) => {
+        const code = '// dash — here\nconst s = "a — b"'
+        const messages = lintRule(RULE, code, { options: [{ allow: ["strings"] }] })
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.line).toBe(1)
+    })
+
+    test("It should report everywhere when the allow list is empty", ({ expect }) => {
+        const code = '// dash — here\nconst s = "a — b"'
+        expect(lintRule(RULE, code, { options: [{ allow: [] }] })).toHaveLength(2)
+    })
 })
