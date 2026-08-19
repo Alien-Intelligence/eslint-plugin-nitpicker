@@ -85,6 +85,16 @@ describe("require-function-jsdoc", () => {
         expect(messages).toHaveLength(1)
     })
 
+    test("It should not report a lazy dynamic-import thunk", ({ expect }) => {
+        const code = 'const UsersController = () => import("#controllers/users_controller")'
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should still report a thunk that does more than a bare import", ({ expect }) => {
+        const code = 'const load = () => {\n    return import("#controllers/users_controller")\n}'
+        expect(lintRule(RULE, code)).toHaveLength(1)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "function foo() {}")
         expect(messages[0]?.message).toContain("why:")
