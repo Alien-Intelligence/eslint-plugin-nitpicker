@@ -1,6 +1,12 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
-import { type FunctionNode, getDocumentableNode, getFunctionName, isTopLevel } from "@/lib/utils/functions"
+import {
+    type FunctionNode,
+    getDocumentableNode,
+    getFunctionName,
+    isDynamicImportThunk,
+    isTopLevel,
+} from "@/lib/utils/functions"
 import { hasLeadingJSDoc } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
 import { functionReturnsJsx, isReactComponentName } from "@/lib/utils/react"
@@ -42,6 +48,9 @@ class RequireFunctionJSDoc extends NitpickerRule<MessageIds, Options> {
 
             const documentable = getDocumentableNode(fn)
             if (!isTopLevel(documentable)) return
+
+            // Lazy dynamic-import thunks (`() => import("...")`) carry no logic worth documenting
+            if (isDynamicImportThunk(fn)) return
 
             // React component functions are exempt from the JSDoc requirement
             if (isReactComponentName(name) && functionReturnsJsx(fn, context.sourceCode.visitorKeys)) return

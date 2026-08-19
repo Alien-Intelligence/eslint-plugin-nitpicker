@@ -48,6 +48,17 @@ export function isTopLevel(node: TSESTree.Node): boolean {
 }
 
 /**
+ * Checks whether a function is a bare dynamic-import thunk, i.e.
+ * `() => import("...")`, the lazy-loading pattern used for AdonisJS route
+ * controllers and for code splitting.
+ * @param fn The function node to inspect.
+ * @returns True if the function only lazily imports a module.
+ */
+export function isDynamicImportThunk(fn: FunctionNode): boolean {
+    return fn.type === "ArrowFunctionExpression" && fn.params.length === 0 && fn.body.type === "ImportExpression"
+}
+
+/**
  * Resolves the declared name of a function, whether it comes from the function
  * itself or the variable it is assigned to.
  * @param fn The function node to name.
