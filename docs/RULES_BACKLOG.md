@@ -14,7 +14,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 ---
 
 ## Shipped
-
 | Rule | Enforces | Source |
 |-------|---|---|
 | `no-em-dash` | No em dash character anywhere | code-style, both STYLE.md |
@@ -39,11 +38,13 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `require-controller-jsdoc` | Require a JSDoc above an AdonisJS controller (default-exported `*Controller` class) (adonisjs category) | user request |
 | `require-hook-object-return` | Custom `use*` hook must return an object, not a bare function; autofix wraps a returned identifier (react category) | user request |
 | `require-context-hook-destructure` | Result of a `use*Context` consumer hook must be destructured, not bound whole (react category) | user request |
+| `no-jsx-comments` | No inline `{/* ... */}` comments in JSX; extract a named sub-component (react category) | user request |
+| `require-memo-callback-jsdoc` | JSDoc required on `useMemo`/`useCallback`; `@param` per `useCallback` parameter (react category) | user request |
+| `require-derived-usememo` | A component/hook `const` derived via a non-hook call must be a `useMemo` (react category) | user request |
 
 ---
 
 ## Candidate — Comments & JSDoc
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `no-comment-semicolons` | Never write `;` inside any comment | E | All | Both STYLE.md "Forbidden Comment Patterns" |
@@ -58,7 +59,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-convention-exception-preamble` | No top-of-file blocks restating a convention / "See STYLE.md …" | M | All | web-app memory |
 
 ## Candidate — Naming
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `boolean-is-are-prefix` | Booleans (locals, params, props) prefixed `is`/`are` | H | All | code-style + BE STYLE.md; type-aware for accuracy |
@@ -67,20 +67,17 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `enum-screaming-snake-keys` | Enum keys `SCREAMING_SNAKE_CASE`, lowercase string values | M | BE | BE STYLE.md |
 
 ## Candidate — Variables & anti-patterns (the "useless aliases" family)
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `no-redundant-union-cast` | Ban `let x: T \| null = expr as T` | M | BE | BE STYLE.md |
 | `no-explicit-void-return` | Don't annotate `void`/`Promise<void>` when the body never returns | M | All | code-style |
 
 ## Candidate — Formatting / code breathing
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `code-breathing` | Blank line between logical blocks (`if`/`for`/`while`/`try`/decl groups) and before `return` (unless single-line body) | H | All | Both STYLE.md + code-style; flagship nitpicker rule, needs options |
 
 ## Candidate — Structure / organization
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `constants-in-constants-file` | Top-level `SCREAMING_SNAKE_CASE` consts (actual constants) don't live at the root of a code file; move them to a `lib/constants.ts` (or `constants/`). Flag by declaration location; can't autofix the move, message points where to relocate | M | All | user request; mirrors this plugin's own `CONSTANTS` convention |
@@ -91,7 +88,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `context-provider-value-object` | A `<SomeContext.Provider value={…}>` value must be an object literal, not a bare function/value | M | FE | user request; JSX-side sibling of shipped `require-hook-object-return` |
 
 ## Candidate — Project-specific (lower priority)
-
 | Proposed rule | Enforces | Diff | Scope | Source / notes |
 |---|---|---|---|---|
 | `no-migration-section-comments` | No section-label comments (`// Timestamps`, `// Relationships`, …) inside a migration's table builder; keep genuine why-notes | M | proj (AdonisJS) | web-app migrations; deferred (comments-scope undecided) |
@@ -105,7 +101,6 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 ---
 
 ## Cross-cutting notes
-
 - **Conflicts need options.** `no-body-destructuring` is absolute in gitgame but relaxed in web-app
   (rename-on-destructure allowed). Rules mined from multiple projects should ship with options and
   per-project config, not a single hard-coded behavior.

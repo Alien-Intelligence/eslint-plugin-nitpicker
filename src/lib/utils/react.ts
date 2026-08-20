@@ -1,6 +1,6 @@
 import type { TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
-import { type FunctionNode, someReturn, type VisitorKeys } from "@/lib/utils/functions"
+import { type FunctionNode, getFunctionName, someReturn, type VisitorKeys } from "@/lib/utils/functions"
 
 /**
  * Checks whether a name follows the `PascalCase` convention React uses to
@@ -83,4 +83,60 @@ export function functionReturnsJsx(fn: FunctionNode, visitorKeys: VisitorKeys): 
     }
 
     return someReturn(fn.body, visitorKeys, isJsxExpression)
+}
+
+/**
+ * Checks whether a function is a React component or a custom hook, the scopes
+ * where `useMemo` is available and where local derivations should be memoized.
+ * @param fn The function node to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the function body.
+ * @returns True if the function is a component or a hook.
+ */
+export function isComponentOrHook(fn: FunctionNode, visitorKeys: VisitorKeys): boolean {
+    const name = getFunctionName(fn)
+    if (name === undefined) return false
+
+    return isHookName(name) || (isReactComponentName(name) && functionReturnsJsx(fn, visitorKeys))
+}
+
+/**
+ * Checks whether an expression contains a non-hook call, without descending into
+ * nested functions, so a value built by a helper or method call is caught but a
+ * callback's inner calls are not.
+ * @param node The AST node to search from.
+ * @param visitorKeys The AST visitor keys, used to walk the subtree.
+ * @returns True if a non-hook call is found.
+ */
+function hasNonHookCall(node: TSESTree.Node, visitorKeys: VisitorKeys): boolean {
+    if (node.type === "CallExpression") {
+        return !(node.callee.type === "Identifier" && isHookName(node.callee.name))
+    }
+
+    for (const key of visitorKeys[node.type] ?? []) {
+        const value = (node as unknown as Record<string, unknown>)[key]
+        const children = Array.isArray(value) ? value : [value]
+
+        for (const child of children) {
+            const childNode = child as TSESTree.Node | null | undefined
+            if (!childNode || typeof childNode.type !== "string") continue
+            if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(childNode.type)) continue
+            if (hasNonHookCall(childNode, visitorKeys)) return true
+        }
+    }
+
+    return false
+}
+
+/**
+ * Checks whether an expression is a derived value that belongs in a `useMemo`,
+ * i.e. it computes something through a non-hook call. A function value (a
+ * callback) and a bare hook result are not derived values.
+ * @param node The expression to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the expression.
+ * @returns True if the expression is a derived value.
+ */
+export function isDerivedValue(node: TSESTree.Expression, visitorKeys: VisitorKeys): boolean {
+    if (node.type === "ArrowFunctionExpression" || node.type === "FunctionExpression") return false
+
+    return hasNonHookCall(node, visitorKeys)
 }

@@ -48,6 +48,26 @@ export function isTopLevel(node: TSESTree.Node): boolean {
 }
 
 /**
+ * Resolves the nearest function a node sits inside, walking out through its
+ * parents.
+ * @param node The node to search from.
+ * @returns The enclosing function, or `null` if the node is at module scope.
+ */
+export function enclosingFunction(node: TSESTree.Node): FunctionNode | null {
+    let current: TSESTree.Node | undefined = node.parent
+
+    while (current !== undefined) {
+        if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(current.type)) {
+            return current as FunctionNode
+        }
+
+        current = current.parent
+    }
+
+    return null
+}
+
+/**
  * Checks whether a function is a bare dynamic-import thunk, i.e.
  * `() => import("...")`, the lazy-loading pattern used for AdonisJS route
  * controllers and for code splitting.

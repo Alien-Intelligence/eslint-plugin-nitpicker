@@ -74,12 +74,12 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 
 ### Base rules
 | Rule                                         | Fixable | Description                                                                                        |
-|----------------------------------------------|---------|---------------------------------------------------------------------------------------------------|
+|----------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
 | `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                          |
-| `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                |
+| `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                 |
 | `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.         |
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.            |
-| `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).              |
+| `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).               |
 | `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.     |
 | `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                             |
 | `nitpicker/no-jsdoc-returns-on-void`         | yes     | Disallow a JSDoc `@returns` tag on a function that returns nothing.                                |
@@ -95,18 +95,21 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 
 ### React rules
 Shipped by the `react` config (and `all`).
-| Rule                                       | Fixable | Description                                                                       |
-|--------------------------------------------|---------|----------------------------------------------------------------------------------|
-| `nitpicker/require-context-hook-destructure` |       | Require the result of a `use*Context` consumer hook to be destructured.           |
-| `nitpicker/require-hook-object-return`     | yes     | Require a custom hook to return an object rather than a bare function.            |
+| Rule                                         | Fixable | Description                                                                                  |
+|----------------------------------------------|---------|----------------------------------------------------------------------------------------------|
+| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.            |
+| `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                      |
+| `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a component or hook to use `useMemo`. |
+| `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                       |
+| `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter). |
 
 ### AdonisJS rules
 Shipped by the `adonisjs` config (and `all`).
-| Rule                                | Fixable | Description                                                                        |
-|-------------------------------------|---------|-----------------------------------------------------------------------------------|
-| `nitpicker/migration-table-order`   |         | Group migration table statements as columns, then timestamps, then indexes.        |
-| `nitpicker/require-controller-jsdoc`|         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class).    |
-| `nitpicker/require-migration-jsdoc` |         | Require a JSDoc comment describing an AdonisJS migration.                          |
+| Rule                                | Fixable | Description                                                                      |
+|-------------------------------------|---------|----------------------------------------------------------------------------------|
+| `nitpicker/migration-table-order`   |         | Group migration table statements as columns, then timestamps, then indexes.      |
+| `nitpicker/require-controller-jsdoc`|         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class). |
+| `nitpicker/require-migration-jsdoc` |         | Require a JSDoc comment describing an AdonisJS migration.                        |
 
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
