@@ -70,20 +70,46 @@ Nitpicker ships five shared flat configs:
 | `adonisjs`    | Opts into the AdonisJS ruleset, and relaxes decorative separators in `start/routes` files. |
 
 ## Rules
-Every rule is part of `recommended` and enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically:
-| Rule                                         | Fixable | Description                                                                                      |
-|----------------------------------------------|---------|--------------------------------------------------------------------------------------------------|
-| `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                        |
-| `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.       |
-| `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.          |
-| `nitpicker/no-em-dash`                       |         | Disallow the em dash character anywhere in the source.                                           |
-| `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                           |
-| `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments, rewriting code references with double quotes.           |
-| `nitpicker/no-line-comment-period`           | yes     | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK). |
-| `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead. |
-| `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                         |
-| `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                         |
-| `nitpicker/require-function-jsdoc`           |         | Require a JSDoc comment on top-level functions (React component functions are exempt).           |
+The **base** rules are the universal ruleset shipped by `recommended`; the **React** and **AdonisJS** rules ship only in their framework configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
+
+### Base rules
+| Rule                                         | Fixable | Description                                                                                        |
+|----------------------------------------------|---------|---------------------------------------------------------------------------------------------------|
+| `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                          |
+| `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                |
+| `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.         |
+| `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.            |
+| `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).              |
+| `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.     |
+| `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                             |
+| `nitpicker/no-jsdoc-returns-on-void`         | yes     | Disallow a JSDoc `@returns` tag on a function that returns nothing.                                |
+| `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments; use double quotes for code references.                   |
+| `nitpicker/no-line-comment-period`           | yes¹    | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK).   |
+| `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead.   |
+| `nitpicker/no-property-destructuring`        |         | Disallow shorthand destructuring off a plain object reference; access the property directly.       |
+| `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                           |
+| `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                               |
+| `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                           |
+| `nitpicker/require-function-jsdoc`           |         | Require a JSDoc comment on top-level functions (React components and lazy `import` thunks exempt). |
+| `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.      |
+
+### React rules
+Shipped by the `react` config (and `all`).
+| Rule                                       | Fixable | Description                                                                       |
+|--------------------------------------------|---------|----------------------------------------------------------------------------------|
+| `nitpicker/require-context-hook-destructure` |       | Require the result of a `use*Context` consumer hook to be destructured.           |
+| `nitpicker/require-hook-object-return`     | yes     | Require a custom hook to return an object rather than a bare function.            |
+
+### AdonisJS rules
+Shipped by the `adonisjs` config (and `all`).
+| Rule                                | Fixable | Description                                                                        |
+|-------------------------------------|---------|-----------------------------------------------------------------------------------|
+| `nitpicker/migration-table-order`   |         | Group migration table statements as columns, then timestamps, then indexes.        |
+| `nitpicker/require-controller-jsdoc`|         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class).    |
+| `nitpicker/require-migration-jsdoc` |         | Require a JSDoc comment describing an AdonisJS migration.                          |
+
+¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
+² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
 
 ### Rule options
 A few rules accept options. Pass them by overriding the rule with a `["warn", { ... }]` tuple.
@@ -123,6 +149,16 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 }
 ```
 
+`no-emojis` takes the same `{ allow: ("strings" | "templates" | "jsx" | "comments")[] }` option, for the same reason: an emoji is often deliberate copy or a meaningful marker (a `⚠️` above a risky call). It defaults to `[]`, and it is report-only, never auto-removing a glyph, so an emoji is only ever flagged, not silently deleted:
+```js
+{
+    files: ["app/**/*.tsx"],
+    rules: {
+        "nitpicker/no-emojis": ["warn", { allow: ["strings", "templates", "jsx"] }],
+    },
+}
+```
+
 ### Line comment code references
 A backtick renders as code inside a JSDoc block, but in a `//` comment it is just a literal character, so `no-line-comment-backticks` rewrites those references with double quotes:
 ```js
@@ -133,14 +169,13 @@ Backticks are left alone in JSDoc and block comments, in tooling directives, whe
 ### Line comment periods
 `no-line-comment-period` only treats a dot as prose when whitespace or the end of the comment follows it, so dots inside code (`foo.bar`, `subagent.*`, `split(".")`), inside a quoted or back-ticked span, in an ellipsis, or closing an abbreviation (`e.g.`, `i.e.`, `etc.`) are left alone.
 
-The two prose cases are fixed differently, since removing a period is only safe at the end of a comment:
+The two prose cases are handled differently, since removing a period is only safe at the end of a comment:
 ```js
 // Reads the token.                     ->  // Reads the token
-// Reads the token. It is cached        ->  // Reads the token
-                                        //  // It is cached
+// Reads the token. It is cached        ->  reported, not fixed
 const a = 1 // Reads the token. Cached  ->  reported, not fixed
 ```
-A mid-comment period is split onto its own line rather than deleted, which would leave a run-on. A trailing comment is reported without a fix, as splitting it would break the line it sits on.
+Only a terminal period is auto-fixed. A mid-comment period runs two fragments together, and auto-splitting it onto a new line mangles wrapped prose paragraphs, so that case is reported for a human or agent to reword rather than fixed.
 
 ## Framework configs
 Some conventions only make sense for a given framework. Nitpicker detects when a file uses React or AdonisJS and, through `require-framework-config`, nudges you to opt into the matching config for those files. Opting in silences that nudge and applies any framework-specific tweaks.

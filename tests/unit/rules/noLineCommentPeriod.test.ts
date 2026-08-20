@@ -76,19 +76,17 @@ describe("no-line-comment-period", () => {
         expect(output).toBe("// trailing dot")
     })
 
-    test("It should split a mid-comment sentence onto its own line", ({ expect }) => {
-        const output = fixRule(RULE, "// a. b")
-        expect(output).toBe("// a\n// b")
+    test("It should report but not fix a mid-comment sentence (never mangle wrapped prose)", ({ expect }) => {
+        const messages = lintRule(RULE, "// a. b")
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.fix).toBeUndefined()
+        expect(fixRule(RULE, "// a. b")).toBe("// a. b")
     })
 
-    test("It should keep the indentation when splitting a sentence", ({ expect }) => {
-        const output = fixRule(RULE, "function f() {\n    // Does a thing. Then another\n}")
-        expect(output).toBe("function f() {\n    // Does a thing\n    // Then another\n}")
-    })
-
-    test("It should split every sentence of a run-on comment", ({ expect }) => {
+    test("It should fix only the terminal period of a run-on comment", ({ expect }) => {
+        // Mid-comment periods are report-only, so only the closing dot is removed
         const output = fixRule(RULE, "// One. Two. Three.")
-        expect(output).toBe("// One\n// Two\n// Three")
+        expect(output).toBe("// One. Two. Three")
     })
 
     test("It should report a mid-comment sentence as a run-on", ({ expect }) => {
