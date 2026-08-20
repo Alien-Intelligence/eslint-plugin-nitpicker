@@ -38,6 +38,21 @@ describe("require-memo-callback-jsdoc", () => {
         expect(lintRule(RULE, code)).toHaveLength(0)
     })
 
+    test("It should flag a useCallback documenting only some of several parameters", ({ expect }) => {
+        const code =
+            "/**\n * Picks.\n * @param id The id.\n */\nconst onPick = useCallback((id, opts) => use(id, opts), [])"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingParam")
+    })
+
+    test("It should check a useCallback documented above its `export` keyword", ({ expect }) => {
+        const code = "/**\n * Picks.\n */\nexport const onPick = useCallback((id) => use(id), [])"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingParam")
+    })
+
     test("It should not report a non-memo hook call", ({ expect }) => {
         expect(lintRule(RULE, "const [x, setX] = useState(0)")).toHaveLength(0)
     })

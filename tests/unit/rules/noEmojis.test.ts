@@ -49,6 +49,13 @@ describe("no-emojis", () => {
         expect(lintRule(RULE, "// warning ⚠️ here", opts)).toHaveLength(0)
     })
 
+    test("It should exempt emoji in a template literal when `allow` includes templates", ({ expect }) => {
+        const opts = { options: [{ allow: ["templates"] }] }
+        expect(lintRule(RULE, "const s = `hi 🎉`", opts)).toHaveLength(0)
+        // A string emoji is still flagged, only templates were allowed
+        expect(lintRule(RULE, 'const s = "hi 🎉"', opts)).toHaveLength(1)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "// oops 🙈")
         expect(messages[0]?.message).toContain("why:")
