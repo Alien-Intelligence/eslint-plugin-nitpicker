@@ -56,6 +56,10 @@ describe("no-property-destructuring", () => {
         expect(messages).toHaveLength(1)
     })
 
+    test("It should not report an exported destructuring binding", ({ expect }) => {
+        expect(lintRule(RULE, "export const { a } = object")).toHaveLength(0)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "const { a } = object")
         expect(messages[0]?.message).toContain("why:")

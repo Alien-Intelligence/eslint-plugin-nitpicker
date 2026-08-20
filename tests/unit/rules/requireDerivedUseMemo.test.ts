@@ -45,6 +45,20 @@ describe("require-derived-usememo", () => {
         expect(lintRule(RULE, code)).toHaveLength(1)
     })
 
+    test("It should not report a value with no call (arithmetic or logic)", ({ expect }) => {
+        expect(lintRule(RULE, "function useThing() {\n    const n = a + b * 2\n    return n\n}")).toHaveLength(0)
+    })
+
+    test("It should not report a destructured hook result", ({ expect }) => {
+        const code = "function useThing() {\n    const [x, setX] = useState(0)\n    return x\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report a const inside a nested callback", ({ expect }) => {
+        const code = "function useThing() {\n    useEffect(() => {\n        const c = list.find(x => x.ok)\n    })\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const code = "function useThing() {\n    const c = list.find(x => x.id)\n    return c\n}"
         const messages = lintRule(RULE, code)

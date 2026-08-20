@@ -25,6 +25,10 @@ describe("no-jsx-comments", () => {
         expect(lintRule(RULE, "/* a note */\nconst x = 1", TSX)).toHaveLength(0)
     })
 
+    test("It should not report an empty expression container with no comment", ({ expect }) => {
+        expect(lintRule(RULE, "const x = <div>{}</div>", TSX)).toHaveLength(0)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "const x = <div>{/* Header */}</div>", TSX)
         expect(messages[0]?.message).toContain("why:")

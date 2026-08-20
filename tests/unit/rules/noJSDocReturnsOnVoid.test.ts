@@ -43,6 +43,12 @@ describe("no-jsdoc-returns-on-void", () => {
         expect(lintRule(RULE, code)).toHaveLength(1)
     })
 
+    test("It should report and fix a @returns on a `: void` arrow assigned to a const", ({ expect }) => {
+        const code = "/**\n * Does.\n * @returns Nothing.\n */\nconst run = (): void => {\n    doThing()\n}"
+        expect(lintRule(RULE, code)).toHaveLength(1)
+        expect(fixRule(RULE, code)).toBe("/**\n * Does.\n */\nconst run = (): void => {\n    doThing()\n}")
+    })
+
     test("It should remove the @returns block, keeping the rest of the JSDoc", ({ expect }) => {
         const code =
             "/**\n * Logs.\n * @param a The value.\n * @returns Nothing.\n */\nfunction log(a) {\n    use(a)\n}"
