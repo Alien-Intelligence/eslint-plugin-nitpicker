@@ -24,7 +24,7 @@ class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
 
     readonly meta = {
         type: "suggestion",
-        fixable: "whitespace",
+        fixable: "code",
         docs: {
             description: "Require an object literal with more than a few properties to span multiple lines.",
             recommended: true,
@@ -58,11 +58,17 @@ class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
                 if (node.properties.length <= maxKeys) return
                 if (node.loc.start.line !== node.loc.end.line) return
 
+                // The fix rebuilds the object from its properties alone, so a
+                // comment between them would be dropped, only auto-fix a clean one
+                const hasComments = context.sourceCode.getCommentsInside(node).length > 0
+
                 context.report({
                     node,
                     messageId: "shouldWrap",
                     data: { count: node.properties.length, max: maxKeys },
-                    fix: fixer => fixer.replaceText(node, expandObjectLiteral(context.sourceCode, node, indent)),
+                    fix: hasComments
+                        ? null
+                        : fixer => fixer.replaceText(node, expandObjectLiteral(context.sourceCode, node, indent)),
                 })
             },
         }

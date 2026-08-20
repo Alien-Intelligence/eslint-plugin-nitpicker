@@ -1,4 +1,4 @@
-import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
+import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
 import { findProsePeriods } from "@/lib/utils/comments"
 import { nitpick } from "@/lib/utils/messages"
@@ -34,29 +34,16 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
             sentence: nitpick({
                 problem: "This line comment runs two sentences together with a period.",
                 why: "Line comments should be short, clear fragments, dropping the period on its own would leave a run-on, so the sentences belong on separate lines",
-                fix: "Split it into one `//` line per fragment, or reword it as a single fragment",
+                fix: "Split it into one `//` line per fragment, or reword it as a single fragment (reported, not auto-fixed, so wrapped prose is never mangled)",
             }),
         },
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        // The indentation of a comment that sits alone on its line, or "null" when
-        // code precedes it, as splitting a trailing comment would break that line
-        const ownLineIndent = (comment: TSESTree.Comment): string | null => {
-            const before = (context.sourceCode.lines[comment.loc.start.line - 1] ?? "").slice(
-                0,
-                comment.loc.start.column,
-            )
-
-            return before.trim() === "" ? before : null
-        }
-
         return {
             Program() {
                 for (const comment of context.sourceCode.getAllComments()) {
                     if (comment.type !== "Line") continue
-
-                    const indent = ownLineIndent(comment)
 
                     for (const period of findProsePeriods(comment)) {
                         const loc = {
@@ -76,21 +63,10 @@ class NoLineCommentPeriod extends NitpickerRule<MessageIds, Options> {
                             continue
                         }
 
-                        // Mid-comment, the period separates two fragments, so the
-                        // fix moves the second one onto its own comment line,
-                        // swallowing the spacing that followed the period
-                        const offset = period.index - comment.range[0] - 2
-                        const spacing = comment.value.slice(offset + 1).match(/^\s*/u)?.[0] ?? ""
-                        const end = period.index + 1 + spacing.length
-
-                        context.report({
-                            loc,
-                            messageId: "sentence",
-                            fix:
-                                indent === null
-                                    ? null
-                                    : fixer => fixer.replaceTextRange([period.index, end], `\n${indent}// `),
-                        })
+                        // Mid-comment, the period separates two fragments, and
+                        // splitting it onto a new line mangles wrapped prose, so this
+                        // case is reported for a human or agent to reword, not fixed
+                        context.report({ loc, messageId: "sentence" })
                     }
                 }
             },

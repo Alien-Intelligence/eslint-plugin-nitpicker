@@ -1,4 +1,4 @@
-import { fixRule, lintRule } from "tests/utils/lint"
+import { lintRule } from "tests/utils/lint"
 import { describe, test } from "vitest"
 
 const RULE = "no-emojis"
@@ -31,8 +31,22 @@ describe("no-emojis", () => {
         expect(lintRule(RULE, 'const s = "flag 🇫🇷"')).toHaveLength(1)
     })
 
-    test("It should remove the emoji on fix", ({ expect }) => {
-        expect(fixRule(RULE, 'const s = "hi🎉"')).toBe('const s = "hi"')
+    test("It should not offer an autofix (report-only, to never delete a meaningful glyph)", ({ expect }) => {
+        const messages = lintRule(RULE, 'const s = "hi🎉"')
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.fix).toBeUndefined()
+    })
+
+    test("It should exempt emoji in strings when `allow` includes strings", ({ expect }) => {
+        const opts = { options: [{ allow: ["strings"] }] }
+        expect(lintRule(RULE, 'const s = "launch 🚀"', opts)).toHaveLength(0)
+        // A comment emoji is still flagged, only strings were allowed
+        expect(lintRule(RULE, "// done 🎉", opts)).toHaveLength(1)
+    })
+
+    test("It should exempt emoji in comments when `allow` includes comments", ({ expect }) => {
+        const opts = { options: [{ allow: ["comments"] }] }
+        expect(lintRule(RULE, "// warning ⚠️ here", opts)).toHaveLength(0)
     })
 
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {

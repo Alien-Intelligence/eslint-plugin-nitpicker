@@ -43,6 +43,15 @@ describe("require-multiline-object", () => {
         expect(lintRule(RULE, "const x = { a: 1, b: 2, c: 3, d: 4 }", opts)).toHaveLength(1)
     })
 
+    test("It should report but not fix an object containing a comment (never drop it)", ({ expect }) => {
+        const code = "const x = { a: 1, /* keep me */ b: 2, c: 3 }"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.fix).toBeUndefined()
+        // The fixer must leave the source untouched rather than dropping the comment
+        expect(fixRule(RULE, code)).toBe(code)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "const x = { a: 1, b: 2, c: 3 }")
         expect(messages[0]?.message).toContain("why:")

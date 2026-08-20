@@ -48,12 +48,8 @@ describe("comment fixes together", () => {
         expect(fixComments("// Calls `foo.bar` and `a. b` here")).toBe('// Calls "foo.bar" and "a. b" here')
     })
 
-    test("It should split a run-on and capitalize the first fragment", ({ expect }) => {
-        expect(fixComments("// reads the token. It is cached")).toBe("// Reads the token\n// It is cached")
-    })
-
-    test("It should leave a split fragment as written, it reads as a wrapped continuation", ({ expect }) => {
-        expect(fixComments("// Reads the token. it is cached")).toBe("// Reads the token\n// it is cached")
+    test("It should capitalize a run-on but leave the mid-comment period (report-only)", ({ expect }) => {
+        expect(fixComments("// reads the token. It is cached")).toBe("// Reads the token. It is cached")
     })
 
     test("It should leave a quoted period alone", ({ expect }) => {
@@ -71,7 +67,9 @@ describe("comment fixes together", () => {
     })
 
     test("It should converge on a comment needing every fix at once", ({ expect }) => {
+        // Backticks -> quotes, spellings fixed, first letter capitalized, terminal
+        // period removed; the mid-comment period is report-only, so it stays
         const output = fixComments("// normalise `foo.bar`. then it colours the cell.")
-        expect(output).toBe('// Normalize "foo.bar"\n// then it colors the cell')
+        expect(output).toBe('// Normalize "foo.bar". then it colors the cell')
     })
 })

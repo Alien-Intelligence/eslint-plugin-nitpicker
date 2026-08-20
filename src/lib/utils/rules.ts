@@ -30,5 +30,5 @@ export type NitpickerRuleDocs = {
  * The shared rule factory for the whole plugin.
  */
 export const createRule = ESLintUtils.RuleCreator<NitpickerRuleDocs>(
-    name => `${CONSTANTS.REPO_URL}/blob/main/docs/rules/${name}.md`,
+    () => `${CONSTANTS.REPO_URL}/blob/main/README.md#rules`,
 )

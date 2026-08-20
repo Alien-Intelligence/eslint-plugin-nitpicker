@@ -1,27 +1,12 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
+import { allowedRanges, isInAnyRange, type SourceLocation } from "@/lib/utils/locations"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
-/**
- * A place an em dash may be tolerated, so user-facing copy, prompt text, and
- * glyphs can keep it while code and comments stay clean.
- */
-type EmDashLocation = "strings" | "templates" | "jsx" | "comments"
-
-type Options = [{ allow?: EmDashLocation[] }]
+type Options = [{ allow?: SourceLocation[] }]
 type MessageIds = "emDash"
-
-/**
- * The token type each allowed location maps to, `comments` aside, as comments are
- * not tokens.
- */
-const TOKEN_TYPES: Partial<Record<EmDashLocation, string>> = {
-    strings: "String",
-    templates: "Template",
-    jsx: "JSXText",
-}
 
 /**
  * Flags every em dash (—) character found anywhere in the source, except in the
@@ -63,41 +48,16 @@ class NoEmDash extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
-        const allow = new Set(options[0]?.allow ?? [])
-
-        // The source spans an em dash may sit in without being reported, left empty
-        // when nothing is allowed so the default scan stays exhaustive
-        const exempt = (): [number, number][] => {
-            const ranges: [number, number][] = []
-            if (allow.size === 0) return ranges
-
-            const tokenTypes = new Set(
-                [...allow].map(location => TOKEN_TYPES[location]).filter(type => type !== undefined),
-            )
-
-            for (const token of context.sourceCode.ast.tokens ?? []) {
-                if (tokenTypes.has(token.type)) ranges.push(token.range)
-            }
-
-            if (allow.has("comments")) {
-                for (const comment of context.sourceCode.getAllComments()) {
-                    ranges.push(comment.range)
-                }
-            }
-
-            return ranges
-        }
-
         return {
             Program() {
                 const text = context.sourceCode.getText()
-                const ranges = exempt()
+                const ranges = allowedRanges(context.sourceCode, options[0]?.allow ?? [])
 
                 // Scan the raw source so every em dash is caught, whether it appears
                 // in code, strings, or comments
                 for (let index = 0; index < text.length; index++) {
                     if (text[index] !== CONSTANTS.EM_DASH) continue
-                    if (ranges.some(([start, end]) => index >= start && index < end)) continue
+                    if (isInAnyRange(index, ranges)) continue
 
                     context.report({
                         loc: {
