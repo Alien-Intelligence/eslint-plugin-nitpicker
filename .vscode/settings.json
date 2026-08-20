@@ -47,10 +47,12 @@
     "cSpell.words": [
         "Colorette",
         "Colour",
+        "httpcontext",
         "jsdocs",
         "normalise",
         "npmjs",
         "sigstore",
-        "TSES"
+        "TSES",
+        "usememo"
     ]
 }
