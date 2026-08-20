@@ -21,8 +21,11 @@ import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
+import noJSXComments from "@/rules/react/noJSXComments"
 import requireContextHookDestructure from "@/rules/react/requireContextHookDestructure"
+import requireDerivedUseMemo from "@/rules/react/requireDerivedUseMemo"
 import requireHookObjectReturn from "@/rules/react/requireHookObjectReturn"
+import requireMemoCallbackJSDoc from "@/rules/react/requireMemoCallbackJSDoc"
 
 /**
  * Every rule instance registered by the plugin.
@@ -48,8 +51,11 @@ const ruleInstances = [
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,
+    noJSXComments,
     requireContextHookDestructure,
+    requireDerivedUseMemo,
     requireHookObjectReturn,
+    requireMemoCallbackJSDoc,
 ]
 
 /**
