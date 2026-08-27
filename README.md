@@ -107,12 +107,12 @@ Shipped by the `react` config (and `all`).
 
 ### AdonisJS rules
 Shipped by the `adonisjs` config (and `all`).
-| Rule                                | Fixable | Description                                                                      |
-|-------------------------------------|---------|----------------------------------------------------------------------------------|
-| `nitpicker/migration-table-order`   |         | Group migration table statements as columns, then timestamps, then indexes.      |
-| `nitpicker/require-controller-jsdoc`|         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class). |
-| `nitpicker/require-migration-jsdoc` |         | Require a JSDoc comment describing an AdonisJS migration.                        |
-| `nitpicker/require-validated-request`|        | Require request data through `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` option). |
+| Rule                                  | Fixable | Description                                                                                                     |
+|---------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------|
+| `nitpicker/migration-table-order`     |         | Group migration table statements as columns, then timestamps, then indexes.                                     |
+| `nitpicker/require-controller-jsdoc`  |         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class).                                |
+| `nitpicker/require-migration-jsdoc`   |         | Require a JSDoc comment describing an AdonisJS migration.                                                       |
+| `nitpicker/require-validated-request` |         | Require request data through `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` option). |
 
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
