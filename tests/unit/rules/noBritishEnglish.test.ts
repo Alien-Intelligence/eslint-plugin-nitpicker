@@ -46,6 +46,20 @@ describe("no-british-english", () => {
         expect(messages).toHaveLength(1)
     })
 
+    test("It should flag the newly hardened British spellings", ({ expect }) => {
+        for (const word of ["centralised", "utilisation", "spectre", "favour", "artefact", "prioritise"]) {
+            expect(lintRule(RULE, `const ${word} = 1`), word).toHaveLength(1)
+        }
+    })
+
+    test("It should fix `centralised` to `centralized` in a comment", ({ expect }) => {
+        expect(fixRule(RULE, "// centralised config")).toBe("// centralized config")
+    })
+
+    test("It should not flag `fulfilled`, which is the same in both variants", ({ expect }) => {
+        expect(lintRule(RULE, "const fulfilled = true")).toHaveLength(0)
+    })
+
     test("It should fix a British word in a comment", ({ expect }) => {
         const output = fixRule(RULE, "// the colour value")
         expect(output).toBe("// the color value")
