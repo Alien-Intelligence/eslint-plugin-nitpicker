@@ -35,4 +35,10 @@ export default [
         files: ["src/lib/data/britishToAmerican.ts"],
         rules: { "nitpicker/no-british-english": "off" },
     },
+    {
+        // The entry point reads the version from the root package.json, which no
+        // path alias covers, so its relative import is unavoidable
+        files: ["src/index.ts"],
+        rules: { "nitpicker/no-relative-imports": "off" },
+    },
 ]

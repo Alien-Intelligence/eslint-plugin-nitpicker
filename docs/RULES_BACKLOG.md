@@ -39,6 +39,9 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-jsx-comments`                  | No inline `{/* ... */}` comments in JSX; extract a named sub-component (react category)                                                                    | user request                                  |
 | `require-memo-callback-jsdoc`      | JSDoc required on `useMemo`/`useCallback`; `@param` per `useCallback` parameter (react category)                                                           | user request                                  |
 | `require-derived-usememo`          | A component/hook `const` derived via a non-hook call must be a `useMemo` (react category)                                                                  | user request                                  |
+| `no-relative-imports`              | No relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` globs exempt)                                                            | web-app pass; both STYLE.md                   |
+| `require-validated-request`        | Controllers read request data via `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` globs exempt) (adonisjs category)              | web-app pass; BE STYLE.md                     |
+| `catch-error-name`                 | A `catch` clause binds its error as `error` (`_error` for an unused binding)                                                                                | web-app pass; BE STYLE.md                     |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |

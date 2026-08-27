@@ -4,6 +4,8 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 import migrationTableOrder from "@/rules/adonisjs/migrationTableOrder"
 import requireControllerJSDoc from "@/rules/adonisjs/requireControllerJSDoc"
 import requireMigrationJSDoc from "@/rules/adonisjs/requireMigrationJSDoc"
+import requireValidatedRequest from "@/rules/adonisjs/requireValidatedRequest"
+import catchErrorName from "@/rules/base/catchErrorName"
 import maxJSDocDescriptionLength from "@/rules/base/maxJSDocDescriptionLength"
 import noAliasVariables from "@/rules/base/noAliasVariables"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
@@ -16,6 +18,7 @@ import noLineCommentBackticks from "@/rules/base/noLineCommentBackticks"
 import noLineCommentPeriod from "@/rules/base/noLineCommentPeriod"
 import noPropertyAccessAlias from "@/rules/base/noPropertyAccessAlias"
 import noPropertyDestructuring from "@/rules/base/noPropertyDestructuring"
+import noRelativeImports from "@/rules/base/noRelativeImports"
 import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
 import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
@@ -34,6 +37,8 @@ const ruleInstances = [
     migrationTableOrder,
     requireControllerJSDoc,
     requireMigrationJSDoc,
+    requireValidatedRequest,
+    catchErrorName,
     maxJSDocDescriptionLength,
     noAliasVariables,
     noBritishEnglish,
@@ -46,6 +51,7 @@ const ruleInstances = [
     noLineCommentPeriod,
     noPropertyAccessAlias,
     noPropertyDestructuring,
+    noRelativeImports,
     noSingleLineJSDoc,
     requireCapitalizedComments,
     requireFrameworkConfig,
