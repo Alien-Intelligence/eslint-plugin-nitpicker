@@ -39,9 +39,9 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-jsx-comments`                  | No inline `{/* ... */}` comments in JSX; extract a named sub-component (react category)                                                                    | user request                                  |
 | `require-memo-callback-jsdoc`      | JSDoc required on `useMemo`/`useCallback`; `@param` per `useCallback` parameter (react category)                                                           | user request                                  |
 | `require-derived-usememo`          | A component/hook `const` derived via a non-hook call must be a `useMemo` (react category)                                                                  | user request                                  |
-| `no-relative-imports`              | No relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` globs exempt)                                                            | web-app pass; both STYLE.md                   |
+| `no-relative-imports`              | No relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` globs exempt)                                                           | web-app pass; both STYLE.md                   |
 | `require-validated-request`        | Controllers read request data via `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` globs exempt) (adonisjs category)              | web-app pass; BE STYLE.md                     |
-| `catch-error-name`                 | A `catch` clause binds its error as `error` (`_error` for an unused binding)                                                                                | web-app pass; BE STYLE.md                     |
+| `catch-error-name`                 | A `catch` clause binds its error as `error` (`_error` for an unused binding)                                                                               | web-app pass; BE STYLE.md                     |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |
@@ -65,10 +65,10 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `enum-screaming-snake-keys`        | Enum keys `SCREAMING_SNAKE_CASE`, lowercase string values                       | M    | BE    | BE STYLE.md                                                    |
 
 ## Candidate — Variables & anti-patterns (the "useless aliases" family)
-| Proposed rule             | Enforces                                                          | Diff              | Scope | Source / notes |             |
-|---------------------------|-------------------------------------------------------------------|-------------------|-------|----------------|-------------|
-| `no-redundant-union-cast` | Ban `let x: T \                                                   | null = expr as T` | M     | BE             | BE STYLE.md |
-| `no-explicit-void-return` | Don't annotate `void`/`Promise<void>` when the body never returns | M                 | All   | code-style     |             |
+| Proposed rule             | Enforces                                                          | Diff | Scope | Source / notes |
+|---------------------------|-------------------------------------------------------------------|------|-------|----------------|
+| `no-redundant-union-cast` | Ban `let x: T \| null = expr as T`                                | M    | BE    | BE STYLE.md    |
+| `no-explicit-void-return` | Don't annotate `void`/`Promise<void>` when the body never returns | M    | All   | code-style     |
 
 ## Candidate — Formatting / code breathing
 | Proposed rule    | Enforces                                                                                                               | Diff | Scope | Source / notes                                                     |
@@ -95,6 +95,36 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `config-over-magic-numbers`     | Timing/threshold values live in `*_CONFIG`, not inline                                                                        | H    | BE              | BE STYLE.md                                             |
 | `tailwind-canonical-classes`    | Prefer canonical Tailwind classes over arbitrary values                                                                       | H    | FE              | FE STYLE.md; overlaps existing tailwind plugins         |
 
+## Candidate — React / frontend (0.7.0 web-app research pass)
+| Proposed rule                       | Enforces                                                                                                           | Diff | Scope | Source / notes                                                        |
+|-------------------------------------|--------------------------------------------------------------------------------------------------------------------|------|-------|-----------------------------------------------------------------------|
+| `props-type-name-matches-component` | A default-exported component's props type is named `<Component>Props`, not a generic `Props`                       | M    | FE    | web-app pass; 518 `XProps` vs 0 generic                               |
+| `no-inline-props-type`              | Component props reference a named type/interface, never an inline `({…}: { … })` literal                           | M    | FE    | web-app pass; 518 named vs 13 inline; pairs with props-type-name      |
+| `event-handler-handle-prefix`       | A locally-declared fn bound to a JSX `on*` prop is named `handle*` (setter / `field.onChange` passthroughs exempt) | H    | FE    | web-app pass; 334 `handleX` handlers                                  |
+| `require-tsx-default-export`        | A `.tsx` component file exports its component via `export default`                                                 | M    | FE    | web-app pass + FE STYLE.md; ~39 provider/hook files need an allowlist |
+| `no-hand-rolled-spinner-skeleton`   | No `animate-spin`/`animate-pulse` in className; use the `<Spinner/>`/`<Skeleton/>` primitives                      | E    | FE    | web-app pass; FE STYLE.md "forbidden patterns"                        |
+| `no-redundant-disabled-isloading`   | Forbid `<Button disabled={x} isLoading={x}>` with the same expression on both props                                | M    | FE    | web-app pass; FE STYLE.md                                             |
+
+## Candidate — Framework structure (Next.js / AdonisJS) (0.7.0 web-app research pass)
+| Proposed rule                      | Enforces                                                                                                                       | Diff | Scope     | Source / notes                                                                |
+|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|------|-----------|-------------------------------------------------------------------------------|
+| `require-use-server-in-queries`    | Every file under `queries/` starts with a `"use server"` directive                                                             | M    | proj (FE) | web-app pass; 36/36 comply; FE STYLE.md                                       |
+| `require-use-client-in-hooks`      | Every hook file under `hooks/api/` starts with `"use client"`                                                                  | M    | proj (FE) | web-app pass; FE STYLE.md                                                     |
+| `app-router-server-client-split`   | `page.tsx` is a Server Component (no `"use client"`); its sibling `content.tsx` starts with `"use client"`                     | M    | proj (FE) | web-app pass; 63/62, 1 exception                                              |
+| `no-console-in-queries`            | No `console.warn`/`console.error` in `queries/`; use `tryCatchLog`                                                             | E    | proj (FE) | web-app pass; **docs conflict** — examples still use console, confirm intent  |
+| `require-service-singleton-export` | A `services/` file exporting a service class also exports a camelCase singleton (`export const fooService = new FooService()`) | M    | proj (BE) | web-app pass; 26/26; not written in STYLE.md                                  |
+| `controller-response-via-helper`   | Controllers respond via `this.successResponse<T>()`/`errorResponse()`, not raw `response.status/send/json`                     | M    | proj (BE) | web-app pass; 1495 helper calls; ~5 passthrough controllers need an allowlist |
+| `require-success-response-generic` | `this.successResponse(...)` is always called with an explicit type argument                                                    | E    | proj (BE) | web-app pass; BE STYLE.md                                                     |
+| `no-httpcontext-jsdoc-param`       | A route-handler JSDoc never carries `@param` for `HttpContext` or its destructured props (`auth`, `request`, `params`, …)      | M    | proj (BE) | web-app pass; BE STYLE.md; complements shipped `require-controller-jsdoc`     |
+| `belongsto-fk-column-adjacent`     | Each `@belongsTo` relation is immediately preceded by its `@column() declare <rel>Id` foreign key                              | M    | proj (BE) | web-app pass; 73 `@belongsTo` across 39 models                                |
+
+## Candidate — Logging (AdonisJS) (0.7.0 web-app research pass)
+| Proposed rule                    | Enforces                                                                                       | Diff | Scope | Source / notes                                                                     |
+|----------------------------------|------------------------------------------------------------------------------------------------|------|-------|------------------------------------------------------------------------------------|
+| `trycatchlog-failed-to-prefix`   | The message arg to `tryCatchLog(...)` starts with `"failed to "`                               | E    | BE    | web-app pass; 179/199 comply; BE STYLE.md                                          |
+| `logger-data-object-first`       | `logger.{info,warn,error,debug}` takes the structured data object first, message string second | M    | BE    | web-app pass; BE STYLE.md                                                          |
+| `no-log-message-trailing-period` | Log message strings carry no trailing period                                                   | E    | BE    | web-app pass; BE STYLE.md; lowercase-initial variant needs a proper-noun allowlist |
+
 ## Cross-cutting notes
 - **Conflicts need options.** `no-body-destructuring` is absolute in gitgame but relaxed in web-app
   (rename-on-destructure allowed). Rules mined from multiple projects should ship with options and
@@ -106,3 +136,8 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
   STYLE.md but are not AST-lintable in the usual way; would need a filename-pattern rule. Deferred.
 - **Type-aware rules** (`boolean-is-are-prefix`, `jsdoc-param-descriptions`) are most accurate with the
   TypeScript type checker; decide whether Nitpicker takes a type-aware tier or stays syntactic.
+- **Doc conflicts found in the 0.7.0 web-app pass** (confirm intent before building):
+  `console.warn`/`console.error` are banned in `queries/` yet the STYLE.md's own examples still use them;
+  and STYLE.md says "use `next/image` for all images" while CLAUDE.md says image optimization is disabled
+  ("external CDN assumed"), so a `require-next-image` rule would contradict the architecture doc and was
+  deliberately not proposed.
