@@ -1,4 +1,5 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
+import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
 import { getJSDocLineTag, hasLeadingJSDoc } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
@@ -6,11 +7,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = []
 type MessageIds = "missingJSDoc" | "missingParam"
-
-/**
- * The memoization hooks whose result is worth documenting.
- */
-const MEMO_HOOKS = new Set(["useMemo", "useCallback"])
 
 /**
  * Requires a JSDoc above a `useMemo` or `useCallback` so a memoized value or
@@ -48,7 +44,7 @@ class RequireMemoCallbackJSDoc extends NitpickerRule<MessageIds, Options> {
         return {
             VariableDeclarator(node) {
                 if (node.init?.type !== "CallExpression" || node.init.callee.type !== "Identifier") return
-                if (!MEMO_HOOKS.has(node.init.callee.name)) return
+                if (!CONSTANTS.REACT.MEMO_HOOKS.has(node.init.callee.name)) return
 
                 // The JSDoc sits above the whole declaration, or its export
                 let target: TSESTree.Node = node.parent

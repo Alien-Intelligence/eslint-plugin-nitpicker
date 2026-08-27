@@ -153,6 +153,22 @@ const CONSTANTS = {
          * `useTreeViewContext` (the bare `useContext` is excluded).
          */
         CONTEXT_HOOK: /^use[A-Z]\w*Context$/,
+
+        /**
+         * The memoization hooks whose result is worth documenting with a JSDoc.
+         */
+        MEMO_HOOKS: new Set(["useMemo", "useCallback"]),
+    },
+
+    /**
+     * Constants for AdonisJS request handling.
+     */
+    REQUEST: {
+        /**
+         * The raw request accessors that read request data directly, bypassing
+         * the Vine validator contract.
+         */
+        RAW_ACCESSORS: new Set(["input", "body", "qs", "all", "only", "except"]),
     },
 
     /**

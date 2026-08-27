@@ -76,6 +76,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | Rule                                         | Fixable | Description                                                                                        |
 |----------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
 | `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                          |
+| `nitpicker/catch-error-name`                 |         | Require a `catch` clause to bind its error as `error` (`_error` for an unused binding).            |
 | `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                 |
 | `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.         |
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.            |
@@ -87,6 +88,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/no-line-comment-period`           | yes¹    | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK).   |
 | `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead.   |
 | `nitpicker/no-property-destructuring`        |         | Disallow shorthand destructuring off a plain object reference; access the property directly.       |
+| `nitpicker/no-relative-imports`              |         | Disallow relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` option).  |
 | `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                           |
 | `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                               |
 | `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                           |
@@ -110,6 +112,7 @@ Shipped by the `adonisjs` config (and `all`).
 | `nitpicker/migration-table-order`   |         | Group migration table statements as columns, then timestamps, then indexes.      |
 | `nitpicker/require-controller-jsdoc`|         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class). |
 | `nitpicker/require-migration-jsdoc` |         | Require a JSDoc comment describing an AdonisJS migration.                        |
+| `nitpicker/require-validated-request`|        | Require request data through `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` option). |
 
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
@@ -135,6 +138,12 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 "nitpicker/no-decorative-comment-separators": ["warn", {
     allowIn: ["**/start/routes.ts"],
 }],
+```
+
+`no-relative-imports` and `require-validated-request` each take the same `{ allowIn: string[] }`, a list of globs exempt from the rule, for the few files where the pattern is unavoidable (an entrypoint that reaches outside the alias roots, or a passthrough proxy controller that reads the raw request):
+```js
+"nitpicker/no-relative-imports": ["warn", { allowIn: ["**/bin/*.ts"] }],
+"nitpicker/require-validated-request": ["warn", { allowIn: ["**/*_proxy_controller.ts"] }],
 ```
 
 `require-framework-config` takes `{ ignore: ("adonisjs" | "react")[] }`, the frameworks to skip the nudge for:
