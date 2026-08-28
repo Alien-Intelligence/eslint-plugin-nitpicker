@@ -97,13 +97,14 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 
 ### React rules
 Shipped by the `react` config (and `all`).
-| Rule                                         | Fixable | Description                                                                                  |
-|----------------------------------------------|---------|----------------------------------------------------------------------------------------------|
-| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.            |
-| `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                      |
-| `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a component or hook to use `useMemo`. |
-| `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                       |
-| `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter). |
+| Rule                                         | Fixable | Description                                                                                    |
+|----------------------------------------------|---------|------------------------------------------------------------------------------------------------|
+| `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`. |
+| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.              |
+| `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                        |
+| `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a component or hook to use `useMemo`.   |
+| `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                         |
+| `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter).   |
 
 ### AdonisJS rules
 Shipped by the `adonisjs` config (and `all`).
@@ -123,6 +124,11 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 `max-jsdoc-description-length` takes `{ max: number }`, defaulting to `250`:
 ```js
 "nitpicker/max-jsdoc-description-length": ["warn", { max: 200 }],
+```
+
+`max-classname-length` takes `{ max: number }`, the maximum length of a `className` class string, defaulting to `120`:
+```js
+"nitpicker/max-classname-length": ["warn", { max: 100 }],
 ```
 
 `no-british-english` takes `{ extra?: Record<string, string>; ignore?: string[] }` to extend the built-in dictionary or exempt words you want to keep:
