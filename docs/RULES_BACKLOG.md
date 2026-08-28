@@ -42,6 +42,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-relative-imports`              | No relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` globs exempt)                                                           | web-app pass; both STYLE.md                   |
 | `require-validated-request`        | Controllers read request data via `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` globs exempt) (adonisjs category)              | web-app pass; BE STYLE.md                     |
 | `catch-error-name`                 | A `catch` clause binds its error as `error` (`_error` for an unused binding)                                                                               | web-app pass; BE STYLE.md                     |
+| `max-classname-length`             | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()` (react category)                                             | user request                                  |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |

@@ -51,6 +51,7 @@
         "jsdocs",
         "normalise",
         "npmjs",
+        "quasis",
         "sigstore",
         "TSES",
         "usememo"

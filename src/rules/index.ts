@@ -24,6 +24,7 @@ import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
+import maxClassNameLength from "@/rules/react/maxClassNameLength"
 import noJSXComments from "@/rules/react/noJSXComments"
 import requireContextHookDestructure from "@/rules/react/requireContextHookDestructure"
 import requireDerivedUseMemo from "@/rules/react/requireDerivedUseMemo"
@@ -57,6 +58,7 @@ const ruleInstances = [
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,
+    maxClassNameLength,
     noJSXComments,
     requireContextHookDestructure,
     requireDerivedUseMemo,
