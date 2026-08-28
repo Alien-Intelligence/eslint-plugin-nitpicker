@@ -49,6 +49,12 @@ describe("require-derived-usememo", () => {
         expect(lintRule(RULE, "function useThing() {\n    const n = a + b * 2\n    return n\n}")).toHaveLength(0)
     })
 
+    test("It should not crash on a module-scope const whose init is a call", ({ expect }) => {
+        // The ancestor walk must stop at Program (whose parent is null), not read past it
+        expect(lintRule(RULE, "const Ctx = createContext()")).toHaveLength(0)
+        expect(lintRule(RULE, "const logger = createLogger({ level: 1 })")).toHaveLength(0)
+    })
+
     test("It should not report a destructured hook result", ({ expect }) => {
         const code = "function useThing() {\n    const [x, setX] = useState(0)\n    return x\n}"
         expect(lintRule(RULE, code)).toHaveLength(0)

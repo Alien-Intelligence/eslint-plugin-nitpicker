@@ -54,9 +54,11 @@ export function isTopLevel(node: TSESTree.Node): boolean {
  * @returns The enclosing function, or `null` if the node is at module scope.
  */
 export function enclosingFunction(node: TSESTree.Node): FunctionNode | null {
+    // "node.parent" is typed undefined but is null at the Program root, so guard
+    // with a truthy check to stop the walk on either
     let current: TSESTree.Node | undefined = node.parent
 
-    while (current !== undefined) {
+    while (current) {
         if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(current.type)) {
             return current as FunctionNode
         }
