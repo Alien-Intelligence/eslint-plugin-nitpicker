@@ -95,6 +95,21 @@ describe("require-function-jsdoc", () => {
         expect(lintRule(RULE, code)).toHaveLength(1)
     })
 
+    test("It should not report a function documented above an ignore directive", ({ expect }) => {
+        const biome =
+            "/**\n * Sends it.\n */\n// biome-ignore lint/suspicious/useAwait: timing\nexport async function send() {}"
+        expect(lintRule(RULE, biome)).toHaveLength(0)
+
+        // Not an ESLint directive here, to avoid ESLint's own unused-directive noise
+        const tsExpect = "/**\n * Sends it.\n */\n// @ts-expect-error legacy\nexport function send() {}"
+        expect(lintRule(RULE, tsExpect)).toHaveLength(0)
+    })
+
+    test("It should still report a function with a directive but no JSDoc above it", ({ expect }) => {
+        const code = "// biome-ignore lint/suspicious/useAwait: timing\nexport async function send() {}"
+        expect(lintRule(RULE, code)).toHaveLength(1)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "function foo() {}")
         expect(messages[0]?.message).toContain("why:")

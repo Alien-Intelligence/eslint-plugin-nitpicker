@@ -1,5 +1,6 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
+import { isDirectiveComment } from "@/lib/utils/comments"
 
 /**
  * Checks whether a comment is a JSDoc comment, i.e. a block comment that opens
@@ -45,8 +46,17 @@ export function jsDocAnchor(node: TSESTree.Node): TSESTree.Node {
  */
 export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
     const commentsBefore = sourceCode.getCommentsBefore(jsDocAnchor(node))
-    const closest = commentsBefore.at(-1)
 
+    // Skip trailing ignore directives (biome-ignore, eslint-*, @ts-*) that can
+    // sit between the JSDoc and the node, so the JSDoc above them still counts
+    let index = commentsBefore.length - 1
+    while (index >= 0) {
+        const comment = commentsBefore[index]
+        if (comment === undefined || !isDirectiveComment(comment)) break
+        index--
+    }
+
+    const closest = commentsBefore[index]
     return closest !== undefined && isJSDocComment(closest)
 }
 
