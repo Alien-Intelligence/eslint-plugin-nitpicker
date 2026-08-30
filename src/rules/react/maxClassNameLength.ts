@@ -1,4 +1,5 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
+import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
@@ -9,9 +10,9 @@ type MessageIds = "tooLong"
 const DEFAULT_MAX = 120
 
 /**
- * Flags a `className` whose class string is longer than the configured limit, so
- * a wall of Tailwind utilities gets broken up (typically across `cn()` arguments
- * on their own lines) rather than living on one unreadable line.
+ * Flags a class string in a `className` longer than the configured limit, so a
+ * wall of Tailwind utilities gets broken into shorter pieces. A long string
+ * inside a `cn(...)` call is caught too, since `cn` does not break it up.
  */
 class MaxClassNameLength extends NitpickerRule<MessageIds, Options> {
     readonly name = "max-classname-length"
@@ -46,34 +47,54 @@ class MaxClassNameLength extends NitpickerRule<MessageIds, Options> {
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const max = options[0]?.max ?? DEFAULT_MAX
 
-        // The class string of a "className" value when it is a single string
-        // literal or a non-interpolated template, or "null" for anything richer
-        const classString = (value: TSESTree.JSXAttribute["value"]): string | null => {
-            if (value === null) return null
-            if (value.type === "Literal") return typeof value.value === "string" ? value.value : null
-            if (value.type !== "JSXExpressionContainer") return null
+        // Collect the class strings inside a className value: string literals and
+        // non-interpolated templates, including those nested in a cn(...) call,
+        // without descending into a nested function
+        const collect = (
+            node: TSESTree.Node | null | undefined,
+            found: { node: TSESTree.Node; text: string }[],
+        ): void => {
+            if (!node) return
 
-            if (value.expression.type === "Literal")
-                return typeof value.expression.value === "string" ? value.expression.value : null
-            if (value.expression.type === "TemplateLiteral" && value.expression.expressions.length === 0) {
-                return value.expression.quasis[0]?.value.cooked ?? ""
+            if (node.type === "Literal") {
+                if (typeof node.value === "string") found.push({ node, text: node.value })
+                return
             }
 
-            return null
+            if (node.type === "TemplateLiteral") {
+                if (node.expressions.length === 0) found.push({ node, text: node.quasis[0]?.value.cooked ?? "" })
+                return
+            }
+
+            for (const key of context.sourceCode.visitorKeys[node.type] ?? []) {
+                const value = (node as unknown as Record<string, unknown>)[key]
+                const children = Array.isArray(value) ? value : [value]
+
+                for (const child of children) {
+                    const childNode = child as TSESTree.Node | null | undefined
+                    if (!childNode || typeof childNode.type !== "string") continue
+                    if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(childNode.type)) continue
+                    collect(childNode, found)
+                }
+            }
         }
 
         return {
             JSXAttribute(node) {
-                if (node.name.type !== "JSXIdentifier" || node.name.name !== "className") return
+                if (node.name.type !== "JSXIdentifier" || node.name.name !== "className" || node.value === null) return
 
-                const classes = classString(node.value)
-                if (classes === null || classes.length <= max || node.value === null) return
+                const found: { node: TSESTree.Node; text: string }[] = []
+                collect(node.value, found)
 
-                context.report({
-                    node: node.value,
-                    messageId: "tooLong",
-                    data: { length: classes.length, max },
-                })
+                for (const { node: literal, text } of found) {
+                    if (text.length <= max) continue
+
+                    context.report({
+                        node: literal,
+                        messageId: "tooLong",
+                        data: { length: text.length, max },
+                    })
+                }
             },
         }
     }

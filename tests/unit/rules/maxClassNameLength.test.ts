@@ -27,8 +27,13 @@ describe("max-classname-length", () => {
         expect(lintRule(RULE, `const x = <div className={\`${LONG}\`} />`, TSX)).toHaveLength(1)
     })
 
-    test("It should not report a `cn()` call (already the broken-up form)", ({ expect }) => {
-        const code = `const x = <div className={cn("${LONG}", isActive && "on")} />`
+    test("It should report a long string inside a `cn()` call", ({ expect }) => {
+        const code = `const x = <div className={cn("${LONG}", className)} />`
+        expect(lintRule(RULE, code, TSX)).toHaveLength(1)
+    })
+
+    test("It should not report a `cn()` call of short strings", ({ expect }) => {
+        const code = 'const x = <div className={cn("flex gap-2", isActive && "on", className)} />'
         expect(lintRule(RULE, code, TSX)).toHaveLength(0)
     })
 
