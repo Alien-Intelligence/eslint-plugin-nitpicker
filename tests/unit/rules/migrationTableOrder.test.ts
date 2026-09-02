@@ -5,6 +5,8 @@ const RULE = "migration-table-order"
 
 /**
  * Wraps table-builder statements in a `this.schema.createTable` call.
+ * @param body The table-builder statements to wrap.
+ * @returns The migration source to lint.
  */
 function migration(body: string): string {
     return `this.schema.createTable("things", table => {\n${body}\n})`

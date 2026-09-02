@@ -27,6 +27,11 @@ type ReturnPredicate = (argument: TSESTree.Expression | null) => boolean
 export function getDocumentableNode(fn: FunctionNode): TSESTree.Node {
     let node: TSESTree.Node = fn
 
+    // An object or class member is documented above the member, not the function
+    if (node.parent.type === "Property" || node.parent.type === "MethodDefinition") {
+        return node.parent
+    }
+
     if (node.parent.type === "VariableDeclarator" && node.parent.parent.type === "VariableDeclaration") {
         node = node.parent.parent
     }
@@ -45,6 +50,78 @@ export function getDocumentableNode(fn: FunctionNode): TSESTree.Node {
  */
 export function isTopLevel(node: TSESTree.Node): boolean {
     return node.parent?.type === "Program"
+}
+
+/**
+ * A named thing a JSDoc `@param` can refer to.
+ */
+export type NamedParameter = { name: string; node: TSESTree.Node }
+
+/**
+ * How a parameter expects to be documented: a plain name, or a destructured
+ * object, which may be documented either property by property or under a single
+ * name standing for the whole object.
+ */
+export type ParameterDoc =
+    | { kind: "name"; name: string; node: TSESTree.Node }
+    | { kind: "object"; names: NamedParameter[]; node: TSESTree.Node }
+
+/**
+ * Describes how each parameter of a function expects to be documented. An array
+ * pattern is skipped as too ambiguous to require.
+ * @param fn The function node to read the signature of.
+ * @returns One entry per documentable parameter.
+ */
+export function parameterDocs(fn: FunctionNode): ParameterDoc[] {
+    const docs: ParameterDoc[] = []
+
+    const collect = (param: TSESTree.Node): void => {
+        switch (param.type) {
+            case "Identifier":
+                docs.push({
+                    kind: "name",
+                    name: param.name,
+                    node: param,
+                })
+                return
+            case "AssignmentPattern":
+                collect(param.left)
+                return
+            case "RestElement":
+                collect(param.argument)
+                return
+            case "TSParameterProperty":
+                collect(param.parameter)
+                return
+            case "ObjectPattern": {
+                const names: NamedParameter[] = []
+                for (const property of param.properties) {
+                    if (property.type === "RestElement") {
+                        if (property.argument.type === "Identifier") {
+                            names.push({ name: property.argument.name, node: property.argument })
+                        }
+                    } else if (property.key.type === "Identifier") {
+                        names.push({ name: property.key.name, node: property.key })
+                    }
+                }
+
+                if (names.length > 0) {
+                    docs.push({
+                        kind: "object",
+                        names,
+                        node: param,
+                    })
+                }
+                return
+            }
+            default:
+                return
+        }
+    }
+
+    for (const param of fn.params) collect(param)
+
+    return docs
 }
 
 /**

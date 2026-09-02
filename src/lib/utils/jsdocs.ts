@@ -39,12 +39,15 @@ export function jsDocAnchor(node: TSESTree.Node): TSESTree.Node {
 }
 
 /**
- * Checks whether a node is immediately preceded by a JSDoc comment.
+ * Resolves the JSDoc comment documenting a node, if it has one.
  * @param sourceCode The source code of the linted file.
  * @param node The node to inspect the leading comments of.
- * @returns True if the comment right before the node is a JSDoc comment.
+ * @returns The JSDoc comment, or `null` when the node is undocumented.
  */
-export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
+export function getLeadingJSDoc(
+    sourceCode: Readonly<TSESLint.SourceCode>,
+    node: TSESTree.Node,
+): TSESTree.Comment | null {
     const commentsBefore = sourceCode.getCommentsBefore(jsDocAnchor(node))
 
     // Skip trailing ignore directives (biome-ignore, eslint-*, @ts-*) that can
@@ -57,7 +60,46 @@ export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node:
     }
 
     const closest = commentsBefore[index]
-    return closest !== undefined && isJSDocComment(closest)
+    return closest !== undefined && isJSDocComment(closest) ? closest : null
+}
+
+/**
+ * Collects the parameter names a JSDoc documents, keyed on the root name so a
+ * dotted member tag such as `@param input.id` counts as documenting `input`.
+ * @param comment The JSDoc comment to read.
+ * @returns The documented parameter names.
+ */
+export function getJSDocParamNames(comment: TSESTree.Comment): Set<string> {
+    const names = new Set<string>()
+
+    for (const line of comment.value.split("\n")) {
+        const name = line.match(CONSTANTS.JSDOC.PARAM_TAG)?.[1]
+        if (name !== undefined) names.add(name)
+    }
+
+    return names
+}
+
+/**
+ * Checks whether a JSDoc carries a `@returns` (or `@return`) tag.
+ * @param comment The JSDoc comment to read.
+ * @returns True if the JSDoc documents a return value.
+ */
+export function hasJSDocReturnsTag(comment: TSESTree.Comment): boolean {
+    return comment.value.split("\n").some(line => {
+        const tag = getJSDocLineTag(line)
+        return tag === "returns" || tag === "return"
+    })
+}
+
+/**
+ * Checks whether a node is immediately preceded by a JSDoc comment.
+ * @param sourceCode The source code of the linted file.
+ * @param node The node to inspect the leading comments of.
+ * @returns True if the comment right before the node is a JSDoc comment.
+ */
+export function hasLeadingJSDoc(sourceCode: Readonly<TSESLint.SourceCode>, node: TSESTree.Node): boolean {
+    return getLeadingJSDoc(sourceCode, node) !== null
 }
 
 /**

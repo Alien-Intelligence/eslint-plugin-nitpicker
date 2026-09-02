@@ -76,6 +76,13 @@ const CONSTANTS = {
          * find any tag (`param`, `returns`, `throws`, etc.).
          */
         TAG: /^\s*\*?\s*@(\w+)/,
+
+        /**
+         * Matches an `@param` line and captures the documented name, tolerating a
+         * leading `{Type}` and an optional `[name]` or `[name=default]` form. A
+         * dotted member such as `input.id` captures its root, `input`.
+         */
+        PARAM_TAG: /^\s*\*?\s*@param\s+(?:\{[^}]*\}\s*)?\[?([\w$]+)/,
     },
 
     /**
