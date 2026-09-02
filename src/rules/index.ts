@@ -21,6 +21,7 @@ import noPropertyDestructuring from "@/rules/base/noPropertyDestructuring"
 import noRelativeImports from "@/rules/base/noRelativeImports"
 import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
 import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
+import requireCompleteJSDoc from "@/rules/base/requireCompleteJSDoc"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
@@ -55,6 +56,7 @@ const ruleInstances = [
     noRelativeImports,
     noSingleLineJSDoc,
     requireCapitalizedComments,
+    requireCompleteJSDoc,
     requireFrameworkConfig,
     requireFunctionJSDoc,
     requireMultilineObject,

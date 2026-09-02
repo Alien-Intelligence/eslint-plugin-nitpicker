@@ -91,6 +91,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/no-relative-imports`              |         | Disallow relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` option).  |
 | `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                           |
 | `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                               |
+| `nitpicker/require-complete-jsdoc`           |         | Require a function's JSDoc to document every parameter and its return value.                       |
 | `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                           |
 | `nitpicker/require-function-jsdoc`           |         | Require a JSDoc comment on top-level functions (React components and lazy `import` thunks exempt). |
 | `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.      |
@@ -183,6 +184,26 @@ A backtick renders as code inside a JSDoc block, but in a `//` comment it is jus
 // Reads `auth.user` from the context  ->  // Reads "auth.user" from the context
 ```
 Backticks are left alone in JSDoc and block comments, in tooling directives, when unpaired, in a run (a ```` ``` ```` fence), and when the span already holds a double quote, since `` `split(".")` `` cannot be requoted without nesting.
+
+### JSDoc completeness
+`require-complete-jsdoc` only inspects a function that already has a JSDoc (requiring the JSDoc itself is `require-function-jsdoc`'s job). It then checks the doc against the signature:
+```js
+// Missing @param url, and missing @returns
+/**
+ * Sends it.
+ * @param user The user.
+ */
+function send(user, url) { return 1 }
+```
+A **void** or **`Promise<void>`** function needs no `@returns`, and neither does a component returning JSX. A **destructured** parameter may be documented either way, so both of these pass:
+```js
+/** @param user The user. @param url The link. */   // property by property
+async function send({ user, url }) {}
+
+/** @param options The options. */                   // one name for the whole object
+async function send({ user, url }) {}
+```
+It also covers class methods and object-literal methods, not just top-level functions.
 
 ### Line comment periods
 `no-line-comment-period` only treats a dot as prose when whitespace or the end of the comment follows it, so dots inside code (`foo.bar`, `subagent.*`, `split(".")`), inside a quoted or back-ticked span, in an ellipsis, or closing an abbreviation (`e.g.`, `i.e.`, `etc.`) are left alone.
