@@ -41,4 +41,10 @@ export default [
         files: ["src/index.ts"],
         rules: { "nitpicker/no-relative-imports": "off" },
     },
+    {
+        // Every rule implements the abstract "create" member, whose purpose is
+        // fixed by the base class, so documenting it 30 times says nothing
+        files: ["src/rules/**/*.ts"],
+        rules: { "nitpicker/require-function-jsdoc": ["warn", { ignore: ["create"] }] },
+    },
 ]

@@ -21,9 +21,55 @@ describe("require-function-jsdoc", () => {
         expect(messages).toHaveLength(0)
     })
 
-    test("It should not report a nested function", ({ expect }) => {
+    test("It should report a nested named function by default", ({ expect }) => {
         const messages = lintRule(RULE, `${JSDOC}function outer() {\n    const inner = () => {}\n    return inner\n}`)
-        expect(messages).toHaveLength(0)
+        expect(messages).toHaveLength(1)
+    })
+
+    test("It should not report a nested function when nested is not included", ({ expect }) => {
+        const code = `${JSDOC}function outer() {\n    const inner = () => {}\n    return inner\n}`
+        expect(lintRule(RULE, code, { options: [{ include: [] }] })).toHaveLength(0)
+    })
+
+    test("It should report a nested function declaration by default", ({ expect }) => {
+        const code = `${JSDOC}function outer() {\n    function resolveInstance() {}\n    return resolveInstance\n}`
+        expect(lintRule(RULE, code)).toHaveLength(1)
+    })
+
+    test("It should report an undocumented class method by default", ({ expect }) => {
+        const messages = lintRule(RULE, "class A {\n    run(id) {\n        go(id)\n    }\n}")
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingJSDoc")
+    })
+
+    test("It should not report a documented class method", ({ expect }) => {
+        const code = "class A {\n    /**\n     * Runs.\n     */\n    run(id) {\n        go(id)\n    }\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report a class method when class-methods is not included", ({ expect }) => {
+        const opts = { options: [{ include: ["nested"] }] }
+        expect(lintRule(RULE, "class A {\n    run(id) {}\n}", opts)).toHaveLength(0)
+    })
+
+    test("It should not report an object-literal method by default", ({ expect }) => {
+        const code = "const adapter = {\n    async beginTurn(input) {\n        return go(input)\n    },\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should report an object-literal method when opted in", ({ expect }) => {
+        const opts = { options: [{ include: ["object-methods"] }] }
+        const code = "const adapter = {\n    async beginTurn(input) {\n        return go(input)\n    },\n}"
+        expect(lintRule(RULE, code, opts)).toHaveLength(1)
+    })
+
+    test("It should not report an anonymous callback at any scope", ({ expect }) => {
+        expect(lintRule(RULE, `${JSDOC}function outer() {\n    return [1].map(x => x)\n}`)).toHaveLength(0)
+    })
+
+    test("It should skip a computed member key", ({ expect }) => {
+        const opts = { options: [{ include: ["class-methods", "object-methods"] }] }
+        expect(lintRule(RULE, "class A {\n    [key](id) {}\n}", opts)).toHaveLength(0)
     })
 
     test("It should not report a callback", ({ expect }) => {

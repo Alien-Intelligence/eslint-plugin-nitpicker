@@ -65,6 +65,12 @@ const CONSTANTS = {
          * survive even though it looks like the end of a sentence.
          */
         ABBREVIATIONS: ["e.g.", "i.e.", "etc.", "vs.", "cf.", "al.", "approx.", "resp."],
+
+        /**
+         * The default maximum prose length of a run of consecutive line comments,
+         * tighter than a JSDoc description since a stacked wall reads worse.
+         */
+        MAX_RUN_LENGTH: 200,
     },
 
     /**
@@ -83,6 +89,11 @@ const CONSTANTS = {
          * dotted member such as `input.id` captures its root, `input`.
          */
         PARAM_TAG: /^\s*\*?\s*@param\s+(?:\{[^}]*\}\s*)?\[?([\w$]+)/,
+
+        /**
+         * The default maximum character length of a JSDoc description.
+         */
+        MAX_DESCRIPTION_LENGTH: 250,
     },
 
     /**
@@ -165,6 +176,11 @@ const CONSTANTS = {
          * The memoization hooks whose result is worth documenting with a JSDoc.
          */
         MEMO_HOOKS: new Set(["useMemo", "useCallback"]),
+
+        /**
+         * The default maximum length of a `className` class string.
+         */
+        MAX_CLASSNAME_LENGTH: 120,
     },
 
     /**

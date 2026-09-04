@@ -7,6 +7,7 @@ import requireMigrationJSDoc from "@/rules/adonisjs/requireMigrationJSDoc"
 import requireValidatedRequest from "@/rules/adonisjs/requireValidatedRequest"
 import catchErrorName from "@/rules/base/catchErrorName"
 import maxJSDocDescriptionLength from "@/rules/base/maxJSDocDescriptionLength"
+import maxLineCommentLength from "@/rules/base/maxLineCommentLength"
 import noAliasVariables from "@/rules/base/noAliasVariables"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
 import noDecorativeCommentSeparators from "@/rules/base/noDecorativeCommentSeparators"
@@ -24,6 +25,7 @@ import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireCompleteJSDoc from "@/rules/base/requireCompleteJSDoc"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
+import requireJSDocDelimiterLines from "@/rules/base/requireJSDocDelimiterLines"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
 import maxClassNameLength from "@/rules/react/maxClassNameLength"
 import noJSXComments from "@/rules/react/noJSXComments"
@@ -42,6 +44,7 @@ const ruleInstances = [
     requireValidatedRequest,
     catchErrorName,
     maxJSDocDescriptionLength,
+    maxLineCommentLength,
     noAliasVariables,
     noBritishEnglish,
     noDecorativeCommentSeparators,
@@ -58,6 +61,7 @@ const ruleInstances = [
     requireCapitalizedComments,
     requireCompleteJSDoc,
     requireFrameworkConfig,
+    requireJSDocDelimiterLines,
     requireFunctionJSDoc,
     requireMultilineObject,
     maxClassNameLength,

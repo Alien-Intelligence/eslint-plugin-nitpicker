@@ -37,6 +37,11 @@ class NoJSDocReturnsOnVoid extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
+        /**
+         * Reports a void function whose JSDoc still carries a returns tag.
+         * @param fn The function to inspect.
+         * @param anchor The node the JSDoc sits above.
+         */
         const check = (fn: FunctionNode, anchor: TSESTree.Node): void => {
             const jsdoc = context.sourceCode.getCommentsBefore(anchor).at(-1)
             if (jsdoc === undefined || !isJSDocComment(jsdoc)) return

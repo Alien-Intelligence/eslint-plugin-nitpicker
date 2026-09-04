@@ -7,8 +7,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ max: number }]
 type MessageIds = "tooLong"
 
-const DEFAULT_MAX = 120
-
 /**
  * Flags a class string in a `className` longer than the configured limit, so a
  * wall of Tailwind utilities gets broken into shorter pieces. A long string
@@ -17,7 +15,7 @@ const DEFAULT_MAX = 120
 class MaxClassNameLength extends NitpickerRule<MessageIds, Options> {
     readonly name = "max-classname-length"
 
-    readonly defaultOptions: Options = [{ max: DEFAULT_MAX }]
+    readonly defaultOptions: Options = [{ max: CONSTANTS.REACT.MAX_CLASSNAME_LENGTH }]
 
     readonly meta = {
         type: "suggestion",
@@ -45,11 +43,14 @@ class MaxClassNameLength extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
-        const max = options[0]?.max ?? DEFAULT_MAX
+        const max = options[0]?.max ?? CONSTANTS.REACT.MAX_CLASSNAME_LENGTH
 
-        // Collect the class strings inside a className value: string literals and
-        // non-interpolated templates, including those nested in a cn(...) call,
-        // without descending into a nested function
+        /**
+         * Collects the class strings inside a className value, including those
+         * nested in a `cn(...)` call, without descending into a nested function.
+         * @param node The node to search from.
+         * @param found The collected strings, appended in place.
+         */
         const collect = (
             node: TSESTree.Node | null | undefined,
             found: { node: TSESTree.Node; text: string }[],

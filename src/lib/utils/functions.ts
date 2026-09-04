@@ -75,6 +75,11 @@ export type ParameterDoc =
 export function parameterDocs(fn: FunctionNode): ParameterDoc[] {
     const docs: ParameterDoc[] = []
 
+    /**
+     * Adds the names a single parameter contributes, recursing through the
+     * wrappers a parameter can carry.
+     * @param param The parameter node to read.
+     */
     const collect = (param: TSESTree.Node): void => {
         switch (param.type) {
             case "Identifier":

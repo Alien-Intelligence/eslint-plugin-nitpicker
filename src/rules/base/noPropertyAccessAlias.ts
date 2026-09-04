@@ -66,8 +66,11 @@ class NoPropertyAccessAlias extends NitpickerRule<MessageIds, Options> {
         const candidates: Candidate[] = []
         const written = new Set<string>()
 
-        // Track the properties the file writes to, so an alias taken before one of
-        // those writes is understood as a snapshot
+        /**
+         * Tracks a property the file writes to, so an alias taken before one of
+         * those writes is understood as a snapshot.
+         * @param target The assignment target to record.
+         */
         const recordWrite = (target: TSESTree.Node): void => {
             if (target.type !== "MemberExpression") return
 

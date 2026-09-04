@@ -37,8 +37,12 @@ class RequireHookObjectReturn extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        // Whether a returned expression is a function, resolving a returned
-        // identifier through its local declaration such as a "useCallback" const
+        /**
+         * Checks whether a returned expression is a function, resolving an identifier
+         * through its local declaration such as a `useCallback` const.
+         * @param argument The returned expression.
+         * @returns True if the expression is a function.
+         */
         const returnsFunction = (argument: TSESTree.Expression): boolean => {
             if (isFunctionValue(argument)) return true
             if (argument.type !== "Identifier") return false
@@ -48,6 +52,10 @@ class RequireHookObjectReturn extends NitpickerRule<MessageIds, Options> {
             return declarator?.type === "VariableDeclarator" && isFunctionValue(declarator.init)
         }
 
+        /**
+         * Reports a hook that hands back a bare function.
+         * @param argument The returned expression to report on.
+         */
         const report = (argument: TSESTree.Expression): void => {
             context.report({
                 node: argument,
@@ -59,6 +67,10 @@ class RequireHookObjectReturn extends NitpickerRule<MessageIds, Options> {
             })
         }
 
+        /**
+         * Checks a hook's returns for a bare function.
+         * @param fn The function to inspect.
+         */
         const check = (fn: FunctionNode): void => {
             const name = getFunctionName(fn)
             if (name === undefined || !isHookName(name)) return
