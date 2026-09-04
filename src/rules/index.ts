@@ -23,9 +23,11 @@ import noRelativeImports from "@/rules/base/noRelativeImports"
 import noSingleLineJSDoc from "@/rules/base/noSingleLineJSDoc"
 import requireCapitalizedComments from "@/rules/base/requireCapitalizedComments"
 import requireCompleteJSDoc from "@/rules/base/requireCompleteJSDoc"
+import requireConsistentMemberJSDoc from "@/rules/base/requireConsistentMemberJSDoc"
 import requireFrameworkConfig from "@/rules/base/requireFrameworkConfig"
 import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireJSDocDelimiterLines from "@/rules/base/requireJSDocDelimiterLines"
+import requireMemberJSDocBlankLine from "@/rules/base/requireMemberJSDocBlankLine"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
 import maxClassNameLength from "@/rules/react/maxClassNameLength"
 import noJSXComments from "@/rules/react/noJSXComments"
@@ -60,8 +62,10 @@ const ruleInstances = [
     noSingleLineJSDoc,
     requireCapitalizedComments,
     requireCompleteJSDoc,
+    requireConsistentMemberJSDoc,
     requireFrameworkConfig,
     requireJSDocDelimiterLines,
+    requireMemberJSDocBlankLine,
     requireFunctionJSDoc,
     requireMultilineObject,
     maxClassNameLength,

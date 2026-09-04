@@ -93,9 +93,11 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                            |
 | `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                                |
 | `nitpicker/require-complete-jsdoc`           |         | Require a function's JSDoc to document every parameter and its return value.                        |
+| `nitpicker/require-consistent-member-jsdoc`  |         | Require every interface/type member to be documented once any member is.                            |
 | `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                            |
 | `nitpicker/require-function-jsdoc`           |         | Require a JSDoc on functions, including class methods and nested ones (`include`/`ignore` options). |
 | `nitpicker/require-jsdoc-delimiter-lines`    | yes     | Require a JSDoc's `/**` and `*/` to sit on their own lines, not share one with prose.               |
+| `nitpicker/require-member-jsdoc-blank-line`  | yes     | Require a blank line before a documented interface/type member (the first needs none).              |
 | `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.       |
 
 ### React rules
@@ -199,6 +201,30 @@ A backtick renders as code inside a JSDoc block, but in a `//` comment it is jus
 // Reads `auth.user` from the context  ->  // Reads "auth.user" from the context
 ```
 Backticks are left alone in JSDoc and block comments, in tooling directives, when unpaired, in a run (a ```` ``` ```` fence), and when the span already holds a double quote, since `` `split(".")` `` cannot be requoted without nesting.
+
+### Interface member documentation
+Two rules keep a documented interface (or type literal) readable. `require-consistent-member-jsdoc` makes documentation all-or-nothing per block, since a lone JSDoc among bare properties reads as an oversight:
+```ts
+interface StoredTurn {
+    sessionId: string
+    /**
+     * Reasoning text, display only.
+     */
+    thinking?: string
+}
+```
+Documenting **none** of the members stays perfectly fine, so this only fires once you start. `require-member-jsdoc-blank-line` then keeps them apart, so each JSDoc reads as belonging to the member below it rather than trailing the one above:
+```ts
+interface P {
+    allow_fallbacks?: boolean
+
+    /**
+     * Only route to providers that support every parameter.
+     */
+    require_parameters?: boolean
+}
+```
+The first member of a block needs no blank line above it.
 
 ### JSDoc completeness
 `require-complete-jsdoc` only inspects a function that already has a JSDoc (requiring the JSDoc itself is `require-function-jsdoc`'s job). It then checks the doc against the signature:
