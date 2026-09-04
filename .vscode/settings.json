@@ -1,15 +1,18 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "typescript.enablePromptUseWorkspaceTsdk": true,
-    "[typescript][typescriptreact][javascript]": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "biomejs.biome",
+    // Web languages
+    "[typescript][typescriptreact][javascript][css][json][jsonc]": {
         "editor.codeActionsOnSave": {
-            "source.organizeImports.biome": "explicit",
+            "source.action.useSortedAttributes.biome": "explicit",
+            "source.action.useSortedKeys.biome": "explicit",
+            "source.action.useSortedProperties.biome": "explicit",
             "source.fixAll.biome": "explicit",
-            "source.fixAll.eslint": "explicit"
-        }
+            "source.fixAll.eslint": "explicit",
+            "source.organizeImports.biome": "explicit"
+        },
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.formatOnSave": true
     },
+    // Exclude common build and cache directories from the file explorer
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -44,6 +47,12 @@
         "packages/contracts/cache": true,
         "**/.vscode": true
     },
+    // JS and TS settings
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    // CSpell
     "cSpell.words": [
         "Colorette",
         "Colour",
