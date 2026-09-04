@@ -73,28 +73,30 @@ Nitpicker ships five shared flat configs:
 The **base** rules are the universal ruleset shipped by `recommended`; the **React** and **AdonisJS** rules ship only in their framework configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
 
 ### Base rules
-| Rule                                         | Fixable | Description                                                                                        |
-|----------------------------------------------|---------|----------------------------------------------------------------------------------------------------|
-| `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                          |
-| `nitpicker/catch-error-name`                 |         | Require a `catch` clause to bind its error as `error` (`_error` for an unused binding).            |
-| `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                 |
-| `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.         |
-| `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.            |
-| `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).               |
-| `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.     |
-| `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                             |
-| `nitpicker/no-jsdoc-returns-on-void`         | yes     | Disallow a JSDoc `@returns` tag on a function that returns nothing.                                |
-| `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments; use double quotes for code references.                   |
-| `nitpicker/no-line-comment-period`           | yes¹    | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK).   |
-| `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead.   |
-| `nitpicker/no-property-destructuring`        |         | Disallow shorthand destructuring off a plain object reference; access the property directly.       |
-| `nitpicker/no-relative-imports`              |         | Disallow relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` option).  |
-| `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                           |
-| `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                               |
-| `nitpicker/require-complete-jsdoc`           |         | Require a function's JSDoc to document every parameter and its return value.                       |
-| `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                           |
-| `nitpicker/require-function-jsdoc`           |         | Require a JSDoc comment on top-level functions (React components and lazy `import` thunks exempt). |
-| `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.      |
+| Rule                                         | Fixable | Description                                                                                         |
+|----------------------------------------------|---------|-----------------------------------------------------------------------------------------------------|
+| `nitpicker/max-jsdoc-description-length`     |         | Enforce a maximum character length for a JSDoc description (default 250).                           |
+| `nitpicker/max-line-comment-length`          |         | Enforce a maximum prose length for a run of consecutive `//` comments (default 200).                |
+| `nitpicker/catch-error-name`                 |         | Require a `catch` clause to bind its error as `error` (`_error` for an unused binding).             |
+| `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                  |
+| `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.          |
+| `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.             |
+| `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).                |
+| `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.      |
+| `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                              |
+| `nitpicker/no-jsdoc-returns-on-void`         | yes     | Disallow a JSDoc `@returns` tag on a function that returns nothing.                                 |
+| `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments; use double quotes for code references.                    |
+| `nitpicker/no-line-comment-period`           | yes¹    | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK).    |
+| `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead.    |
+| `nitpicker/no-property-destructuring`        |         | Disallow shorthand destructuring off a plain object reference; access the property directly.        |
+| `nitpicker/no-relative-imports`              |         | Disallow relative (`./`, `../`) import/re-export paths; use the package alias (`allowIn` option).   |
+| `nitpicker/no-single-line-jsdoc`             | yes     | Require JSDoc comments to span multiple lines rather than a single line.                            |
+| `nitpicker/require-capitalized-comments`     | yes     | Require a comment to start with an uppercase letter.                                                |
+| `nitpicker/require-complete-jsdoc`           |         | Require a function's JSDoc to document every parameter and its return value.                        |
+| `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                            |
+| `nitpicker/require-function-jsdoc`           |         | Require a JSDoc on functions, including class methods and nested ones (`include`/`ignore` options). |
+| `nitpicker/require-jsdoc-delimiter-lines`    | yes     | Require a JSDoc's `/**` and `*/` to sit on their own lines, not share one with prose.               |
+| `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.       |
 
 ### React rules
 Shipped by the `react` config (and `all`).
@@ -125,6 +127,19 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 `max-jsdoc-description-length` takes `{ max: number }`, defaulting to `250`:
 ```js
 "nitpicker/max-jsdoc-description-length": ["warn", { max: 200 }],
+```
+
+`max-line-comment-length` takes `{ max: number }`, the cap on the joined prose of a run of consecutive `//` comments, defaulting to `200`. It is tighter than the JSDoc cap because a stacked wall of `//` lines reads worse than a block:
+```js
+"nitpicker/max-line-comment-length": ["warn", { max: 160 }],
+```
+
+`require-function-jsdoc` takes `{ include, ignore }`. `include` picks which function kinds are required on top of top-level ones, out of `"class-methods"`, `"object-methods"` and `"nested"`, defaulting to `["class-methods", "nested"]`. `object-methods` is off by default because callback and visitor objects share the shape of a genuine method bag. `ignore` lists names to skip, for an inherited or framework member whose purpose is fixed by the interface it implements:
+```js
+"nitpicker/require-function-jsdoc": ["warn", {
+    include: ["class-methods", "object-methods", "nested"],
+    ignore: ["create", "render"],
+}],
 ```
 
 `max-classname-length` takes `{ max: number }`, the maximum length of a `className` class string, defaulting to `120`:

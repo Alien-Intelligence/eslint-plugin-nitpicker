@@ -1,4 +1,5 @@
 import type { TSESLint } from "@typescript-eslint/utils"
+import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
 import { getJSDocDescription, isJSDocComment } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
@@ -6,8 +7,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 type Options = [{ max: number }]
 type MessageIds = "tooLong"
-
-const DEFAULT_MAX = 250
 
 /**
  * Flags JSDoc comments whose description (the prose before the first tag) is
@@ -17,7 +16,7 @@ const DEFAULT_MAX = 250
 class MaxJSDocDescriptionLength extends NitpickerRule<MessageIds, Options> {
     readonly name = "max-jsdoc-description-length"
 
-    readonly defaultOptions: Options = [{ max: DEFAULT_MAX }]
+    readonly defaultOptions: Options = [{ max: CONSTANTS.JSDOC.MAX_DESCRIPTION_LENGTH }]
 
     readonly meta = {
         type: "suggestion",
@@ -45,7 +44,7 @@ class MaxJSDocDescriptionLength extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
-        const max = options[0]?.max ?? DEFAULT_MAX
+        const max = options[0]?.max ?? CONSTANTS.JSDOC.MAX_DESCRIPTION_LENGTH
 
         return {
             Program() {

@@ -37,8 +37,12 @@ class RequireCapitalizedComments extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
-        // Whether a "//" comment continues a wrapped one, i.e the previous
-        // physical line is itself a line comment
+        /**
+         * Checks whether a line comment continues a wrapped one, i.e the previous
+         * physical line is itself a line comment.
+         * @param comment The comment to test.
+         * @returns True if the comment is a continuation line.
+         */
         const isContinuation = (comment: TSESTree.Comment): boolean => {
             if (comment.type !== "Line") return false
 

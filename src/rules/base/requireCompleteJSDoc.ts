@@ -46,6 +46,10 @@ class RequireCompleteJSDoc extends NitpickerRule<MessageIds, Options> {
      * @returns The rule listener.
      */
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>): TSESLint.RuleListener {
+        /**
+         * Checks a documented function's tags against its signature.
+         * @param fn The function to inspect.
+         */
         const check = (fn: FunctionNode): void => {
             const jsdoc = getLeadingJSDoc(context.sourceCode, getDocumentableNode(fn))
             if (jsdoc === null) return

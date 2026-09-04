@@ -51,6 +51,10 @@ class NoRelativeImports extends NitpickerRule<MessageIds, Options> {
             return {}
         }
 
+        /**
+         * Reports a module specifier written as a relative path.
+         * @param source The module specifier to inspect, if any.
+         */
         const check = (source: TSESTree.StringLiteral | null | undefined): void => {
             if (source === null || source === undefined) return
             if (!source.value.startsWith("./") && !source.value.startsWith("../")) return

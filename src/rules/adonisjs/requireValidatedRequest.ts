@@ -53,8 +53,12 @@ class RequireValidatedRequest extends NitpickerRule<MessageIds, Options> {
             return {}
         }
 
-        // Whether an expression refers to the HttpContext "request", whether bound
-        // directly or reached through "ctx.request" / "this.ctx.request"
+        /**
+         * Checks whether an expression refers to the HttpContext request, whether
+         * bound directly or reached through `ctx.request`.
+         * @param node The expression to inspect.
+         * @returns True if the expression is the request.
+         */
         const isRequest = (node: TSESTree.Node): boolean => {
             if (node.type === "Identifier") return node.name === "request"
             return (
