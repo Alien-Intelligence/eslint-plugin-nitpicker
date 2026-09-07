@@ -29,6 +29,9 @@ import requireFunctionJSDoc from "@/rules/base/requireFunctionJSDoc"
 import requireJSDocDelimiterLines from "@/rules/base/requireJSDocDelimiterLines"
 import requireMemberJSDocBlankLine from "@/rules/base/requireMemberJSDocBlankLine"
 import requireMultilineObject from "@/rules/base/requireMultilineObject"
+import maxConsecutiveStatements from "@/rules/breathing/maxConsecutiveStatements"
+import requireBlankBeforeBlock from "@/rules/breathing/requireBlankBeforeBlock"
+import requireBlankBeforeReturn from "@/rules/breathing/requireBlankBeforeReturn"
 import maxClassNameLength from "@/rules/react/maxClassNameLength"
 import noJSXComments from "@/rules/react/noJSXComments"
 import requireContextHookDestructure from "@/rules/react/requireContextHookDestructure"
@@ -68,6 +71,9 @@ const ruleInstances = [
     requireMemberJSDocBlankLine,
     requireFunctionJSDoc,
     requireMultilineObject,
+    maxConsecutiveStatements,
+    requireBlankBeforeBlock,
+    requireBlankBeforeReturn,
     maxClassNameLength,
     noJSXComments,
     requireContextHookDestructure,

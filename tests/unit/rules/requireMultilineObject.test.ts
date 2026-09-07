@@ -46,6 +46,7 @@ describe("require-multiline-object", () => {
     test("It should report but not fix an object containing a comment (never drop it)", ({ expect }) => {
         const code = "const x = { a: 1, /* keep me */ b: 2, c: 3 }"
         const messages = lintRule(RULE, code)
+
         expect(messages).toHaveLength(1)
         expect(messages[0]?.fix).toBeUndefined()
         // The fixer must leave the source untouched rather than dropping the comment

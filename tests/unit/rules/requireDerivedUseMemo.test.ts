@@ -8,6 +8,7 @@ describe("require-derived-usememo", () => {
     test("It should report a derived const in a hook", ({ expect }) => {
         const code = "function useThing() {\n    const c = list.find(x => x.id === id) || null\n    return c\n}"
         const messages = lintRule(RULE, code)
+
         expect(messages).toHaveLength(1)
         expect(messages[0]?.ruleId).toBe("nitpicker/require-derived-usememo")
         expect(messages[0]?.messageId).toBe("useMemo")

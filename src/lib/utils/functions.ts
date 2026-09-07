@@ -117,6 +117,7 @@ export function parameterDocs(fn: FunctionNode): ParameterDoc[] {
                         node: param,
                     })
                 }
+
                 return
             }
             default:
