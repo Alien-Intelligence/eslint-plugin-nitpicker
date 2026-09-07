@@ -1,4 +1,5 @@
-import { describe, test } from "vitest"
+import type { TSESLint } from "@typescript-eslint/utils"
+import { describe, expect, test } from "vitest"
 import plugin from "@/index"
 import { rules } from "@/rules"
 
@@ -18,7 +19,8 @@ const BREATHING_RULES = [
  * @returns The enabled rule names.
  */
 function ruleNamesOf(name: string): string[] {
-    return Object.keys(plugin.configs?.[name]?.rules ?? {})
+    const config = plugin.configs?.[name] as TSESLint.FlatConfig.Config | undefined
+    return Object.keys(config?.rules ?? {})
 }
 
 describe("shared configs", () => {

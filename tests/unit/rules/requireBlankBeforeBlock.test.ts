@@ -1,5 +1,5 @@
 import { fixRule, lintRule } from "tests/utils/lint"
-import { describe, test } from "vitest"
+import { describe, expect, test } from "vitest"
 
 const RULE = "require-blank-before-block"
 
