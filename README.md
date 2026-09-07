@@ -60,7 +60,7 @@ export default [
 All rules ship as warnings. Promote any of them to errors by overriding the rule level yourself, the same way as any ESLint rule.
 
 ## Shared configs
-Nitpicker ships five shared flat configs:
+Nitpicker ships six shared flat configs:
 | Config        | What it enables                                                                            |
 |---------------|--------------------------------------------------------------------------------------------|
 | `recommended` | The universal `base` ruleset, every rule enabled as a warning. The sensible default.       |
@@ -68,9 +68,10 @@ Nitpicker ships five shared flat configs:
 | `all`         | Every rule, plus both framework rulesets opted in. The maximally pedantic setup.           |
 | `react`       | Opts into the React ruleset for the files you scope it to.                                 |
 | `adonisjs`    | Opts into the AdonisJS ruleset, and relaxes decorative separators in `start/routes` files. |
+| `breathing`   | Opts into the code-spacing ruleset, which is deliberately out of `recommended`.             |
 
 ## Rules
-The **base** rules are the universal ruleset shipped by `recommended`; the **React** and **AdonisJS** rules ship only in their framework configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
+The **base** rules are the universal ruleset shipped by `recommended`; the **React**, **AdonisJS**, and **breathing** rules ship only in their own configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
 
 ### Base rules
 | Rule                                         | Fixable | Description                                                                                         |
@@ -119,6 +120,14 @@ Shipped by the `adonisjs` config (and `all`).
 | `nitpicker/require-controller-jsdoc`  |         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class).                                |
 | `nitpicker/require-migration-jsdoc`   |         | Require a JSDoc comment describing an AdonisJS migration.                                                       |
 | `nitpicker/require-validated-request` |         | Require request data through `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` option). |
+
+### Breathing rules
+Shipped by the `breathing` config (and `all`), never by `recommended`. See [Code breathing](#code-breathing).
+| Rule                                    | Fixable | Description                                                                                        |
+|-----------------------------------------|---------|------------------------------------------------------------------------------------------------------|
+| `nitpicker/max-consecutive-statements`  |         | Enforce a maximum run of sibling statements with no blank line between them (default 4).           |
+| `nitpicker/require-blank-before-block`  | yes     | Require a blank line before a multi-line control-flow block that follows another statement.        |
+| `nitpicker/require-blank-before-return` | yes     | Require a blank line before the `return`/`throw` a block of several statements (default 4) ends on. |
 
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
@@ -256,6 +265,42 @@ The two prose cases are handled differently, since removing a period is only saf
 const a = 1 // Reads the token. Cached  ->  reported, not fixed
 ```
 Only a terminal period is auto-fixed. A mid-comment period runs two fragments together, and auto-splitting it onto a new line mangles wrapped prose paragraphs, so that case is reported for a human or agent to reword rather than fixed.
+
+## Code breathing
+The `breathing` config encodes what a style guide usually calls "code must breathe": blank lines between logical steps, so a function reads as paragraphs rather than as one block of text. Three rules cover it.
+
+`require-blank-before-block` separates a multi-line block from whatever precedes it, and `require-blank-before-return` sets a block's conclusion apart once the block has a few statements in it:
+```ts
+const rows = await fetchRows()
+doSomething(rows)
+if (rows.length === 0) {        // ->  blank line here
+    return null
+}
+log(rows)
+return rows                     // ->  and here
+```
+`max-consecutive-statements` then flags a run of statements with no blank line anywhere in it (default 4), which is the case no autofix can resolve, so it is reported without one.
+
+These rules read a statement's leading comments as part of it, so a required blank line goes **above** the comment block rather than between the comment and the code it describes. A comment never counts as separation on its own.
+
+They are deliberately quiet about code that is packed on purpose:
+- A declaration immediately consumed by the statement below it (`const user = await find(id)` then `if (!user) return`), which is one thought, not two. Turn this off per rule with `{ allowAfterDeclaration: false }`.
+- Single-line guard clauses, however many are stacked.
+- A guard the formatter merely wrapped onto two lines, since it has no braced body.
+- A run of statements built the same way, such as a schema builder, a block of assertions, or a stack of `useState` calls, which reads as a table rather than as prose.
+- Anything an `else if`, `else`, `catch`, or `finally` introduces, and the space between `switch` cases.
+
+Nothing here ever asks for a blank line next to a brace.
+
+### Opting in
+These rules rewrite the whitespace of an existing codebase, so they are **not** in `recommended`, and upgrading Nitpicker never turns them on. Enable them when you are ready:
+```js
+export default [
+    nitpicker.configs.recommended,
+    nitpicker.configs.breathing,
+]
+```
+Two of the three are auto-fixable, so `eslint --fix` clears most of the initial pass. If you already run `@stylistic/padding-line-between-statements` or the legacy `newline-before-return`, disable those first, since their fixers will fight these.
 
 ## Framework configs
 Some conventions only make sense for a given framework. Nitpicker detects when a file uses React or AdonisJS and, through `require-framework-config`, nudges you to opt into the matching config for those files. Opting in silences that nudge and applies any framework-specific tweaks.

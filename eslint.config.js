@@ -14,7 +14,10 @@ export default [
             sourceType: "module",
         },
         plugins: { nitpicker },
-        rules: nitpicker.configs.recommended.rules,
+        rules: {
+            ...nitpicker.configs.recommended.rules,
+            ...nitpicker.configs.breathing.rules,
+        },
     },
     {
         // These files must contain the em dash character itself (the rule's own

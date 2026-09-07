@@ -141,6 +141,49 @@ const CONSTANTS = {
     },
 
     /**
+     * Constants for inspecting statement lists and their spacing.
+     */
+    STATEMENTS: {
+        /**
+         * The control-flow statements that own a body, so they read as a block
+         * and need air above them.
+         */
+        CONTROL_FLOW: new Set([
+            "IfStatement",
+            "ForStatement",
+            "ForOfStatement",
+            "ForInStatement",
+            "WhileStatement",
+            "DoWhileStatement",
+            "TryStatement",
+            "SwitchStatement",
+        ]),
+
+        /**
+         * The statements that conclude a block by leaving it.
+         */
+        EXITS: new Set(["ReturnStatement", "ThrowStatement"]),
+
+        /**
+         * The statements that jump out of the current step, which is what makes
+         * a braceless `if` a guard clause rather than a branch.
+         */
+        JUMPS: new Set(["ReturnStatement", "ThrowStatement", "ContinueStatement", "BreakStatement"]),
+
+        /**
+         * The default block size at which a trailing exit needs a blank line
+         * above it, counting the exit itself.
+         */
+        MIN_STATEMENTS_BEFORE_EXIT: 4,
+
+        /**
+         * The default maximum run of sibling statements with no blank line
+         * between them.
+         */
+        MAX_CONSECUTIVE: 4,
+    },
+
+    /**
      * Constants for detecting framework usage.
      */
     FRAMEWORKS: {

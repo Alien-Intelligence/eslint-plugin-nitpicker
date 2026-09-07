@@ -4,7 +4,7 @@ import CONSTANTS from "@/lib/constants"
 /**
  * The category a rule belongs to, which decides the shared config it ships in.
  */
-export type RuleCategory = "base" | "adonisjs" | "react"
+export type RuleCategory = "base" | "adonisjs" | "react" | "breathing"
 
 /**
  * Extra metadata attached to every Nitpicker rule under `meta.docs`.

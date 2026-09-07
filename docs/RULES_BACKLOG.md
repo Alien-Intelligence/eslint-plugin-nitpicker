@@ -48,6 +48,9 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `max-line-comment-length`          | A run of consecutive `//` comments is capped at N characters of prose (default 200, tighter than the JSDoc cap)                                                                                    | user request                                  |
 | `require-consistent-member-jsdoc`  | Once any member of an interface or type literal is documented, all of them must be; documenting none stays fine                                                                                    | user request                                  |
 | `require-member-jsdoc-blank-line`  | A documented interface or type-literal member needs a blank line above it (the first needs none); autofix inserts it                                                                               | user request                                  |
+| `require-blank-before-block`       | A multi-line control-flow block that follows another statement needs a blank line above it; autofix inserts it (`breathing` config)                                                                | user request; both STYLE.md "Code Breathing"  |
+| `require-blank-before-return`      | The `return`/`throw` a block of N+ statements ends on needs a blank line above it (default 4, counting the exit); autofix inserts it (`breathing` config)                                          | user request; both STYLE.md "Code Breathing"  |
+| `max-consecutive-statements`       | A run of sibling statements with no blank line between them is capped at N (default 4); report-only, since no fix can pick the break point (`breathing` config)                                    | user request; both STYLE.md "Code Breathing"  |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |
@@ -77,9 +80,15 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-explicit-void-return` | Don't annotate `void`/`Promise<void>` when the body never returns | M    | All   | code-style     |
 
 ## Candidate — Formatting / code breathing
-| Proposed rule    | Enforces                                                                                                               | Diff | Scope | Source / notes                                                     |
-|------------------|------------------------------------------------------------------------------------------------------------------------|------|-------|--------------------------------------------------------------------|
-| `code-breathing` | Blank line between logical blocks (`if`/`for`/`while`/`try`/decl groups) and before `return` (unless single-line body) | H    | All   | Both STYLE.md + code-style; flagship nitpicker rule, needs options |
+Shipped in 0.8.0 as three rules in the opt-in `breathing` config: `require-blank-before-block`, `require-blank-before-return`, and `max-consecutive-statements`. They are kept out of `recommended` because adopting them rewrites the whitespace of an existing codebase, and `categoryRules()` ignores `meta.docs.recommended`, so a `base` rule would land in every consumer's CI on upgrade.
+
+Calibrated against two corpora (`chat-sdk`, packed; `data-streaming/web-app`, well spaced), which drove five exemptions: a declaration consumed by the statement below it, single-line guard clauses, formatter-wrapped unbraced guards, multi-line statements ending a run, and runs of parallel statements sharing a receiver (schema builders, assertion blocks, `useState` stacks). Final counts: chat-sdk 112 findings across 30/79 files, web-app 290 across 151/1694.
+
+| Proposed rule           | Enforces                                                                                     | Diff | Scope | Source / notes                                          |
+|-------------------------|------------------------------------------------------------------------------------------------|------|-------|----------------------------------------------------------|
+| `blank-after-block`     | A statement following a multi-line block needs a blank line below the closing brace           | M    | All   | The "below" half; noisier (block-ends-container, `else`) |
+| `blank-around-iife`     | A multi-line IIFE gets the same treatment as control flow (`blocks: ["expression"]` option)   | E    | All   | Known gap in `require-blank-before-block`                |
+| `no-orphaned-comment`   | A comment separated from the code below it by a blank line is either attached or moved        | E    | All   | Surfaced while designing the breathing helpers           |
 
 ## Candidate — Structure / organization
 | Proposed rule                     | Enforces                                                                                                                                                                                                                                      | Diff | Scope | Source / notes                                                         |

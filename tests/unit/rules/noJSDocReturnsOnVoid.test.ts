@@ -22,6 +22,7 @@ describe("no-jsdoc-returns-on-void", () => {
     test("It should report a @returns on a function with no return", ({ expect }) => {
         const code = "/**\n * Logs.\n * @returns Nothing.\n */\nfunction log() {\n    console.log(1)\n}"
         const messages = lintRule(RULE, code)
+
         expect(messages).toHaveLength(1)
         expect(messages[0]?.ruleId).toBe("nitpicker/no-jsdoc-returns-on-void")
         expect(messages[0]?.messageId).toBe("voidReturns")
