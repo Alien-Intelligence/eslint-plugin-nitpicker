@@ -1,6 +1,7 @@
-import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
+import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
+import { classFragments } from "@/lib/utils/classnames"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
@@ -45,47 +46,15 @@ class MaxClassNameLength extends NitpickerRule<MessageIds, Options> {
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const max = options[0]?.max ?? CONSTANTS.REACT.MAX_CLASSNAME_LENGTH
 
-        /**
-         * Collects the class strings inside a className value, including those
-         * nested in a `cn(...)` call, without descending into a nested function.
-         * @param node The node to search from.
-         * @param found The collected strings, appended in place.
-         */
-        const collect = (
-            node: TSESTree.Node | null | undefined,
-            found: { node: TSESTree.Node; text: string }[],
-        ): void => {
-            if (!node) return
-
-            if (node.type === "Literal") {
-                if (typeof node.value === "string") found.push({ node, text: node.value })
-                return
-            }
-
-            if (node.type === "TemplateLiteral") {
-                if (node.expressions.length === 0) found.push({ node, text: node.quasis[0]?.value.cooked ?? "" })
-                return
-            }
-
-            for (const key of context.sourceCode.visitorKeys[node.type] ?? []) {
-                const value = (node as unknown as Record<string, unknown>)[key]
-                const children = Array.isArray(value) ? value : [value]
-
-                for (const child of children) {
-                    const childNode = child as TSESTree.Node | null | undefined
-                    if (!childNode || typeof childNode.type !== "string") continue
-                    if (CONSTANTS.FUNCTIONS.NODE_TYPES.has(childNode.type)) continue
-                    collect(childNode, found)
-                }
-            }
-        }
-
         return {
             JSXAttribute(node) {
                 if (node.name.type !== "JSXIdentifier" || node.name.name !== "className" || node.value === null) return
 
-                const found: { node: TSESTree.Node; text: string }[] = []
-                collect(node.value, found)
+                // Only a whole class string has a meaningful length, one static piece of
+                // an interpolated template says nothing about how long the string is
+                const found = classFragments(node.value, context.sourceCode.visitorKeys).filter(
+                    fragment => fragment.complete,
+                )
 
                 for (const { node: literal, text } of found) {
                     if (text.length <= max) continue

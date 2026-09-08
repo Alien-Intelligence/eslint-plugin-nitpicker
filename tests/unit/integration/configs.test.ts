@@ -14,6 +14,21 @@ const BREATHING_RULES = [
 ]
 
 /**
+ * The design-system rules, which assume a wrapped primitive layer and a token
+ * palette, so they must stay out of every config a project gets by default.
+ */
+const DESIGN_RULES = [
+    "nitpicker/no-arbitrary-dimension",
+    "nitpicker/no-centered-table-column",
+    "nitpicker/no-hand-rolled-surface",
+    "nitpicker/no-palette-bypass",
+    "nitpicker/no-raw-color",
+    "nitpicker/no-raw-control-element",
+    "nitpicker/no-unwrapped-primitive-import",
+    "nitpicker/require-dialog-footer",
+]
+
+/**
  * Reads the rule names one of the plugin's shared configs enables.
  * @param name The config name to read.
  * @returns The enabled rule names.
@@ -30,16 +45,17 @@ describe("shared configs", () => {
             "all",
             "base",
             "breathing",
+            "design",
             "react",
             "recommended",
         ])
     })
 
-    test.each(["base", "recommended"])("It should keep the breathing rules out of %s", name => {
+    test.each(["base", "recommended"])("It should keep the opt-in rules out of %s", name => {
         const enabled = ruleNamesOf(name)
         expect(enabled.length).toBeGreaterThan(0)
 
-        for (const rule of BREATHING_RULES) {
+        for (const rule of [...BREATHING_RULES, ...DESIGN_RULES]) {
             expect(enabled).not.toContain(rule)
         }
     })
@@ -48,16 +64,20 @@ describe("shared configs", () => {
         expect(ruleNamesOf("breathing").sort()).toEqual([...BREATHING_RULES].sort())
     })
 
+    test("It should enable exactly the design rules in design", ({ expect }) => {
+        expect(ruleNamesOf("design").sort()).toEqual([...DESIGN_RULES].sort())
+    })
+
     test("It should enable every rule in all", ({ expect }) => {
         expect(ruleNamesOf("all")).toHaveLength(Object.keys(rules).length)
 
-        for (const rule of BREATHING_RULES) {
+        for (const rule of [...BREATHING_RULES, ...DESIGN_RULES]) {
             expect(ruleNamesOf("all")).toContain(rule)
         }
     })
 
     test("It should give every rule a category that maps to a shipped config", ({ expect }) => {
         const categories = new Set(Object.values(rules).map(rule => rule.meta.docs?.category ?? "base"))
-        expect([...categories].sort()).toEqual(["adonisjs", "base", "breathing", "react"])
+        expect([...categories].sort()).toEqual(["adonisjs", "base", "breathing", "design", "react"])
     })
 })

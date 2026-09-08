@@ -51,6 +51,14 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `require-blank-before-block`       | A multi-line control-flow block that follows another statement needs a blank line above it; autofix inserts it (`breathing` config)                                                                | user request; both STYLE.md "Code Breathing"  |
 | `require-blank-before-return`      | The `return`/`throw` a block of N+ statements ends on needs a blank line above it (default 4, counting the exit); autofix inserts it (`breathing` config)                                          | user request; both STYLE.md "Code Breathing"  |
 | `max-consecutive-statements`       | A run of sibling statements with no blank line between them is capped at N (default 4); report-only, since no fix can pick the break point (`breathing` config)                                    | user request; both STYLE.md "Code Breathing"  |
+| `no-unwrapped-primitive-import`    | A symbol the design system wraps is imported from its library instead of the wrapper; keyed on symbol, not package (`design` config)                                                               | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `require-dialog-footer`            | A `DialogContent` that renders a `Button` must render a `DialogFooter` (`design` config)                                                                                                           | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-raw-control-element`           | No bare `<button>`/`<input>`/`<select>`/`<textarea>` in JSX, use the primitive (`design` config)                                                                                                   | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-hand-rolled-surface`           | No rounded + bordered + card-background element in a file that never imports `Card`; heuristic, permanent warn (`design` config)                                                                   | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-raw-color`                     | No hex colour literal in a `Literal`/`TemplateElement`, use a token (`allowIn` for brand marks) (`design` config)                                                                                  | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-arbitrary-dimension`           | No Tailwind arbitrary px value on the scale properties, e.g. `text-[10px]` (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-centered-table-column`         | No `text-center` on a `TableHead`/`TableCell`, text left and numbers right (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-palette-bypass`                | A semantic `cva` variant (`success`, `warning`, ...) must use a status token, not the raw palette (`design` config)                                                                                | web-app ds-sync pass; NITPICKER-RULES.md      |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |
@@ -89,6 +97,15 @@ Calibrated against two corpora (`chat-sdk`, packed; `data-streaming/web-app`, we
 | `blank-after-block`     | A statement following a multi-line block needs a blank line below the closing brace           | M    | All   | The "below" half; noisier (block-ends-container, `else`) |
 | `blank-around-iife`     | A multi-line IIFE gets the same treatment as control flow (`blocks: ["expression"]` option)   | E    | All   | Known gap in `require-blank-before-block`                |
 | `no-orphaned-comment`   | A comment separated from the code below it by a blank line is either attached or moved        | E    | All   | Surfaced while designing the breathing helpers           |
+
+## Candidate — Design system
+Shipped in 0.9.0 as eight rules in the opt-in `design` config. Kept out of `recommended` for the same reason as `breathing`: they assume a shadcn-style wrapper layer, Tailwind utilities, `cva` variant maps and CSS-variable tokens, and `categoryRules()` ignores `meta.docs.recommended`, so a `base` rule would land in every consumer's CI on upgrade.
+
+Specified in `web-app/packages/frontend/scripts/ds-sync/NITPICKER-RULES.md` from a review of the written design system, and measured against the web-app frontend at the commit they were written for: **141 findings across 710 files**. None is auto-fixable, since every finding is a judgement about what a piece of UI is.
+
+Worth recording as the argument for an AST rule over a grep: `require-dialog-footer` found **18** where the file-level audit found 29. Every one of the 11 differences was a `<Button>` used as the `DialogTrigger`, which sits outside `DialogContent` and is not a dialog action at all.
+
+Two checks stayed in `scripts/ds-sync/audit.mjs` because ESLint sees one file at a time and cannot express them: dead primitives (needs an importer count across every file) and duplicate implementations (needs cross-file similarity).
 
 ## Candidate — Structure / organization
 | Proposed rule                     | Enforces                                                                                                                                                                                                                                      | Diff | Scope | Source / notes                                                         |
