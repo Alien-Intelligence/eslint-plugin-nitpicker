@@ -227,6 +227,67 @@ const CONSTANTS = {
     },
 
     /**
+     * Constants for the design-system rules.
+     */
+    DESIGN: {
+        /**
+         * A CSS hex color literal, in the four lengths CSS actually allows:
+         * `#rgb`, `#rgba`, `#rrggbb` and `#rrggbbaa`. Five and seven digits are
+         * excluded, since neither is a color.
+         */
+        HEX_COLOR: /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/,
+
+        /**
+         * The bare HTML form controls a design system replaces with a primitive,
+         * mapped to the primitive name by capitalizing the tag.
+         */
+        RAW_CONTROLS: ["button", "input", "select", "textarea"],
+
+        /**
+         * The Tailwind property prefixes whose arbitrary px value bypasses the
+         * type and spacing scales, e.g. `text-[10px]` or `w-[774px]`.
+         */
+        SCALE_PROPERTIES: ["w", "h", "p", "px", "py", "m", "mx", "my", "gap", "text", "size"],
+
+        /**
+         * Matches a Tailwind arbitrary value given in px, e.g. `[10px]`.
+         */
+        ARBITRARY_PX: /-\[\d+px\]/,
+
+        /**
+         * The three ingredients that together draw a card surface: a rounded
+         * corner, a border on every side, and a card or page background. A
+         * single-side border (`border-t` and friends) is a divider rather than a
+         * surface, so it is excluded.
+         */
+        SURFACE: [/\brounded-(?:md|lg|xl)\b/, /\bborder\b(?!-[trblxyse]\b)/, /\bbg-(?:card|background)\b/],
+
+        /**
+         * A raw Tailwind palette class, i.e. a named hue with a numeric scale
+         * step, which is what a semantic variant must not reach for.
+         */
+        RAW_PALETTE: /\b(?:red|green|amber|yellow|blue|orange)-\d{2,3}\b/,
+
+        /**
+         * The semantic variant names that carry a meaning the status tokens own,
+         * mapped to the token each one belongs to.
+         */
+        STATUS_TOKENS: {
+            success: "--success",
+            warning: "--warning",
+            error: "--error",
+            destructive: "--destructive",
+            info: "--info",
+        },
+
+        /**
+         * The class-variance-authority factory whose `variants.variant` map holds
+         * a component's semantic variants.
+         */
+        VARIANT_FACTORY: "cva",
+    },
+
+    /**
      * Constants for AdonisJS request handling.
      */
     REQUEST: {

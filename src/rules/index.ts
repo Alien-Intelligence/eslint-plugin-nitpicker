@@ -32,6 +32,14 @@ import requireMultilineObject from "@/rules/base/requireMultilineObject"
 import maxConsecutiveStatements from "@/rules/breathing/maxConsecutiveStatements"
 import requireBlankBeforeBlock from "@/rules/breathing/requireBlankBeforeBlock"
 import requireBlankBeforeReturn from "@/rules/breathing/requireBlankBeforeReturn"
+import noArbitraryDimension from "@/rules/design/noArbitraryDimension"
+import noCenteredTableColumn from "@/rules/design/noCenteredTableColumn"
+import noHandRolledSurface from "@/rules/design/noHandRolledSurface"
+import noPaletteBypass from "@/rules/design/noPaletteBypass"
+import noRawColor from "@/rules/design/noRawColor"
+import noRawControlElement from "@/rules/design/noRawControlElement"
+import noUnwrappedPrimitiveImport from "@/rules/design/noUnwrappedPrimitiveImport"
+import requireDialogFooter from "@/rules/design/requireDialogFooter"
 import maxClassNameLength from "@/rules/react/maxClassNameLength"
 import noJSXComments from "@/rules/react/noJSXComments"
 import requireContextHookDestructure from "@/rules/react/requireContextHookDestructure"
@@ -74,6 +82,14 @@ const ruleInstances = [
     maxConsecutiveStatements,
     requireBlankBeforeBlock,
     requireBlankBeforeReturn,
+    noArbitraryDimension,
+    noCenteredTableColumn,
+    noHandRolledSurface,
+    noPaletteBypass,
+    noRawColor,
+    noRawControlElement,
+    noUnwrappedPrimitiveImport,
+    requireDialogFooter,
     maxClassNameLength,
     noJSXComments,
     requireContextHookDestructure,

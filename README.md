@@ -60,7 +60,7 @@ export default [
 All rules ship as warnings. Promote any of them to errors by overriding the rule level yourself, the same way as any ESLint rule.
 
 ## Shared configs
-Nitpicker ships six shared flat configs:
+Nitpicker ships seven shared flat configs:
 | Config        | What it enables                                                                            |
 |---------------|--------------------------------------------------------------------------------------------|
 | `recommended` | The universal `base` ruleset, every rule enabled as a warning. The sensible default.       |
@@ -69,9 +69,10 @@ Nitpicker ships six shared flat configs:
 | `react`       | Opts into the React ruleset for the files you scope it to.                                 |
 | `adonisjs`    | Opts into the AdonisJS ruleset, and relaxes decorative separators in `start/routes` files. |
 | `breathing`   | Opts into the code-spacing ruleset, which is deliberately out of `recommended`.             |
+| `design`      | Opts into the design-system ruleset, also deliberately out of `recommended`.               |
 
 ## Rules
-The **base** rules are the universal ruleset shipped by `recommended`; the **React**, **AdonisJS**, and **breathing** rules ship only in their own configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
+The **base** rules are the universal ruleset shipped by `recommended`; the **React**, **AdonisJS**, **breathing**, and **design** rules ship only in their own configs. Every rule is enabled as a warning. The Fixable column marks rules that `eslint --fix` can resolve automatically.
 
 ### Base rules
 | Rule                                         | Fixable | Description                                                                                         |
@@ -129,6 +130,19 @@ Shipped by the `breathing` config (and `all`), never by `recommended`. See [Code
 | `nitpicker/require-blank-before-block`  | yes     | Require a blank line before a multi-line control-flow block that follows another statement.        |
 | `nitpicker/require-blank-before-return` | yes     | Require a blank line before the `return`/`throw` a block of several statements (default 4) ends on. |
 
+### Design rules
+Shipped by the `design` config (and `all`), never by `recommended`. See [Design system](#design-system).
+| Rule                                         | Fixable | Description                                                                                        |
+|----------------------------------------------|---------|------------------------------------------------------------------------------------------------------|
+| `nitpicker/no-arbitrary-dimension`           |         | Disallow Tailwind arbitrary px values (`text-[10px]`, `w-[774px]`), which bypass the scales.       |
+| `nitpicker/no-centered-table-column`         |         | Disallow centring a `TableHead`/`TableCell`; text goes left, numbers right.                        |
+| `nitpicker/no-hand-rolled-surface`           |         | Disallow drawing a card surface by hand in a file that never imports `Card`.                       |
+| `nitpicker/no-palette-bypass`                |         | Disallow a semantic `cva` variant using the raw colour palette instead of a status token.          |
+| `nitpicker/no-raw-color`                     |         | Disallow hex colour literals; use a design token (`allowIn` for third-party brand marks).          |
+| `nitpicker/no-raw-control-element`           |         | Disallow bare `<button>`/`<input>`/`<select>`/`<textarea>`; use the primitive (`allowIn` option).  |
+| `nitpicker/no-unwrapped-primitive-import`    |         | Disallow importing a symbol from a library when the design system wraps it (`wrapped` option).     |
+| `nitpicker/require-dialog-footer`            |         | Require a dialog's action buttons to live in a `DialogFooter` (`allowIn` option).                  |
+
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
 
@@ -177,6 +191,39 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 ```js
 "nitpicker/no-relative-imports": ["warn", { allowIn: ["**/bin/*.ts"] }],
 "nitpicker/require-validated-request": ["warn", { allowIn: ["**/*_proxy_controller.ts"] }],
+```
+
+`no-unwrapped-primitive-import` takes `{ wrapped, allowIn }`. `wrapped` maps a package to the symbols your design system re-exports under the same name, and where to import each from. It defaults to `{}`, so the rule does nothing until you describe your own wrapper layer. Key it on the **symbol**, never the package: a wrapper rarely re-exports everything its library does, and a package-level ban buries the one real finding under the correct imports of everything else:
+```js
+"nitpicker/no-unwrapped-primitive-import": ["warn", {
+    wrapped: {
+        sonner: { Toaster: "@frontend/components/ui/sonner" },
+        "@radix-ui/react-dialog": { DialogTitle: "@frontend/components/ui/dialog" },
+    },
+}],
+```
+
+`require-dialog-footer` and `no-raw-color` each take `{ allowIn: string[] }`, for a dialog family mid-migration and for a third-party brand mark whose colour is not yours to tokenize:
+```js
+"nitpicker/require-dialog-footer": ["warn", { allowIn: ["**/dialogs/admin/**"] }],
+"nitpicker/no-raw-color": ["warn", { allowIn: ["**/creditCard.tsx"] }],
+```
+
+`no-raw-control-element` takes `{ elements, allowIn }`. `elements` is the tag list, defaulting to `["button", "input", "select", "textarea"]`, and the suggested primitive is the tag capitalized. Prefer exact paths in `allowIn` over directory globs, so a new raw control in the same directory still trips the rule:
+```js
+"nitpicker/no-raw-control-element": ["warn", {
+    allowIn: ["components/grids/datasets.tsx"],
+}],
+```
+
+`no-arbitrary-dimension` takes `{ properties: string[] }`, the Tailwind prefixes to police, defaulting to `["w", "h", "p", "px", "py", "m", "mx", "my", "gap", "text", "size"]`:
+```js
+"nitpicker/no-arbitrary-dimension": ["warn", { properties: ["text", "gap"] }],
+```
+
+`no-palette-bypass` takes `{ tokens: Record<string, string> }`, mapping a semantic variant name to the token it should use. Your override is merged over the defaults (`success`, `warning`, `error`, `destructive`, `info`) rather than replacing them, so naming one variant does not silently stop policing the rest:
+```js
+"nitpicker/no-palette-bypass": ["warn", { tokens: { success: "--info" } }],
 ```
 
 `require-framework-config` takes `{ ignore: ("adonisjs" | "react")[] }`, the frameworks to skip the nudge for:
@@ -301,6 +348,39 @@ export default [
 ]
 ```
 Two of the three are auto-fixable, so `eslint --fix` clears most of the initial pass. If you already run `@stylistic/padding-line-between-statements` or the legacy `newline-before-return`, disable those first, since their fixers will fight these.
+
+## Design system
+The `design` config encodes the rules a design system states but cannot enforce: that a primitive is reached through its wrapper, that colour and size come from tokens, and that a surface is built from the primitive rather than redrawn by hand. Eight rules cover it.
+
+They assume a shadcn-style layout: a `components/ui` wrapper layer, Tailwind utilities, `cva` variant maps, and CSS-variable tokens. Outside that shape most of them will not fire at all.
+
+### Scoping
+Every rule here except `no-palette-bypass` is about **feature** code. The wrapper layer is exactly where importing the library directly, drawing a surface by hand, and rendering a bare `<button>` are the correct thing to do, so exclude it:
+```js
+{
+    files: ["components/**/*.tsx", "app/**/*.tsx"],
+    ignores: ["components/ui/**"],
+    ...nitpicker.configs.design,
+}
+```
+`no-palette-bypass` is the inverse. It only fires inside a `cva(...)` variant map, which in practice lives in the primitives, so give it its own entry:
+```js
+{
+    files: ["components/ui/**/*.tsx"],
+    plugins: { nitpicker },
+    rules: { "nitpicker/no-palette-bypass": ["warn", { tokens: { success: "--info" } }] },
+}
+```
+
+### What is a heuristic and what is not
+`no-unwrapped-primitive-import`, `no-centered-table-column`, `no-palette-bypass` and `no-raw-control-element` are exact: they match a symbol, an element name, or a class you either wrote or did not.
+
+`no-hand-rolled-surface` is a heuristic and is meant to stay a warning. It reads the static classes of one `className`, joining the arms of a `cn(...)` call, and asks whether they add up to a rounded bordered card background in a file that never imports `Card`. A bordered region that is legitimately not a card looks identical from there. Its value is prompting the question, not settling it. A single-side border (`border-t` and friends) is excluded, since a divider is not a surface.
+
+`no-raw-color` matches `Literal` and `TemplateElement` nodes only, so a hash in JSX prose (a street address, an anchor) is never a finding. It accepts the four hex lengths CSS allows (3, 4, 6, 8) and ignores the five- and seven-digit strings that cannot be colours.
+
+### Opting in
+Like `breathing`, these are **not** in `recommended`, and upgrading Nitpicker never turns them on. None of them is auto-fixable: every finding is a judgement about what a piece of UI is, which no fixer can make. Expect to land them one at a time, cheapest first, rather than all at once.
 
 ## Framework configs
 Some conventions only make sense for a given framework. Nitpicker detects when a file uses React or AdonisJS and, through `require-framework-config`, nudges you to opt into the matching config for those files. Opting in silences that nudge and applies any framework-specific tweaks.

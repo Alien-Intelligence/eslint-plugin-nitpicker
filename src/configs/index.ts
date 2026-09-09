@@ -4,6 +4,7 @@ import { recommended } from "@/configs/presets/recommended"
 import { adonisjs } from "@/configs/rulesets/adonisjs"
 import { base } from "@/configs/rulesets/base"
 import { breathing } from "@/configs/rulesets/breathing"
+import { design } from "@/configs/rulesets/design"
 import { react } from "@/configs/rulesets/react"
 
 /**
@@ -21,6 +22,7 @@ export function buildConfigs(plugin: TSESLint.FlatConfig.Plugin): Record<string,
         adonisjs: adonisjs(plugin),
         react: react(plugin),
         breathing: breathing(plugin),
+        design: design(plugin),
         all: all(plugin),
     }
 }
