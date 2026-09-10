@@ -11,8 +11,6 @@ type MessageIds = "handRolled"
 // The primitive that owns the card surface, and the family of parts named after it
 const CARD = "Card"
 
-// A heuristic, and meant to stay a warning: a bordered region that is legitimately
-// not a card looks the same from here, so the value is prompting the question
 /**
  * Flags an element whose classes combine a rounded corner, a border and a card
  * background, in a file that never imports the `Card` primitive. That is a card
@@ -63,6 +61,10 @@ class NoHandRolledSurface extends NitpickerRule<MessageIds, Options> {
                 // A surface can be assembled across the arms of a "cn(...)" call, so the
                 // question is what the element carries in total, not per string
                 const classes = joinFragments(classFragments(attribute.value, context.sourceCode.visitorKeys))
+
+                // A heuristic, which is why this stays a warning: a bordered region
+                // that is legitimately not a card looks the same from here, so the
+                // value is in prompting the question
                 if (!CONSTANTS.DESIGN.SURFACE.every(pattern => pattern.test(classes))) return
 
                 candidates.push(attribute)

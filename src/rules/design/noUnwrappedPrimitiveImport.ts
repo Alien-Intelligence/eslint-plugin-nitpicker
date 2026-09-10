@@ -7,8 +7,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ wrapped: Record<string, Record<string, string>>; allowIn: string[] }]
 type MessageIds = "unwrapped"
 
-// Keyed on the symbol, not the package: a wrapper rarely re-exports everything
-// its library does, so a package-level ban would drown the real finding
 /**
  * Flags a symbol imported straight from a third-party package when the design
  * system ships a wrapper exporting that same name. Scope this away from the
@@ -70,6 +68,9 @@ class NoUnwrappedPrimitiveImport extends NitpickerRule<MessageIds, Options> {
                     if (specifier.type !== "ImportSpecifier") continue
                     if (specifier.imported.type !== "Identifier") continue
 
+                    // Keyed on the symbol rather than the package, since a wrapper
+                    // rarely re-exports everything its library does, and a
+                    // package-level ban would drown the real finding
                     const replacement = symbols[specifier.imported.name]
                     if (replacement === undefined) continue
 

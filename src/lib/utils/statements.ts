@@ -1,5 +1,6 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
+import { isOwnLineComment } from "@/lib/utils/comments"
 import { jsDocAnchor } from "@/lib/utils/jsdocs"
 
 /**
@@ -22,19 +23,6 @@ export type StatementStart = {
      * statement has one, otherwise the statement itself.
      */
     node: TSESTree.Node | TSESTree.Comment
-}
-
-/**
- * Checks whether a comment sits on a line of its own, i.e. nothing but
- * whitespace precedes it, so it leads the code below rather than trailing the
- * code beside it.
- * @param sourceCode The source code of the linted file.
- * @param comment The comment to test.
- * @returns True if the comment starts its own line.
- */
-function isOwnLineComment(sourceCode: Readonly<TSESLint.SourceCode>, comment: TSESTree.Comment): boolean {
-    const line = sourceCode.lines[comment.loc.start.line - 1] ?? ""
-    return line.slice(0, comment.loc.start.column).trim() === ""
 }
 
 /**

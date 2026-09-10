@@ -8,8 +8,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ elements: string[]; allowIn: string[] }]
 type MessageIds = "rawControl"
 
-// A hidden file input behind a styled trigger is the honest exception, and belongs
-// in "allowIn" rather than being tolerated silently
 /**
  * Flags a bare HTML form control in JSX where the design system ships a
  * primitive carrying the focus ring, disabled treatment, sizing and invalid
@@ -55,6 +53,8 @@ class NoRawControlElement extends NitpickerRule<MessageIds, Options> {
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const elements = new Set(options[0]?.elements ?? CONSTANTS.DESIGN.RAW_CONTROLS)
+        // A hidden file input behind a styled trigger is the honest exception,
+        // and naming it here beats tolerating it silently
         const allowIn = options[0]?.allowIn ?? []
         if (allowIn.length > 0 && matchesGlob(context.filename, allowIn)) {
             return {}

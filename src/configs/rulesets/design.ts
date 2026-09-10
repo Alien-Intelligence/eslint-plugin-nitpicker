@@ -2,8 +2,6 @@ import type { TSESLint } from "@typescript-eslint/utils"
 import { categoryRules } from "@/configs/helpers"
 import CONSTANTS from "@/lib/constants"
 
-// Scope this to the feature code, excluding the primitive layer itself, where
-// wrapping a library and drawing a surface by hand are the correct thing to do
 /**
  * Builds the `design` flat config: the design-system rules, opt-in rather than
  * part of `recommended` since they assume a wrapped primitive layer and a token

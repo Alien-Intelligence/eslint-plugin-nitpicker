@@ -10,6 +10,7 @@ import maxJSDocDescriptionLength from "@/rules/base/maxJSDocDescriptionLength"
 import maxLineCommentLength from "@/rules/base/maxLineCommentLength"
 import noAliasVariables from "@/rules/base/noAliasVariables"
 import noBritishEnglish from "@/rules/base/noBritishEnglish"
+import noCommentAboveJSDoc from "@/rules/base/noCommentAboveJSDoc"
 import noDecorativeCommentSeparators from "@/rules/base/noDecorativeCommentSeparators"
 import noEmDash from "@/rules/base/noEmDash"
 import noEmojis from "@/rules/base/noEmojis"
@@ -60,6 +61,7 @@ const ruleInstances = [
     maxLineCommentLength,
     noAliasVariables,
     noBritishEnglish,
+    noCommentAboveJSDoc,
     noDecorativeCommentSeparators,
     noEmDash,
     noEmojis,

@@ -8,8 +8,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ tokens: Record<string, string> }]
 type MessageIds = "paletteBypass"
 
-// Unlike the rest of the design rules this one targets the primitives, since a
-// variant map is where a component's semantic colors are declared
 /**
  * Flags a semantic variant whose classes reach past the status tokens into the
  * raw palette, which is how a product ends up carrying two greens and two ambers
@@ -92,6 +90,9 @@ class NoPaletteBypass extends NitpickerRule<MessageIds, Options> {
                 const variants = propertyValue(config, "variants")
                 if (variants === undefined) return
 
+                // Unlike the rest of the design rules this one targets the primitive
+                // layer, since a variant map is where a component declares its
+                // semantic colors
                 const variant = propertyValue(variants, "variant")
                 if (variant === undefined || variant.type !== "ObjectExpression") return
 
