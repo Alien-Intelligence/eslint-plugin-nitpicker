@@ -1,4 +1,4 @@
-import type { TSESTree } from "@typescript-eslint/utils"
+import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { type FunctionNode, getFunctionName, someReturn, type VisitorKeys } from "@/lib/utils/functions"
 
@@ -97,6 +97,36 @@ export function isComponentOrHook(fn: FunctionNode, visitorKeys: VisitorKeys): b
     if (name === undefined) return false
 
     return isHookName(name) || (isReactComponentName(name) && functionReturnsJsx(fn, visitorKeys))
+}
+
+/**
+ * Checks whether a file opts into being a Client Component through a top-level
+ * `"use client"` directive.
+ * @param sourceCode The source code of the linted file.
+ * @returns True if the file declares itself a Client Component.
+ */
+export function hasClientDirective(sourceCode: Readonly<TSESLint.SourceCode>): boolean {
+    for (const statement of sourceCode.ast.body) {
+        // The directive prologue ends at the first statement that is not one
+        if (statement.type !== "ExpressionStatement" || statement.expression.type !== "Literal") return false
+        if (statement.expression.value === CONSTANTS.REACT.CLIENT_DIRECTIVE) return true
+    }
+
+    return false
+}
+
+/**
+ * Checks whether a file is a React Server Component, i.e. a Next.js App Router
+ * entry file that has not opted into the client. No hook can run in one, so a
+ * rule asking for a hook has nothing to ask for.
+ * @param sourceCode The source code of the linted file.
+ * @param filename The path of the linted file.
+ * @returns True if the file renders on the server.
+ */
+export function isServerComponentFile(sourceCode: Readonly<TSESLint.SourceCode>, filename: string): boolean {
+    if (!CONSTANTS.REACT.SERVER_FILE.test(filename.split("\\").join("/"))) return false
+
+    return !hasClientDirective(sourceCode)
 }
 
 /**

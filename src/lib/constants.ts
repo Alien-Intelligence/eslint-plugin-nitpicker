@@ -224,6 +224,19 @@ const CONSTANTS = {
          * The default maximum length of a `className` class string.
          */
         MAX_CLASSNAME_LENGTH: 120,
+
+        /**
+         * The directive a file opts into being a Client Component with.
+         */
+        CLIENT_DIRECTIVE: "use client",
+
+        /**
+         * The Next.js App Router entry files, which render on the server unless
+         * they opt out, so no hook can run in them. Matched against a path with
+         * forward slashes. The `error` boundaries are absent, since React
+         * requires those to be Client Components.
+         */
+        SERVER_FILE: /(?:^|\/)app\/(?:.*\/)?(?:page|layout|template|default|loading|not-found)\.[jt]sx?$/,
     },
 
     /**
