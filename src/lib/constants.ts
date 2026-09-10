@@ -51,7 +51,7 @@ const CONSTANTS = {
          * than prose, matched against the comment text.
          */
         DIRECTIVE:
-            /^\s*(?:eslint\b|eslint-|globals?\b|exported\b|jshint\b|jslint\b|istanbul\b|[cv]8\b|ts-|prettier-ignore|biome-ignore|webpack\b|noinspection\b|@)/,
+            /^\s*(?:eslint\b|eslint-|globals?\b|exported\b|jshint\b|jslint\b|istanbul\b|[cv]8\b|ts-|prettier-ignore|biome-ignore|webpack\b|noinspection\b|#region\b|#endregion\b|@)/,
 
         /**
          * Quote characters that fence a verbatim span inside a comment, whose

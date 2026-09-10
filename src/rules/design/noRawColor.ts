@@ -8,8 +8,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ allowIn: string[] }]
 type MessageIds = "rawColor"
 
-// A third-party brand mark is the honest exception, since a brand color is not
-// ours to tokenize, and belongs in "allowIn" so the rule stays credible
 /**
  * Flags a hex color literal, wherever it is written: a class string, a style
  * object, or any other string in the file. A literal cannot follow the theme and
@@ -49,6 +47,8 @@ class NoRawColor extends NitpickerRule<MessageIds, Options> {
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
+        // A third-party brand mark is the honest exception, since a brand color
+        // is not ours to tokenize, and naming it here keeps the rule credible
         const allowIn = options[0]?.allowIn ?? []
         if (allowIn.length > 0 && matchesGlob(context.filename, allowIn)) {
             return {}

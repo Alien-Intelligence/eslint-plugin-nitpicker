@@ -82,6 +82,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/catch-error-name`                 |         | Require a `catch` clause to bind its error as `error` (`_error` for an unused binding).             |
 | `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                  |
 | `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.          |
+| `nitpicker/no-comment-above-jsdoc`           |         | Disallow a comment stacked directly above a JSDoc, splitting one description in two.               |
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.             |
 | `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).                |
 | `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.      |
@@ -137,8 +138,8 @@ Shipped by the `design` config (and `all`), never by `recommended`. See [Design 
 | `nitpicker/no-arbitrary-dimension`           |         | Disallow Tailwind arbitrary px values (`text-[10px]`, `w-[774px]`), which bypass the scales.       |
 | `nitpicker/no-centered-table-column`         |         | Disallow centring a `TableHead`/`TableCell`; text goes left, numbers right.                        |
 | `nitpicker/no-hand-rolled-surface`           |         | Disallow drawing a card surface by hand in a file that never imports `Card`.                       |
-| `nitpicker/no-palette-bypass`                |         | Disallow a semantic `cva` variant using the raw colour palette instead of a status token.          |
-| `nitpicker/no-raw-color`                     |         | Disallow hex colour literals; use a design token (`allowIn` for third-party brand marks).          |
+| `nitpicker/no-palette-bypass`                |         | Disallow a semantic `cva` variant using the raw color palette instead of a status token.          |
+| `nitpicker/no-raw-color`                     |         | Disallow hex color literals; use a design token (`allowIn` for third-party brand marks).          |
 | `nitpicker/no-raw-control-element`           |         | Disallow bare `<button>`/`<input>`/`<select>`/`<textarea>`; use the primitive (`allowIn` option).  |
 | `nitpicker/no-unwrapped-primitive-import`    |         | Disallow importing a symbol from a library when the design system wraps it (`wrapped` option).     |
 | `nitpicker/require-dialog-footer`            |         | Require a dialog's action buttons to live in a `DialogFooter` (`allowIn` option).                  |
@@ -203,7 +204,7 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 }],
 ```
 
-`require-dialog-footer` and `no-raw-color` each take `{ allowIn: string[] }`, for a dialog family mid-migration and for a third-party brand mark whose colour is not yours to tokenize:
+`require-dialog-footer` and `no-raw-color` each take `{ allowIn: string[] }`, for a dialog family mid-migration and for a third-party brand mark whose color is not yours to tokenize:
 ```js
 "nitpicker/require-dialog-footer": ["warn", { allowIn: ["**/dialogs/admin/**"] }],
 "nitpicker/no-raw-color": ["warn", { allowIn: ["**/creditCard.tsx"] }],
@@ -282,6 +283,29 @@ interface P {
 ```
 The first member of a block needs no blank line above it.
 
+### One description per declaration
+`no-comment-above-jsdoc` flags a comment stacked directly on top of a JSDoc:
+```ts
+// Keyed on the symbol, not the package: a wrapper rarely re-exports everything
+// its library does, so a package-level ban would drown the real finding
+/**
+ * Flags a symbol imported straight from a third-party package when the design
+ * system ships a wrapper exporting that same name.
+ */
+class NoUnwrappedPrimitiveImport { }
+```
+A reader now has to merge two blocks written in different registers, with nothing saying which belongs where. It is also how a description escapes `max-jsdoc-description-length`, since prose moved above the `/**` is measured as a line-comment run instead, raising the effective ceiling from 250 to 450.
+
+The fix is rarely to merge the two, which would just blow the limit. Implementation rationale belongs **on the code it explains**, leaving the JSDoc to say what the thing is:
+```ts
+for (const specifier of node.specifiers) {
+    // Keyed on the symbol rather than the package, since a wrapper rarely
+    // re-exports everything its library does, and a package-level ban would
+    // drown the real finding
+    const replacement = symbols[specifier.imported.name]
+```
+Guidance on how to respond to a warning belongs in the rule's own `fix:` message, and guidance on how to wire a config belongs in its docs. A directive (`// biome-ignore`, `// @ts-expect-error`, `// #region`) is exempt, as is a banner on the first line of a file, and a comment separated from the JSDoc by a blank line is left alone.
+
 ### JSDoc completeness
 `require-complete-jsdoc` only inspects a function that already has a JSDoc (requiring the JSDoc itself is `require-function-jsdoc`'s job). It then checks the doc against the signature:
 ```js
@@ -350,7 +374,7 @@ export default [
 Two of the three are auto-fixable, so `eslint --fix` clears most of the initial pass. If you already run `@stylistic/padding-line-between-statements` or the legacy `newline-before-return`, disable those first, since their fixers will fight these.
 
 ## Design system
-The `design` config encodes the rules a design system states but cannot enforce: that a primitive is reached through its wrapper, that colour and size come from tokens, and that a surface is built from the primitive rather than redrawn by hand. Eight rules cover it.
+The `design` config encodes the rules a design system states but cannot enforce: that a primitive is reached through its wrapper, that color and size come from tokens, and that a surface is built from the primitive rather than redrawn by hand. Eight rules cover it.
 
 They assume a shadcn-style layout: a `components/ui` wrapper layer, Tailwind utilities, `cva` variant maps, and CSS-variable tokens. Outside that shape most of them will not fire at all.
 
@@ -377,7 +401,7 @@ Every rule here except `no-palette-bypass` is about **feature** code. The wrappe
 
 `no-hand-rolled-surface` is a heuristic and is meant to stay a warning. It reads the static classes of one `className`, joining the arms of a `cn(...)` call, and asks whether they add up to a rounded bordered card background in a file that never imports `Card`. A bordered region that is legitimately not a card looks identical from there. Its value is prompting the question, not settling it. A single-side border (`border-t` and friends) is excluded, since a divider is not a surface.
 
-`no-raw-color` matches `Literal` and `TemplateElement` nodes only, so a hash in JSX prose (a street address, an anchor) is never a finding. It accepts the four hex lengths CSS allows (3, 4, 6, 8) and ignores the five- and seven-digit strings that cannot be colours.
+`no-raw-color` matches `Literal` and `TemplateElement` nodes only, so a hash in JSX prose (a street address, an anchor) is never a finding. It accepts the four hex lengths CSS allows (3, 4, 6, 8) and ignores the five- and seven-digit strings that cannot be colors.
 
 ### Opting in
 Like `breathing`, these are **not** in `recommended`, and upgrading Nitpicker never turns them on. None of them is auto-fixable: every finding is a judgement about what a piece of UI is, which no fixer can make. Expect to land them one at a time, cheapest first, rather than all at once.

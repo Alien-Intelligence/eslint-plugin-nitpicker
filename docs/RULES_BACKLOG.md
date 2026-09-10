@@ -59,6 +59,7 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-arbitrary-dimension`           | No Tailwind arbitrary px value on the scale properties, e.g. `text-[10px]` (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
 | `no-centered-table-column`         | No `text-center` on a `TableHead`/`TableCell`, text left and numbers right (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
 | `no-palette-bypass`                | A semantic `cva` variant (`success`, `warning`, ...) must use a status token, not the raw palette (`design` config)                                                                                | web-app ds-sync pass; NITPICKER-RULES.md      |
+| `no-comment-above-jsdoc`           | A comment stacked directly above a JSDoc, splitting one declaration's description in two; directives, a first-line banner, and a blank-line-separated comment are exempt                          | user request                                  |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |

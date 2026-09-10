@@ -1,4 +1,4 @@
-import type { TSESTree } from "@typescript-eslint/utils"
+import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { isWordChar } from "@/lib/utils/words"
 
@@ -53,6 +53,31 @@ export type BacktickSpan = {
  */
 export function isDirectiveComment(comment: TSESTree.Comment): boolean {
     return CONSTANTS.COMMENTS.DIRECTIVE.test(comment.value)
+}
+
+/**
+ * Checks whether a comment sits on a line of its own, i.e. only whitespace
+ * precedes it, so it leads the code below rather than trailing the code beside
+ * it.
+ * @param sourceCode The source code of the linted file.
+ * @param comment The comment to test.
+ * @returns True if the comment starts its own line.
+ */
+export function isOwnLineComment(sourceCode: Readonly<TSESLint.SourceCode>, comment: TSESTree.Comment): boolean {
+    const line = sourceCode.lines[comment.loc.start.line - 1] ?? ""
+
+    return line.slice(0, comment.loc.start.column).trim() === ""
+}
+
+/**
+ * Checks whether a comment sits directly above another, with no blank line
+ * between them, so the two read as one block.
+ * @param comment The upper comment.
+ * @param below The comment it should lead.
+ * @returns True if the two are adjacent.
+ */
+export function isAdjacentAbove(comment: TSESTree.Comment, below: TSESTree.Comment): boolean {
+    return comment.loc.end.line === below.loc.start.line - 1
 }
 
 /**

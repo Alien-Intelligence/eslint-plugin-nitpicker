@@ -8,8 +8,6 @@ import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 type Options = [{ properties: string[] }]
 type MessageIds = "arbitrary"
 
-// A value that keeps recurring is a gap in the scale rather than carelessness,
-// and wants a token adding rather than an exemption
 /**
  * Flags a Tailwind arbitrary value given in px, such as `text-[10px]` or
  * `w-[774px]`. The scales exist so surfaces share a rhythm, and a one-off value
@@ -43,7 +41,7 @@ class NoArbitraryDimension extends NitpickerRule<MessageIds, Options> {
             arbitrary: nitpick({
                 problem: "Arbitrary value `{{value}}` bypasses the scale.",
                 why: "The type and spacing scales exist so surfaces share a rhythm, and a one-off value is followed by nothing else",
-                fix: "Use the nearest step on the scale, or add a token if the value is genuinely needed twice",
+                fix: "Use the nearest step on the scale, or add a token when the value recurs, rather than exempting it",
             }),
         },
     } satisfies TSESLint.RuleMetaData<MessageIds, NitpickerRuleDocs, Options>
