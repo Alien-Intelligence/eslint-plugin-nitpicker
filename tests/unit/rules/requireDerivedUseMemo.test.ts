@@ -1,5 +1,7 @@
+import type { TSESLint } from "@typescript-eslint/utils"
 import { lintRule } from "tests/utils/lint"
-import { describe, test } from "vitest"
+import { describe, expect, test } from "vitest"
+import { isServerComponentFile } from "@/lib/utils/react"
 
 const RULE = "require-derived-usememo"
 const TSX = { filename: "Component.tsx" }
@@ -64,6 +66,89 @@ describe("require-derived-usememo", () => {
     test("It should not report a const inside a nested callback", ({ expect }) => {
         const code = "function useThing() {\n    useEffect(() => {\n        const c = list.find(x => x.ok)\n    })\n}"
         expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report an async component, which no hook can run in", ({ expect }) => {
+        const code = "async function Page() {\n    const rows = data.filter(r => r.ok)\n    return <div>{rows}</div>\n}"
+        expect(lintRule(RULE, code, TSX)).toHaveLength(0)
+    })
+
+    test("It should not report an async arrow component", ({ expect }) => {
+        const code =
+            "const Page = async () => {\n    const rows = data.filter(r => r.ok)\n    return <div>{rows}</div>\n}"
+        expect(lintRule(RULE, code, TSX)).toHaveLength(0)
+    })
+
+    test("It should still report the sync component beside an async one", ({ expect }) => {
+        const code = [
+            "async function Page() {",
+            "    const rows = data.filter(r => r.ok)",
+            "    return <div>{rows}</div>",
+            "}",
+            "function Panel() {",
+            "    const cols = data.map(r => r.id)",
+            "    return <div>{cols}</div>",
+            "}",
+        ].join("\n")
+        expect(lintRule(RULE, code, TSX)).toHaveLength(1)
+    })
+
+    test.each([
+        "app/page.tsx",
+        "app/layout.tsx",
+        "app/dashboard/page.tsx",
+        "packages/frontend/app/admin/settings/layout.tsx",
+        "app/template.tsx",
+        "app/default.tsx",
+        "app/loading.tsx",
+        "app/not-found.tsx",
+    ])("It should not report a server component in %s", filename => {
+        const code = "function Page() {\n    const rows = data.filter(r => r.ok)\n    return <div>{rows}</div>\n}"
+        expect(lintRule(RULE, code, { filename })).toHaveLength(0)
+    })
+
+    test("It should detect a server component on a Windows path", ({ expect }) => {
+        // ESLint hands the rule an OS-native path, so a backslash one must resolve too
+        const empty = { ast: { body: [] } } as unknown as Readonly<TSESLint.SourceCode>
+        expect(isServerComponentFile(empty, "F:\\repo\\app\\dash\\page.tsx")).toBe(true)
+        expect(isServerComponentFile(empty, "F:\\repo\\app\\dash\\Chart.tsx")).toBe(false)
+    })
+
+    test("It should report an App Router file that opts into the client", ({ expect }) => {
+        const code = [
+            '"use client"',
+            "",
+            "function Page() {",
+            "    const rows = data.filter(r => r.ok)",
+            "    return <div>{rows}</div>",
+            "}",
+        ].join("\n")
+        expect(lintRule(RULE, code, { filename: "app/dashboard/page.tsx" })).toHaveLength(1)
+    })
+
+    test("It should ignore a 'use client' that is not in the prologue", ({ expect }) => {
+        // Next.js only honors the directive at the top, so the file stays a
+        // server component and the rule stays quiet rather than guessing
+        const code = [
+            "import { data } from './data'",
+            '"use client"',
+            "",
+            "function Page() {",
+            "    const rows = data.filter(r => r.ok)",
+            "    return <div>{rows}</div>",
+            "}",
+        ].join("\n")
+        expect(lintRule(RULE, code, { filename: "app/dashboard/page.tsx" })).toHaveLength(0)
+    })
+
+    test.each([
+        "app/dashboard/Chart.tsx",
+        "pages/index.tsx",
+        "src/components/page.tsx",
+        "app/dashboard/layout.test.tsx",
+    ])("It should still report a non-server-entry file at %s", filename => {
+        const code = "function Page() {\n    const rows = data.filter(r => r.ok)\n    return <div>{rows}</div>\n}"
+        expect(lintRule(RULE, code, { filename })).toHaveLength(1)
     })
 
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {

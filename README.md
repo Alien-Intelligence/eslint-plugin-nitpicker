@@ -109,7 +109,7 @@ Shipped by the `react` config (and `all`).
 | `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`. |
 | `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.              |
 | `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                        |
-| `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a component or hook to use `useMemo`.   |
+| `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a client component or hook to use `useMemo`. |
 | `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                         |
 | `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter).   |
 
@@ -381,6 +381,13 @@ Every rule here except `no-palette-bypass` is about **feature** code. The wrappe
 
 ### Opting in
 Like `breathing`, these are **not** in `recommended`, and upgrading Nitpicker never turns them on. None of them is auto-fixable: every finding is a judgement about what a piece of UI is, which no fixer can make. Expect to land them one at a time, cheapest first, rather than all at once.
+
+### Server Components
+`require-derived-usememo` is the one React rule that asks you to *add* a hook, so it stays quiet wherever no hook can run. It skips:
+- Any `async` component or hook, since React supports no async client component, so an async one always renders on the server.
+- A Next.js App Router entry file (`page`, `layout`, `template`, `default`, `loading`, `not-found`) under an `app/` directory that has no top-level `"use client"` directive.
+
+Add the directive and the rule applies again, since the file is then a Client Component. The `error` boundaries are never treated as server files, as React requires those to be client ones. No configuration is needed for either case.
 
 ## Framework configs
 Some conventions only make sense for a given framework. Nitpicker detects when a file uses React or AdonisJS and, through `require-framework-config`, nudges you to opt into the matching config for those files. Opting in silences that nudge and applies any framework-specific tweaks.
