@@ -2,6 +2,7 @@ import type { TSESLint } from "@typescript-eslint/utils"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
 import migrationTableOrder from "@/rules/adonisjs/migrationTableOrder"
+import noCtxHttpContextParam from "@/rules/adonisjs/noCtxHttpContextParam"
 import requireControllerJSDoc from "@/rules/adonisjs/requireControllerJSDoc"
 import requireMigrationJSDoc from "@/rules/adonisjs/requireMigrationJSDoc"
 import requireValidatedRequest from "@/rules/adonisjs/requireValidatedRequest"
@@ -53,6 +54,7 @@ import requireMemoCallbackJSDoc from "@/rules/react/requireMemoCallbackJSDoc"
  */
 const ruleInstances = [
     migrationTableOrder,
+    noCtxHttpContextParam,
     requireControllerJSDoc,
     requireMigrationJSDoc,
     requireValidatedRequest,

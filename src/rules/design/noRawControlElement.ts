@@ -53,6 +53,7 @@ class NoRawControlElement extends NitpickerRule<MessageIds, Options> {
 
     create(context: Readonly<TSESLint.RuleContext<MessageIds, Options>>, options: Options): TSESLint.RuleListener {
         const elements = new Set(options[0]?.elements ?? CONSTANTS.DESIGN.RAW_CONTROLS)
+
         // A hidden file input behind a styled trigger is the honest exception,
         // and naming it here beats tolerating it silently
         const allowIn = options[0]?.allowIn ?? []

@@ -68,7 +68,7 @@ Nitpicker ships seven shared flat configs:
 | `all`         | Every rule, plus both framework rulesets opted in. The maximally pedantic setup.           |
 | `react`       | Opts into the React ruleset for the files you scope it to.                                 |
 | `adonisjs`    | Opts into the AdonisJS ruleset, and relaxes decorative separators in `start/routes` files. |
-| `breathing`   | Opts into the code-spacing ruleset, which is deliberately out of `recommended`.             |
+| `breathing`   | Opts into the code-spacing ruleset, which is deliberately out of `recommended`.            |
 | `design`      | Opts into the design-system ruleset, also deliberately out of `recommended`.               |
 
 ## Rules
@@ -82,7 +82,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/catch-error-name`                 |         | Require a `catch` clause to bind its error as `error` (`_error` for an unused binding).             |
 | `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                  |
 | `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.          |
-| `nitpicker/no-comment-above-jsdoc`           |         | Disallow a comment stacked directly above a JSDoc, splitting one description in two.               |
+| `nitpicker/no-comment-above-jsdoc`           |         | Disallow a comment stacked directly above a JSDoc, splitting one description in two.                |
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.             |
 | `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).                |
 | `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.      |
@@ -105,44 +105,45 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 
 ### React rules
 Shipped by the `react` config (and `all`).
-| Rule                                         | Fixable | Description                                                                                    |
-|----------------------------------------------|---------|------------------------------------------------------------------------------------------------|
-| `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`. |
-| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.              |
-| `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                        |
+| Rule                                         | Fixable | Description                                                                                         |
+|----------------------------------------------|---------|-----------------------------------------------------------------------------------------------------|
+| `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`.      |
+| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.                   |
+| `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                             |
 | `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a client component or hook to use `useMemo`. |
-| `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                         |
-| `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter).   |
+| `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                              |
+| `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter).        |
 
 ### AdonisJS rules
 Shipped by the `adonisjs` config (and `all`).
 | Rule                                  | Fixable | Description                                                                                                     |
 |---------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------|
 | `nitpicker/migration-table-order`     |         | Group migration table statements as columns, then timestamps, then indexes.                                     |
+| `nitpicker/no-ctx-httpcontext-param`  |         | Disallow binding the whole `HttpContext`, destructure the properties used (`allowIn` option).                   |
 | `nitpicker/require-controller-jsdoc`  |         | Require a JSDoc comment describing an AdonisJS controller (`*Controller` class).                                |
 | `nitpicker/require-migration-jsdoc`   |         | Require a JSDoc comment describing an AdonisJS migration.                                                       |
 | `nitpicker/require-validated-request` |         | Require request data through `request.validateUsing()`, not raw `request.input/body/qs/all` (`allowIn` option). |
 
 ### Breathing rules
 Shipped by the `breathing` config (and `all`), never by `recommended`. See [Code breathing](#code-breathing).
-| Rule                                    | Fixable | Description                                                                                        |
-|-----------------------------------------|---------|------------------------------------------------------------------------------------------------------|
-| `nitpicker/max-consecutive-statements`  |         | Enforce a maximum run of sibling statements with no blank line between them (default 4).           |
-| `nitpicker/require-blank-before-block`  | yes     | Require a blank line before a multi-line control-flow block that follows another statement.        |
+| Rule                                    | Fixable | Description                                                                                         |
+|-----------------------------------------|---------|-----------------------------------------------------------------------------------------------------|
+| `nitpicker/max-consecutive-statements`  |         | Enforce a maximum run of sibling statements with no blank line between them (default 4).            |
+| `nitpicker/require-blank-before-block`  | yes     | Require a blank line before a multi-line control-flow block that follows another statement.         |
 | `nitpicker/require-blank-before-return` | yes     | Require a blank line before the `return`/`throw` a block of several statements (default 4) ends on. |
 
 ### Design rules
 Shipped by the `design` config (and `all`), never by `recommended`. See [Design system](#design-system).
-| Rule                                         | Fixable | Description                                                                                        |
-|----------------------------------------------|---------|------------------------------------------------------------------------------------------------------|
-| `nitpicker/no-arbitrary-dimension`           |         | Disallow Tailwind arbitrary px values (`text-[10px]`, `w-[774px]`), which bypass the scales.       |
-| `nitpicker/no-centered-table-column`         |         | Disallow centring a `TableHead`/`TableCell`; text goes left, numbers right.                        |
-| `nitpicker/no-hand-rolled-surface`           |         | Disallow drawing a card surface by hand in a file that never imports `Card`.                       |
-| `nitpicker/no-palette-bypass`                |         | Disallow a semantic `cva` variant using the raw color palette instead of a status token.          |
-| `nitpicker/no-raw-color`                     |         | Disallow hex color literals; use a design token (`allowIn` for third-party brand marks).          |
-| `nitpicker/no-raw-control-element`           |         | Disallow bare `<button>`/`<input>`/`<select>`/`<textarea>`; use the primitive (`allowIn` option).  |
-| `nitpicker/no-unwrapped-primitive-import`    |         | Disallow importing a symbol from a library when the design system wraps it (`wrapped` option).     |
-| `nitpicker/require-dialog-footer`            |         | Require a dialog's action buttons to live in a `DialogFooter` (`allowIn` option).                  |
+| Rule                                      | Fixable | Description                                                                                       |
+|-------------------------------------------|---------|---------------------------------------------------------------------------------------------------|
+| `nitpicker/no-arbitrary-dimension`        |         | Disallow Tailwind arbitrary px values (`text-[10px]`, `w-[774px]`), which bypass the scales.      |
+| `nitpicker/no-centered-table-column`      |         | Disallow centring a `TableHead`/`TableCell`; text goes left, numbers right.                       |
+| `nitpicker/no-hand-rolled-surface`        |         | Disallow drawing a card surface by hand in a file that never imports `Card`.                      |
+| `nitpicker/no-palette-bypass`             |         | Disallow a semantic `cva` variant using the raw color palette instead of a status token.          |
+| `nitpicker/no-raw-color`                  |         | Disallow hex color literals; use a design token (`allowIn` for third-party brand marks).          |
+| `nitpicker/no-raw-control-element`        |         | Disallow bare `<button>`/`<input>`/`<select>`/`<textarea>`; use the primitive (`allowIn` option). |
+| `nitpicker/no-unwrapped-primitive-import` |         | Disallow importing a symbol from a library when the design system wraps it (`wrapped` option).    |
+| `nitpicker/require-dialog-footer`         |         | Require a dialog's action buttons to live in a `DialogFooter` (`allowIn` option).                 |
 
 ¹ Only the terminal-period case is auto-fixed; a mid-comment sentence break is reported without a fix so wrapped prose is never mangled.
 ² Auto-fixed only when the object holds no comments; an object with an inline comment is reported without a fix so the comment is never dropped.
@@ -188,10 +189,11 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
 }],
 ```
 
-`no-relative-imports` and `require-validated-request` each take the same `{ allowIn: string[] }`, a list of globs exempt from the rule, for the few files where the pattern is unavoidable (an entrypoint that reaches outside the alias roots, or a passthrough proxy controller that reads the raw request):
+`no-relative-imports`, `require-validated-request`, and `no-ctx-httpcontext-param` each take the same `{ allowIn: string[] }`, a list of globs exempt from the rule, for the few files where the pattern is unavoidable (an entrypoint that reaches outside the alias roots, a passthrough proxy controller that reads the raw request, or a handler that forwards the context onwards whole):
 ```js
 "nitpicker/no-relative-imports": ["warn", { allowIn: ["**/bin/*.ts"] }],
 "nitpicker/require-validated-request": ["warn", { allowIn: ["**/*_proxy_controller.ts"] }],
+"nitpicker/no-ctx-httpcontext-param": ["warn", { allowIn: ["**/exceptions/handler.ts"] }],
 ```
 
 `no-unwrapped-primitive-import` takes `{ wrapped, allowIn }`. `wrapped` maps a package to the symbols your design system re-exports under the same name, and where to import each from. It defaults to `{}`, so the rule does nothing until you describe your own wrapper layer. Key it on the **symbol**, never the package: a wrapper rarely re-exports everything its library does, and a package-level ban buries the one real finding under the correct imports of everything else:
@@ -325,6 +327,17 @@ async function send({ user, url }) {}
 async function send({ user, url }) {}
 ```
 It also covers class methods and object-literal methods, not just top-level functions.
+
+An AdonisJS **route handler** is the one signature documented route-first, describing the endpoint rather than the values the framework hands it. So a parameter destructured off `HttpContext` needs no `@param`, and any function receiving the context needs no `@returns`:
+```ts
+/**
+ * POST /users
+ */
+async store({ auth, request }: HttpContext) {
+    return this.successResponse(...)
+}
+```
+The exemption is keyed on the `HttpContext` annotation, so a destructured parameter of any other type is documented as usual, and a handler's own non-context parameters still need their `@param`. Binding the context whole (`ctx: HttpContext`) is **not** exempt, since it still owes an `@param ctx`, and it is a violation in its own right that `no-ctx-httpcontext-param` reports.
 
 ### Line comment periods
 `no-line-comment-period` only treats a dot as prose when whitespace or the end of the comment follows it, so dots inside code (`foo.bar`, `subagent.*`, `split(".")`), inside a quoted or back-ticked span, in an ellipsis, or closing an abbreviation (`e.g.`, `i.e.`, `etc.`) are left alone.

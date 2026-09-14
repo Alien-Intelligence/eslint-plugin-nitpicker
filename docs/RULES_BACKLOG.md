@@ -59,7 +59,8 @@ Scope: **All** · **BE** (backend/AdonisJS) · **FE** (frontend/React) · **proj
 | `no-arbitrary-dimension`           | No Tailwind arbitrary px value on the scale properties, e.g. `text-[10px]` (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
 | `no-centered-table-column`         | No `text-center` on a `TableHead`/`TableCell`, text left and numbers right (`design` config)                                                                                                       | web-app ds-sync pass; NITPICKER-RULES.md      |
 | `no-palette-bypass`                | A semantic `cva` variant (`success`, `warning`, ...) must use a status token, not the raw palette (`design` config)                                                                                | web-app ds-sync pass; NITPICKER-RULES.md      |
-| `no-comment-above-jsdoc`           | A comment stacked directly above a JSDoc, splitting one declaration's description in two; directives, a first-line banner, and a blank-line-separated comment are exempt                          | user request                                  |
+| `no-comment-above-jsdoc`           | A comment stacked directly above a JSDoc, splitting one declaration's description in two; directives, a first-line banner, and a blank-line-separated comment are exempt                           | user request                                  |
+| `no-ctx-httpcontext-param`         | No parameter binding the whole `HttpContext` (`ctx: HttpContext`), destructure the properties used; absolute, middleware included (`allowIn` globs exempt) (adonisjs category)                     | user request; BE STYLE.md                     |
 
 ## Candidate — Comments & JSDoc
 | Proposed rule                        | Enforces                                                                                                                                                 | Diff | Scope | Source / notes                                    |
@@ -93,11 +94,11 @@ Shipped in 0.8.0 as three rules in the opt-in `breathing` config: `require-blank
 
 Calibrated against two corpora (`chat-sdk`, packed; `data-streaming/web-app`, well spaced), which drove five exemptions: a declaration consumed by the statement below it, single-line guard clauses, formatter-wrapped unbraced guards, multi-line statements ending a run, and runs of parallel statements sharing a receiver (schema builders, assertion blocks, `useState` stacks). Final counts: chat-sdk 112 findings across 30/79 files, web-app 290 across 151/1694.
 
-| Proposed rule           | Enforces                                                                                     | Diff | Scope | Source / notes                                          |
-|-------------------------|------------------------------------------------------------------------------------------------|------|-------|----------------------------------------------------------|
-| `blank-after-block`     | A statement following a multi-line block needs a blank line below the closing brace           | M    | All   | The "below" half; noisier (block-ends-container, `else`) |
-| `blank-around-iife`     | A multi-line IIFE gets the same treatment as control flow (`blocks: ["expression"]` option)   | E    | All   | Known gap in `require-blank-before-block`                |
-| `no-orphaned-comment`   | A comment separated from the code below it by a blank line is either attached or moved        | E    | All   | Surfaced while designing the breathing helpers           |
+| Proposed rule         | Enforces                                                                                    | Diff | Scope | Source / notes                                           |
+|-----------------------|---------------------------------------------------------------------------------------------|------|-------|----------------------------------------------------------|
+| `blank-after-block`   | A statement following a multi-line block needs a blank line below the closing brace         | M    | All   | The "below" half; noisier (block-ends-container, `else`) |
+| `blank-around-iife`   | A multi-line IIFE gets the same treatment as control flow (`blocks: ["expression"]` option) | E    | All   | Known gap in `require-blank-before-block`                |
+| `no-orphaned-comment` | A comment separated from the code below it by a blank line is either attached or moved      | E    | All   | Surfaced while designing the breathing helpers           |
 
 ## Candidate — Design system
 Shipped in 0.9.0 as eight rules in the opt-in `design` config. Kept out of `recommended` for the same reason as `breathing`: they assume a shadcn-style wrapper layer, Tailwind utilities, `cva` variant maps and CSS-variable tokens, and `categoryRules()` ignores `meta.docs.recommended`, so a `base` rule would land in every consumer's CI on upgrade.
@@ -123,7 +124,6 @@ Two checks stayed in `scripts/ds-sync/audit.mjs` because ESLint sees one file at
 | `no-migration-section-comments` | No section-label comments (`// Timestamps`, `// Relationships`, …) inside a migration's table builder; keep genuine why-notes | M    | proj (AdonisJS) | web-app migrations; deferred (comments-scope undecided) |
 | `anonymous-migration-class`     | Migration default-export class must be anonymous (flag `class BaselineMigration extends BaseSchema`)                          | E    | proj (AdonisJS) | web-app migrations; deferred                            |
 | `migration-id-first`            | First `createTable` column must be `increments("id")`                                                                         | M    | proj (AdonisJS) | web-app migrations; deferred (table-dependent)          |
-| `no-ctx-httpcontext-param`      | Controllers destructure `HttpContext`, never `ctx: HttpContext`                                                               | M    | proj (AdonisJS) | BE STYLE.md; middleware exempt                          |
 | `no-optional-user-override`     | A route has one subject; no optional `params.user_id` override                                                                | H    | proj (AdonisJS) | BE STYLE.md                                             |
 | `config-over-magic-numbers`     | Timing/threshold values live in `*_CONFIG`, not inline                                                                        | H    | BE              | BE STYLE.md                                             |
 | `tailwind-canonical-classes`    | Prefer canonical Tailwind classes over arbitrary values                                                                       | H    | FE              | FE STYLE.md; overlaps existing tailwind plugins         |
@@ -148,7 +148,7 @@ Two checks stayed in `scripts/ds-sync/audit.mjs` because ESLint sees one file at
 | `require-service-singleton-export` | A `services/` file exporting a service class also exports a camelCase singleton (`export const fooService = new FooService()`) | M    | proj (BE) | web-app pass; 26/26; not written in STYLE.md                                  |
 | `controller-response-via-helper`   | Controllers respond via `this.successResponse<T>()`/`errorResponse()`, not raw `response.status/send/json`                     | M    | proj (BE) | web-app pass; 1495 helper calls; ~5 passthrough controllers need an allowlist |
 | `require-success-response-generic` | `this.successResponse(...)` is always called with an explicit type argument                                                    | E    | proj (BE) | web-app pass; BE STYLE.md                                                     |
-| `no-httpcontext-jsdoc-param`       | A route-handler JSDoc never carries `@param` for `HttpContext` or its destructured props (`auth`, `request`, `params`, …)      | M    | proj (BE) | web-app pass; BE STYLE.md; complements shipped `require-controller-jsdoc`     |
+| `no-httpcontext-jsdoc-param`       | A route-handler JSDoc never carries `@param` for `HttpContext` or its destructured props (`auth`, `request`, `params`, …)      | M    | proj (BE) | web-app pass; enforcing half of the `require-complete-jsdoc` exemption        |
 | `belongsto-fk-column-adjacent`     | Each `@belongsTo` relation is immediately preceded by its `@column() declare <rel>Id` foreign key                              | M    | proj (BE) | web-app pass; 73 `@belongsTo` across 39 models                                |
 
 ## Candidate — Logging (AdonisJS) (0.7.0 web-app research pass)
