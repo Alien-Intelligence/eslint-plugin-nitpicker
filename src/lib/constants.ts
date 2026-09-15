@@ -309,6 +309,11 @@ const CONSTANTS = {
          * the Vine validator contract.
          */
         RAW_ACCESSORS: new Set(["input", "body", "qs", "all", "only", "except"]),
+
+        /**
+         * The type a route handler's context parameter is annotated with.
+         */
+        HTTP_CONTEXT_TYPE: "HttpContext",
     },
 
     /**

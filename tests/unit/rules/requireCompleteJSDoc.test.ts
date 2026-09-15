@@ -218,6 +218,47 @@ describe("require-complete-jsdoc", () => {
         expect(lintRule(RULE, code)).toHaveLength(0)
     })
 
+    // AdonisJS route handlers, documented route-first
+    test("It should not require @param for a destructured HttpContext", ({ expect }) => {
+        const code =
+            "class C {\n    /**\n     * POST /users\n     */\n    async store({ auth, request, params }: HttpContext) {\n        return this.ok()\n    }\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not require @returns on a route handler", ({ expect }) => {
+        const code =
+            "class C {\n    /**\n     * GET /users/:id\n     */\n    async show({ params }: HttpContext) {\n        return this.successResponse(params.id)\n    }\n}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should still require @param for a context bound whole", ({ expect }) => {
+        // "ctx: HttpContext" is its own violation, no-ctx-httpcontext-param owns it
+        const code =
+            "class C {\n    /**\n     * POST /users\n     */\n    async store(ctx: HttpContext) {\n        return this.ok()\n    }\n}"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingParam")
+    })
+
+    test("It should still require @param for a handler's non-context parameters", ({ expect }) => {
+        const code =
+            "class C {\n    /**\n     * POST /users\n     */\n    async store({ request }: HttpContext, retries: number) {\n        return this.ok(retries)\n    }\n}"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingParam")
+    })
+
+    test("It should not exempt a destructured parameter of another type", ({ expect }) => {
+        const code = "/**\n * Runs.\n */\nasync function run({ auth, request }: AuditContext) {}"
+        expect(lintRule(RULE, code)).toHaveLength(2)
+    })
+
+    test("It should not let the context exemption hide an undocumented sibling object", ({ expect }) => {
+        const code =
+            "class C {\n    /**\n     * POST /users\n     */\n    async store({ request }: HttpContext, { limit }: Options) {\n        return this.ok(limit)\n    }\n}"
+        expect(lintRule(RULE, code)).toHaveLength(1)
+    })
+
     test("It should include AI-friendly why/fix context in both messages", ({ expect }) => {
         const param = lintRule(RULE, "/**\n * Runs.\n */\nasync function run(id) {}")
         expect(param[0]?.message).toContain("why:")

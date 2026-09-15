@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
+import { isHttpContextParam, takesHttpContext } from "@/lib/utils/controllers"
 import { type FunctionNode, getDocumentableNode, isVoidFunction, parameterDocs } from "@/lib/utils/functions"
 import { getJSDocParamNames, getLeadingJSDoc, hasJSDocReturnsTag } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
@@ -59,6 +60,10 @@ class RequireCompleteJSDoc extends NitpickerRule<MessageIds, Options> {
             const plainNames = new Set(docs.filter(doc => doc.kind === "name").map(doc => doc.name))
 
             for (const doc of docs) {
+                // A destructured HttpContext names the context properties a route
+                // handler uses, they are framework-supplied and never documented
+                if (doc.kind === "object" && isHttpContextParam(doc.node)) continue
+
                 if (doc.kind === "name") {
                     if (!documented.has(doc.name)) {
                         context.report({
@@ -92,6 +97,10 @@ class RequireCompleteJSDoc extends NitpickerRule<MessageIds, Options> {
 
             if (hasJSDocReturnsTag(jsdoc)) return
             if (isVoidFunction(fn, context.sourceCode.visitorKeys)) return
+
+            // A route handler is documented route-first, a format that describes
+            // the endpoint rather than the response object it hands back
+            if (takesHttpContext(fn)) return
 
             // A component's render result is obvious, so it needs no "@returns"
             if (functionReturnsJsx(fn, context.sourceCode.visitorKeys)) return
