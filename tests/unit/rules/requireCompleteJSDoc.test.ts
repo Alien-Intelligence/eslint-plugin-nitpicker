@@ -75,6 +75,28 @@ describe("require-complete-jsdoc", () => {
         expect(lintRule(RULE, "/**\n * Runs.\n */\nasync function run([a, b]) {}")).toHaveLength(0)
     })
 
+    // An underscore-prefixed name is the convention for a deliberately unused
+    // binding, the same one catch-error-name mandates for "_error"
+    test("It should skip an underscore-prefixed parameter", ({ expect }) => {
+        const code =
+            "/**\n * Handles it.\n * @param state The state.\n */\nfunction onEvent(_: unknown, state: string) {}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+
+        const named = "/**\n * Handles it.\n * @param state The state.\n */\nfunction onEvent(_event, state) {}"
+        expect(lintRule(RULE, named)).toHaveLength(0)
+    })
+
+    test("It should still accept an underscore parameter that is documented anyway", ({ expect }) => {
+        const code =
+            "/**\n * Handles it.\n * @param _ The event, unused.\n * @param state The state.\n */\nfunction onEvent(_, state) {}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should skip an underscore-prefixed destructured property", ({ expect }) => {
+        const code = "/**\n * Runs.\n * @param user The user.\n */\nasync function run({ user, _internal }) {}"
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
     test("It should expect the name behind a default value", ({ expect }) => {
         expect(lintRule(RULE, "/**\n * Runs.\n */\nasync function run(limit = 10) {}")).toHaveLength(1)
         const ok = "/**\n * Runs.\n * @param limit The cap.\n */\nasync function run(limit = 10) {}"
@@ -141,6 +163,21 @@ describe("require-complete-jsdoc", () => {
 
     test("It should require @returns on an arrow with an expression body", ({ expect }) => {
         expect(lintRule(RULE, "/**\n * Runs.\n */\nconst run = () => 1")).toHaveLength(1)
+        expect(lintRule(RULE, "/**\n * Runs.\n */\nconst run = () => ({ a: 1 })")).toHaveLength(1)
+    })
+
+    // A forwarded call is opaque, so the brace style must not decide whether a
+    // "@returns" is owed, which is what no-jsdoc-returns-on-void objects to
+    test("It should not require @returns on a concise arrow forwarding a call", ({ expect }) => {
+        expect(lintRule(RULE, "/**\n * Runs.\n */\nconst run = () => doVoidThing()")).toHaveLength(0)
+        expect(lintRule(RULE, "/**\n * Runs.\n */\nconst run = async () => await doVoidThing()")).toHaveLength(0)
+    })
+
+    test("It should still require @returns when a return type says a value comes back", ({ expect }) => {
+        const code = "/**\n * Runs.\n */\nconst run = (): string => doThing()"
+        const messages = lintRule(RULE, code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("missingReturns")
     })
 
     test("It should not let a nested function's return require an @returns", ({ expect }) => {

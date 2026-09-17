@@ -53,6 +53,54 @@ describe("require-multiline-object", () => {
         expect(fixRule(RULE, code)).toBe(code)
     })
 
+    test("It should not report the rows of a record table", ({ expect }) => {
+        const code = [
+            "const TERMINALS = [",
+            '    { command: "wt", args: ["-d"], appendDir: true },',
+            '    { command: "cmd", args: ["/c"], appendDir: false },',
+            '    { command: "pwsh", args: ["-NoExit"], appendDir: true },',
+            "]",
+        ].join("\n")
+
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should not report an object nested inside a record table row", ({ expect }) => {
+        const code = [
+            "const TERMINALS = [",
+            '    { command: "wt", opts: { a: 1, b: 2, c: 3 }, appendDir: true },',
+            '    { command: "cmd", opts: { a: 4, b: 5, c: 6 }, appendDir: false },',
+            "]",
+        ].join("\n")
+
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
+    test("It should report an array whose entries carry different keys", ({ expect }) => {
+        const code = [
+            "const TERMINALS = [",
+            '    { command: "wt", args: ["-d"], appendDir: true },',
+            '    { command: "cmd", flags: ["/c"], appendDir: false },',
+            "]",
+        ].join("\n")
+
+        expect(lintRule(RULE, code)).toHaveLength(2)
+    })
+
+    test("It should report rows packed onto one line, which have no column to scan", ({ expect }) => {
+        expect(lintRule(RULE, "const x = [{ a: 1, b: 2, c: 3 }, { a: 4, b: 5, c: 6 }]")).toHaveLength(2)
+    })
+
+    test("It should report a lone object in an array, which is no table", ({ expect }) => {
+        expect(lintRule(RULE, "const x = [\n    { a: 1, b: 2, c: 3 },\n]")).toHaveLength(1)
+    })
+
+    test("It should exempt a file matched by the allowIn option", ({ expect }) => {
+        const opts = { options: [{ allowIn: ["**/constants.ts"] }], filename: "src/constants.ts" }
+        expect(lintRule(RULE, "const x = { a: 1, b: 2, c: 3 }", opts)).toHaveLength(0)
+        expect(lintRule(RULE, "const x = { a: 1, b: 2, c: 3 }", { ...opts, filename: "src/other.ts" })).toHaveLength(1)
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "const x = { a: 1, b: 2, c: 3 }")
         expect(messages[0]?.message).toContain("why:")

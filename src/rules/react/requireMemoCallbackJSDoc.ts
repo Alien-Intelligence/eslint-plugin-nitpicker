@@ -1,6 +1,7 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
+import { isIgnoredName } from "@/lib/utils/functions"
 import { getJSDocLineTag, hasLeadingJSDoc } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
@@ -70,7 +71,13 @@ class RequireMemoCallbackJSDoc extends NitpickerRule<MessageIds, Options> {
                     line => getJSDocLineTag(line) === "param",
                 ).length
 
-                if (documented < callback.params.length) {
+                // An underscore-prefixed name holds a position and nothing
+                // else, so there is no prose an "@param" could carry for it
+                const required = callback.params.filter(
+                    param => param.type !== "Identifier" || !isIgnoredName(param.name),
+                ).length
+
+                if (documented < required) {
                     context.report({ node: node.id, messageId: "missingParam" })
                 }
             },

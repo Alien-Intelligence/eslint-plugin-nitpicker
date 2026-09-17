@@ -1,7 +1,13 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
 import { isHttpContextParam, takesHttpContext } from "@/lib/utils/controllers"
-import { type FunctionNode, getDocumentableNode, isVoidFunction, parameterDocs } from "@/lib/utils/functions"
+import {
+    type FunctionNode,
+    getDocumentableNode,
+    hasOpaqueReturn,
+    isVoidFunction,
+    parameterDocs,
+} from "@/lib/utils/functions"
 import { getJSDocParamNames, getLeadingJSDoc, hasJSDocReturnsTag } from "@/lib/utils/jsdocs"
 import { nitpick } from "@/lib/utils/messages"
 import { functionReturnsJsx } from "@/lib/utils/react"
@@ -97,6 +103,11 @@ class RequireCompleteJSDoc extends NitpickerRule<MessageIds, Options> {
 
             if (hasJSDocReturnsTag(jsdoc)) return
             if (isVoidFunction(fn, context.sourceCode.visitorKeys)) return
+
+            // A concise arrow forwarding a call says nothing about what it hands
+            // back, and "no-jsdoc-returns-on-void" reads it the same way, so
+            // neither rule has an opinion until a return type settles it
+            if (hasOpaqueReturn(fn)) return
 
             // A route handler is documented route-first, a format that describes
             // the endpoint rather than the response object it hands back
