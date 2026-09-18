@@ -29,6 +29,26 @@ describe("no-jsx-comments", () => {
         expect(lintRule(RULE, "const x = <div>{}</div>", TSX)).toHaveLength(0)
     })
 
+    test("It should not report a tooling directive, which only works where it sits", ({ expect }) => {
+        const directives = [
+            "{/* biome-ignore lint/a11y/noLabelWithoutControl: the input is external */}",
+            "{/* prettier-ignore */}",
+            "{/* @ts-expect-error the types disagree here */}",
+        ]
+
+        for (const directive of directives) {
+            expect(lintRule(RULE, `const x = <div>${directive}<X /></div>`, TSX)).toHaveLength(0)
+        }
+    })
+
+    test("It should report a container mixing a directive with prose", ({ expect }) => {
+        const code = "const x = <div>{/* biome-ignore lint/style/noX: why */ /* Header */}<X /></div>"
+        const messages = lintRule(RULE, code, TSX)
+
+        expect(messages).toHaveLength(1)
+        expect(messages[0]?.messageId).toBe("jsxComment")
+    })
+
     test("It should include AI-friendly why/fix context in the message", ({ expect }) => {
         const messages = lintRule(RULE, "const x = <div>{/* Header */}</div>", TSX)
         expect(messages[0]?.message).toContain("why:")

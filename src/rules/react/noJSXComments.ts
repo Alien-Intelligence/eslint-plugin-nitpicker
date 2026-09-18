@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils"
 import { NitpickerRule } from "@/lib/rule"
+import { isDirectiveComment } from "@/lib/utils/comments"
 import { nitpick } from "@/lib/utils/messages"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
@@ -9,7 +10,8 @@ type MessageIds = "jsxComment"
 /**
  * Flags an inline comment placed inside JSX (a `{ }` container holding only a
  * comment), which usually labels a section that should be its own named
- * component rather than a prose marker.
+ * component rather than a prose marker. A tooling directive is exempt, since it
+ * only works where it sits.
  */
 class NoJSXComments extends NitpickerRule<MessageIds, Options> {
     readonly name = "no-jsx-comments"
@@ -39,7 +41,14 @@ class NoJSXComments extends NitpickerRule<MessageIds, Options> {
                 // Only a comment-only JSX container parses its inner expression as
                 // empty, an ordinary value container never does
                 if (node.expression.type !== "JSXEmptyExpression") return
-                if (context.sourceCode.getCommentsInside(node).length === 0) return
+
+                const comments = context.sourceCode.getCommentsInside(node)
+                if (comments.length === 0) return
+
+                // A directive suppresses the node directly below it, so extracting
+                // a sub-component would delete it; requiring every comment to be
+                // one keeps a directive stacked with prose reportable
+                if (comments.every(isDirectiveComment)) return
 
                 context.report({ node, messageId: "jsxComment" })
             },

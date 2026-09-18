@@ -67,8 +67,19 @@ export type ParameterDoc =
     | { kind: "object"; names: NamedParameter[]; node: TSESTree.Node }
 
 /**
+ * Checks whether a binding is deliberately ignored, i.e. named `_` or prefixed
+ * with it, the convention for a name that exists only to hold a position.
+ * @param name The binding name to test.
+ * @returns True if the name marks an ignored binding.
+ */
+export function isIgnoredName(name: string): boolean {
+    return name.startsWith("_")
+}
+
+/**
  * Describes how each parameter of a function expects to be documented. An array
- * pattern is skipped as too ambiguous to require.
+ * pattern is skipped as too ambiguous to require, and so is an underscore-prefixed
+ * name, which says the binding is there only to hold a position.
  * @param fn The function node to read the signature of.
  * @returns One entry per documentable parameter.
  */
@@ -83,6 +94,8 @@ export function parameterDocs(fn: FunctionNode): ParameterDoc[] {
     const collect = (param: TSESTree.Node): void => {
         switch (param.type) {
             case "Identifier":
+                if (isIgnoredName(param.name)) return
+
                 docs.push({
                     kind: "name",
                     name: param.name,
@@ -102,10 +115,10 @@ export function parameterDocs(fn: FunctionNode): ParameterDoc[] {
                 const names: NamedParameter[] = []
                 for (const property of param.properties) {
                     if (property.type === "RestElement") {
-                        if (property.argument.type === "Identifier") {
+                        if (property.argument.type === "Identifier" && !isIgnoredName(property.argument.name)) {
                             names.push({ name: property.argument.name, node: property.argument })
                         }
-                    } else if (property.key.type === "Identifier") {
+                    } else if (property.key.type === "Identifier" && !isIgnoredName(property.key.name)) {
                         names.push({ name: property.key.name, node: property.key })
                     }
                 }
@@ -244,6 +257,22 @@ export function isVoidReturnType(annotation: TSESTree.TSTypeAnnotation): boolean
     }
 
     return false
+}
+
+/**
+ * Checks whether what a function hands back is opaque, i.e. a concise arrow body
+ * that only forwards a call (`() => doThing()`) with no return-type annotation.
+ * Syntax alone cannot say whether such a call yields a value or nothing.
+ * @param fn The function node to inspect.
+ * @returns True if the return value cannot be judged from the syntax.
+ */
+export function hasOpaqueReturn(fn: FunctionNode): boolean {
+    if (fn.returnType) return false
+    if (fn.type !== "ArrowFunctionExpression" || fn.body.type === "BlockStatement") return false
+
+    const expression = fn.body.type === "AwaitExpression" ? fn.body.argument : fn.body
+
+    return expression.type === "CallExpression"
 }
 
 /**

@@ -108,7 +108,7 @@ Shipped by the `react` config (and `all`).
 | Rule                                         | Fixable | Description                                                                                         |
 |----------------------------------------------|---------|-----------------------------------------------------------------------------------------------------|
 | `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`.      |
-| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` comments inside JSX; extract a named sub-component.                   |
+| `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` prose comments inside JSX; extract a named sub-component.             |
 | `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                             |
 | `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a client component or hook to use `useMemo`. |
 | `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                              |
@@ -167,6 +167,19 @@ A few rules accept options. Pass them by overriding the rule with a `["warn", { 
     include: ["class-methods", "object-methods", "nested"],
     ignore: ["create", "render"],
 }],
+```
+
+`require-multiline-object` takes `{ maxKeys, indent, allowIn }`. `maxKeys` is how many properties may stay on one line, defaulting to `2`, and `indent` is the width of one indentation level the fixer expands with, defaulting to `4`. A **record table**, an array of single-line object literals carrying the same keys in the same order, one row per line, is exempt with no configuration, since it is read down its columns and stacking every row trades one scannable block for four times the lines and no alignment:
+```ts
+const TERMINALS = [
+    { command: "wt",   args: ["-d"],      appendDir: true },
+    { command: "cmd",  args: ["/c"],      appendDir: false },
+    { command: "pwsh", args: ["-NoExit"], appendDir: true },
+]
+```
+An array whose entries carry different keys, a lone literal in an array, and rows packed onto one line are not tables, and still report. `allowIn` is the escape hatch for a file the exemption does not fit:
+```js
+"nitpicker/require-multiline-object": ["warn", { maxKeys: 3, allowIn: ["**/fixtures/**"] }],
 ```
 
 `max-classname-length` takes `{ max: number }`, the maximum length of a `className` class string, defaulting to `120`:
@@ -261,6 +274,16 @@ A backtick renders as code inside a JSDoc block, but in a `//` comment it is jus
 ```
 Backticks are left alone in JSDoc and block comments, in tooling directives, when unpaired, in a run (a ```` ``` ```` fence), and when the span already holds a double quote, since `` `split(".")` `` cannot be requoted without nesting.
 
+### Tooling directives
+A directive is not prose, so the rules that read a comment as English leave one alone: `no-line-comment-backticks`, `require-capitalized-comments`, `max-line-comment-length`, `no-comment-above-jsdoc` and `no-jsx-comments`. The set is `eslint`/`eslint-*`, `ts-*`, `biome-ignore`, `prettier-ignore`, `globals`, `exported`, `jshint`, `jslint`, `istanbul`, `c8`/`v8`, `webpack`, `noinspection`, `#region`/`#endregion`, and anything opening with `@`.
+
+This matters most in JSX, where a suppression has to sit directly above the node it suppresses:
+```tsx
+{/* biome-ignore lint/a11y/noLabelWithoutControl: the control is rendered by the field */}
+<label>{title}</label>
+```
+Extracting that into a named sub-component, which is what `no-jsx-comments` otherwise asks for, would delete a working suppression. A container mixing a directive with real prose still reports, since the prose is what the rule is after.
+
 ### Interface member documentation
 Two rules keep a documented interface (or type literal) readable. `require-consistent-member-jsdoc` makes documentation all-or-nothing per block, since a lone JSDoc among bare properties reads as an oversight:
 ```ts
@@ -318,7 +341,24 @@ Guidance on how to respond to a warning belongs in the rule's own `fix:` message
  */
 function send(user, url) { return 1 }
 ```
-A **void** or **`Promise<void>`** function needs no `@returns`, and neither does a component returning JSX. A **destructured** parameter may be documented either way, so both of these pass:
+A **void** or **`Promise<void>`** function needs no `@returns`, and neither does a component returning JSX. A parameter named `_`, or prefixed with it, is skipped, since that name says the binding exists only to hold a position, the same convention `catch-error-name` mandates for `_error`:
+```ts
+/**
+ * Handles the broadcast.
+ * @param state The state that was broadcast.
+ */
+function onEvent(_: unknown, state: string) {}
+```
+A **concise arrow that only forwards a call** is left alone too:
+```ts
+/**
+ * Sends the payload.
+ */
+const send = () => postPayload()
+```
+Nothing in that syntax says whether `postPayload()` hands back a value, and requiring a `@returns` would let the brace style decide it: the same body written as `() => { postPayload() }` is visibly void, so a `@returns` on it is what `no-jsdoc-returns-on-void` removes. Annotate the return type and both rules judge it again.
+
+A **destructured** parameter may be documented either way, so both of these pass:
 ```js
 /** @param user The user. @param url The link. */   // property by property
 async function send({ user, url }) {}
@@ -371,7 +411,7 @@ They are deliberately quiet about code that is packed on purpose:
 - A declaration immediately consumed by the statement below it (`const user = await find(id)` then `if (!user) return`), which is one thought, not two. Turn this off per rule with `{ allowAfterDeclaration: false }`.
 - Single-line guard clauses, however many are stacked.
 - A guard the formatter merely wrapped onto two lines, since it has no braced body.
-- A run of statements built the same way, such as a schema builder, a block of assertions, or a stack of `useState` calls, which reads as a table rather than as prose.
+- A run of statements built the same way, such as a schema builder, a block of assertions, or a stack of `useState` calls, which reads as a table rather than as prose. "The same way" means a **shared receiver**: `table.text(...)`, `assert.equal(...)` and `const [a, setA] = useState(...)` each group, since the reader scans one column of differing arguments. A run of *different* functions (`registerA()`, `registerB()`) is not a table, it is the wall of prose the rule is for, so it still counts one statement per line.
 - Anything an `else if`, `else`, `catch`, or `finally` introduces, and the space between `switch` cases.
 
 Nothing here ever asks for a blank line next to a brace.

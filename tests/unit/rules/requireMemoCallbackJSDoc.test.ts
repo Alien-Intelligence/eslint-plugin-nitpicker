@@ -53,6 +53,17 @@ describe("require-memo-callback-jsdoc", () => {
         expect(messages[0]?.messageId).toBe("missingParam")
     })
 
+    test("It should not count an underscore-prefixed callback parameter", ({ expect }) => {
+        const code = [
+            "/**",
+            " * Handles the broadcast.",
+            " * @param state The state.",
+            " */",
+            "const onEvent = useCallback((_, state) => apply(state), [])",
+        ].join("\n")
+        expect(lintRule(RULE, code)).toHaveLength(0)
+    })
+
     test("It should not report a non-memo hook call", ({ expect }) => {
         expect(lintRule(RULE, "const [x, setX] = useState(0)")).toHaveLength(0)
     })

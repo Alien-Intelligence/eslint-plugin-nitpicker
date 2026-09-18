@@ -2,16 +2,18 @@ import type { TSESLint } from "@typescript-eslint/utils"
 import CONSTANTS from "@/lib/constants"
 import { NitpickerRule } from "@/lib/rule"
 import { nitpick } from "@/lib/utils/messages"
-import { expandObjectLiteral } from "@/lib/utils/objects"
+import { expandObjectLiteral, inRecordTable } from "@/lib/utils/objects"
+import { matchesGlob } from "@/lib/utils/regex"
 import type { NitpickerRuleDocs } from "@/lib/utils/rules"
 
-type Options = [{ maxKeys: number; indent: number }]
+type Options = [{ maxKeys: number; indent: number; allowIn: string[] }]
 type MessageIds = "shouldWrap"
 
 /**
  * Flags an object literal that packs more than `maxKeys` properties onto a
  * single line, and expands it to one property per line, since a wide inline
- * object is harder to scan, diff, and edit than a stacked one.
+ * object is harder to scan than a stacked one. A record table and the `allowIn`
+ * globs are exempt.
  */
 class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
     readonly name = "require-multiline-object"
@@ -19,6 +21,7 @@ class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
         {
             maxKeys: CONSTANTS.OBJECTS.MAX_INLINE_KEYS,
             indent: CONSTANTS.OBJECTS.INDENT_WIDTH,
+            allowIn: [],
         },
     ]
 
@@ -36,6 +39,10 @@ class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
                 properties: {
                     maxKeys: { type: "integer", minimum: 1 },
                     indent: { type: "integer", minimum: 1 },
+                    allowIn: {
+                        type: "array",
+                        items: { type: "string" },
+                    },
                 },
                 additionalProperties: false,
             },
@@ -53,10 +60,20 @@ class RequireMultilineObject extends NitpickerRule<MessageIds, Options> {
         const maxKeys = options[0]?.maxKeys ?? CONSTANTS.OBJECTS.MAX_INLINE_KEYS
         const indent = options[0]?.indent ?? CONSTANTS.OBJECTS.INDENT_WIDTH
 
+        const allowIn = options[0]?.allowIn ?? []
+        if (allowIn.length > 0 && matchesGlob(context.filename, allowIn)) {
+            return {}
+        }
+
         return {
             ObjectExpression(node) {
                 if (node.properties.length <= maxKeys) return
                 if (node.loc.start.line !== node.loc.end.line) return
+
+                // A table of records is read down its columns, so stacking every
+                // row trades one scannable block for four times the lines and no
+                // alignment
+                if (inRecordTable(node)) return
 
                 // The fix rebuilds the object from its properties alone, so a
                 // comment between them would be dropped, only auto-fix a clean one

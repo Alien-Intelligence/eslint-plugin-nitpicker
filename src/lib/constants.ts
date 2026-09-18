@@ -128,6 +128,18 @@ const CONSTANTS = {
          * an object literal across multiple lines.
          */
         INDENT_WIDTH: 4,
+
+        /**
+         * The node types a literal is built out of, which bound a walk out of an
+         * object literal to the surrounding literal structure.
+         */
+        LITERAL_NODES: new Set(["ObjectExpression", "Property", "ArrayExpression"]),
+
+        /**
+         * The minimum number of rows an array needs before it reads as a record
+         * table rather than as a single literal that happens to be wrapped.
+         */
+        MIN_TABLE_ROWS: 2,
     },
 
     /**
