@@ -34,7 +34,7 @@ describe("max-line-comment-length", () => {
     })
 
     test("It should measure a run, not each line alone", ({ expect }) => {
-        // Each line is far under the cap; only their sum crosses it
+        // Each line is far under the cap, only their sum crosses it
         const messages = lintRule(RULE, `${WALL}\nconst a = 1`)
         expect(messages[0]?.message).toContain("over the 200-character limit")
     })

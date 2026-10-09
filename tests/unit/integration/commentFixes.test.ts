@@ -68,7 +68,7 @@ describe("comment fixes together", () => {
 
     test("It should converge on a comment needing every fix at once", ({ expect }) => {
         // Backticks -> quotes, spellings fixed, first letter capitalized, terminal
-        // period removed; the mid-comment period is report-only, so it stays
+        // period removed, but the mid-comment period is report-only, so it stays
         const output = fixComments("// normalise `foo.bar`. then it colours the cell.")
         expect(output).toBe('// Normalize "foo.bar". then it colors the cell')
     })

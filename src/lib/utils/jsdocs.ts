@@ -3,6 +3,49 @@ import CONSTANTS from "@/lib/constants"
 import { isDirectiveComment } from "@/lib/utils/comments"
 
 /**
+ * A block tag found in a JSDoc, e.g. `@param url The link`.
+ */
+export type JSDocTag = {
+    /**
+     * The tag name without its `@`, e.g. `param`.
+     */
+    name: string
+
+    /**
+     * The absolute source index of the tag's `@`.
+     */
+    index: number
+
+    /**
+     * The absolute source index of the end of the tag's own line.
+     */
+    lineEnd: number
+
+    /**
+     * Everything after the tag name, continuation lines included, with the
+     * ` * ` markers stripped.
+     */
+    body: string
+}
+
+/**
+ * What a value-documenting tag says, split into the parameter it names (if any)
+ * and the description that follows.
+ */
+export type JSDocTagParts = {
+    /**
+     * The documented parameter name, e.g. `input.id`, or `null` for a tag that
+     * names none, such as `@returns`.
+     */
+    name: string | null
+
+    /**
+     * The description prose, empty when the tag stops after its type or name.
+     */
+    description: string
+}
+
+/**
  * Checks whether a comment is a JSDoc comment, i.e. a block comment that opens
  * with `/**`.
  * @param comment The comment to test.
@@ -131,6 +174,100 @@ export function getJSDocLineTag(line: string): string | null {
  */
 export function isJSDocTagLine(line: string): boolean {
     return getJSDocLineTag(line) !== null
+}
+
+/**
+ * Collects the block tags of a JSDoc, each with the lines that continue it up to
+ * the next tag or the end of the comment.
+ * @param comment The JSDoc comment to read.
+ * @returns The tags, in source order.
+ */
+export function getJSDocTags(comment: TSESTree.Comment): JSDocTag[] {
+    const tags: JSDocTag[] = []
+
+    // The comment value starts right after the opening "/*"
+    let offset = comment.range[0] + 2
+
+    for (const line of comment.value.split("\n")) {
+        const name = getJSDocLineTag(line)
+        const last = tags.at(-1)
+
+        if (name !== null) {
+            const at = line.indexOf("@")
+
+            tags.push({
+                name,
+                index: offset + at,
+                lineEnd: offset + line.trimEnd().length,
+                body: line.slice(at + 1 + name.length),
+            })
+        } else if (last !== undefined) {
+            last.body += `\n${line.replace(CONSTANTS.JSDOC.LINE_MARKER, "")}`
+        }
+
+        offset += line.length + 1
+    }
+
+    return tags
+}
+
+/**
+ * Finds where a bracketed group closes, counting nested pairs so a type such as
+ * `{Promise<{ id: string }>}` is skipped whole.
+ * @param text The text that opens with the group.
+ * @param open The opening bracket.
+ * @param close The closing bracket.
+ * @returns The index just past the closing bracket, or the text length if the
+ * group never closes.
+ */
+function skipGroup(text: string, open: string, close: string): number {
+    let depth = 0
+
+    for (let index = 0; index < text.length; index++) {
+        if (text.charAt(index) === open) depth++
+        if (text.charAt(index) === close) depth--
+        if (depth === 0) return index + 1
+    }
+
+    return text.length
+}
+
+/**
+ * Splits a value-documenting tag into the parameter it names and its
+ * description, skipping a leading `{Type}`, an optional `[name=default]`, and the
+ * `-` some writers put before the description.
+ * @param tag The tag to split.
+ * @returns The documented name and the description.
+ */
+export function getJSDocTagParts(tag: JSDocTag): JSDocTagParts {
+    let rest = tag.body.trim()
+
+    // A leading brace is the type, unless it opens an inline tag like "{@link}"
+    if (rest.startsWith("{") && !rest.startsWith("{@")) {
+        rest = rest.slice(skipGroup(rest, "{", "}")).trimStart()
+    }
+
+    let name: string | null = null
+
+    if (tag.name === "param" && rest !== "") {
+        const end = rest.startsWith("[") ? skipGroup(rest, "[", "]") : (rest.match(/^\S+/)?.[0].length ?? 0)
+
+        name =
+            rest
+                .slice(0, end)
+                .replace(/^\[|\]$/g, "")
+                .split("=")[0]
+                ?.trim() ?? null
+        rest = rest.slice(end)
+    }
+
+    return {
+        name,
+        description: rest
+            .trim()
+            .replace(/^-(?:\s+|$)/, "")
+            .trim(),
+    }
 }
 
 /**
