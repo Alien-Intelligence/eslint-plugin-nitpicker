@@ -104,7 +104,7 @@ export function firstCommentContentChar(comment: TSESTree.Comment): CommentConte
 
     let offset = 0
     for (const line of comment.value.split("\n")) {
-        // Strip leading whitespace and a single " * " marker; whatever remains is
+        // Strip leading whitespace and a single " * " marker, whatever remains is
         // the line's content, so a marker-only line is skipped
         const markerLength = (line.match(/^\s*\*?\s*/u)?.[0] ?? "").length
         const char = line.slice(markerLength).charAt(0)
@@ -175,6 +175,55 @@ export function findProsePeriods(comment: TSESTree.Comment): ProsePeriod[] {
     }
 
     return periods
+}
+
+/**
+ * Finds the semicolons inside a comment that punctuate prose, skipping the ones
+ * inside a code fence or a quoted span, inside a token (`for (;;)`, `a=1;b=2`), or
+ * closing an HTML entity such as `&amp;`.
+ * @param comment The comment to scan.
+ * @returns The absolute source index of every prose semicolon, in source order.
+ */
+export function findProseSemicolons(comment: TSESTree.Comment): number[] {
+    const semicolons: number[] = []
+
+    // The comment value starts right after the opening "//" or "/*"
+    const base = comment.range[0] + 2
+
+    for (let index = 0; index < comment.value.length; index++) {
+        const char = comment.value.charAt(index)
+
+        // A fence runs to its closing fence, an unclosed one to the end
+        if (comment.value.startsWith(CONSTANTS.COMMENTS.FENCE, index)) {
+            const closing = comment.value.indexOf(CONSTANTS.COMMENTS.FENCE, index + CONSTANTS.COMMENTS.FENCE.length)
+            if (closing === -1) break
+
+            index = closing + CONSTANTS.COMMENTS.FENCE.length - 1
+            continue
+        }
+
+        // A quoted span is verbatim when it closes on its own line, so a stray
+        // quote cannot swallow the rest of a block comment
+        if (CONSTANTS.COMMENTS.QUOTES.has(char)) {
+            const closing = comment.value.indexOf(char, index + 1)
+            const lineEnd = comment.value.indexOf("\n", index + 1)
+            if (closing !== -1 && (lineEnd === -1 || closing < lineEnd)) index = closing
+
+            continue
+        }
+
+        if (char !== ";") continue
+
+        // Prose punctuation is followed by whitespace or ends the comment
+        const next = comment.value.charAt(index + 1)
+        if (next !== "" && !/\s/u.test(next)) continue
+
+        if (CONSTANTS.COMMENTS.HTML_ENTITY.test(comment.value.slice(0, index))) continue
+
+        semicolons.push(base + index)
+    }
+
+    return semicolons
 }
 
 /**

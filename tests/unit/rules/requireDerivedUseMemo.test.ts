@@ -43,7 +43,7 @@ describe("require-derived-usememo", () => {
     })
 
     test("It should not descend into a callback's own calls", ({ expect }) => {
-        // The map is the derivation; the arrow inside is not counted separately
+        // The map is the derivation, the arrow inside is not counted separately
         const code = "function useThing() {\n    const items = raw.map(r => transform(r))\n    return items\n}"
         expect(lintRule(RULE, code)).toHaveLength(1)
     })

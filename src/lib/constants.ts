@@ -71,6 +71,17 @@ const CONSTANTS = {
          * tighter than a JSDoc description since a stacked wall reads worse.
          */
         MAX_RUN_LENGTH: 200,
+
+        /**
+         * The opening of an HTML entity, matched against the comment text before a
+         * semicolon, which then closes the entity rather than punctuating prose.
+         */
+        HTML_ENTITY: /&(?:#\d+|#x[\da-f]+|[a-z][a-z\d]*)$/i,
+
+        /**
+         * The opening and closing fence of a code block inside a comment.
+         */
+        FENCE: "```",
     },
 
     /**
@@ -89,6 +100,31 @@ const CONSTANTS = {
          * dotted member such as `input.id` captures its root, `input`.
          */
         PARAM_TAG: /^\s*\*?\s*@param\s+(?:\{[^}]*\}\s*)?\[?([\w$]+)/,
+
+        /**
+         * The leading whitespace and ` * ` marker of a physical JSDoc line.
+         */
+        LINE_MARKER: /^\s*\*? ?/,
+
+        /**
+         * The tag synonyms JSDoc accepts, mapped to the canonical spelling a
+         * codebase should settle on, so `@return` and `@returns` never mix.
+         */
+        TAG_ALIASES: new Map([
+            ["return", "returns"],
+            ["arg", "param"],
+            ["argument", "param"],
+            ["exception", "throws"],
+            ["yield", "yields"],
+            ["prop", "property"],
+            ["desc", "description"],
+        ]),
+
+        /**
+         * The tags that document a value and so must say something about it, a
+         * bare `@param url` only restates the signature.
+         */
+        DESCRIBED_TAGS: new Set(["param", "returns", "return"]),
 
         /**
          * The default maximum character length of a JSDoc description.
@@ -237,6 +273,18 @@ const CONSTANTS = {
          * JSX whenever their callback returns JSX, e.g. `rows.map(row => <Row />)`.
          */
         LIST_METHODS: new Set(["map", "flatMap"]),
+
+        /**
+         * The suffix a component's props type carries after the component name,
+         * e.g. `ButtonProps` for `Button`.
+         */
+        PROPS_SUFFIX: "Props",
+
+        /**
+         * The generic types that pass a props type through unchanged, so the props
+         * of `Readonly<ButtonProps>` are still named by `ButtonProps`.
+         */
+        PROPS_WRAPPERS: new Set(["Readonly", "PropsWithChildren"]),
 
         /**
          * The default maximum length of a `className` class string.

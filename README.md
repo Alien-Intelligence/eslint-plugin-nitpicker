@@ -83,11 +83,13 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/no-alias-variables`               |         | Disallow a `const` whose whole value is another variable; use the source directly.                  |
 | `nitpicker/no-british-english`               | yes     | Disallow British spellings in identifiers and comments, reporting the American equivalent.          |
 | `nitpicker/no-comment-above-jsdoc`           |         | Disallow a comment stacked directly above a JSDoc, splitting one description in two.                |
+| `nitpicker/no-comment-semicolons`            |         | Disallow semicolons joining clauses in comments (code spans and `@example` blocks are OK).          |
 | `nitpicker/no-decorative-comment-separators` |         | Disallow decorative separators (banners, box-drawing, repeated dashes) inside comments.             |
 | `nitpicker/no-em-dash`                       |         | Disallow the em dash (—) character anywhere in the source (`allow` option for copy).                |
 | `nitpicker/no-emojis`                        |         | Disallow emoji anywhere in the source (`allow` option for copy). Reported, never auto-removed.      |
 | `nitpicker/no-jsdoc-blank-before-tags`       | yes     | Disallow blank lines before JSDoc tags such as `@param` or `@returns`.                              |
 | `nitpicker/no-jsdoc-returns-on-void`         | yes     | Disallow a JSDoc `@returns` tag on a function that returns nothing.                                 |
+| `nitpicker/no-jsdoc-tag-aliases`             | yes     | Disallow JSDoc tag synonyms (`@return`, `@arg`, `@exception`, ...); use the canonical tag.          |
 | `nitpicker/no-line-comment-backticks`        | yes     | Disallow backticks in `//` line comments; use double quotes for code references.                    |
 | `nitpicker/no-line-comment-period`           | yes¹    | Disallow prose periods in `//` line comments (code dots, quoted spans, ellipses, `e.g.` are OK).    |
 | `nitpicker/no-property-access-alias`         |         | Disallow a `const` whose whole value is a single property access; inline the expression instead.    |
@@ -100,6 +102,7 @@ The **base** rules are the universal ruleset shipped by `recommended`; the **Rea
 | `nitpicker/require-framework-config`         |         | Warn when a file uses a framework whose Nitpicker config is not enabled.                            |
 | `nitpicker/require-function-jsdoc`           |         | Require a JSDoc on functions, including class methods and nested ones (`include`/`ignore` options). |
 | `nitpicker/require-jsdoc-delimiter-lines`    | yes     | Require a JSDoc's `/**` and `*/` to sit on their own lines, not share one with prose.               |
+| `nitpicker/require-jsdoc-tag-descriptions`   |         | Require every JSDoc `@param` and `@returns` tag to describe its value, not stop at a name.          |
 | `nitpicker/require-member-jsdoc-blank-line`  | yes     | Require a blank line before a documented interface/type member (the first needs none).              |
 | `nitpicker/require-multiline-object`         | yes²    | Require an object literal with more than a few properties (default 2) to span multiple lines.       |
 
@@ -108,11 +111,13 @@ Shipped by the `react` config (and `all`).
 | Rule                                         | Fixable | Description                                                                                         |
 |----------------------------------------------|---------|-----------------------------------------------------------------------------------------------------|
 | `nitpicker/max-classname-length`             |         | Flag a `className` class string over a max length (default 120); break it up, e.g. via `cn()`.      |
+| `nitpicker/no-inline-props-type`             | yes     | Disallow an inline object literal as a component props type; extract a `<Component>Props` type.     |
 | `nitpicker/no-jsx-comments`                  |         | Disallow inline `{/* ... */}` prose comments inside JSX; extract a named sub-component.             |
 | `nitpicker/require-context-hook-destructure` |         | Require the result of a `use*Context` consumer hook to be destructured.                             |
 | `nitpicker/require-derived-usememo`          |         | Require a derived value (built via a non-hook call) in a client component or hook to use `useMemo`. |
 | `nitpicker/require-hook-object-return`       | yes     | Require a custom hook to return an object rather than a bare function.                              |
 | `nitpicker/require-memo-callback-jsdoc`      |         | Require a JSDoc on a `useMemo`/`useCallback` (with an `@param` per `useCallback` parameter).        |
+| `nitpicker/require-props-type-name`          |         | Require a component props type declared in the file to be named after it, e.g. `ButtonProps`.       |
 
 ### AdonisJS rules
 Shipped by the `adonisjs` config (and `all`).
@@ -275,7 +280,7 @@ A backtick renders as code inside a JSDoc block, but in a `//` comment it is jus
 Backticks are left alone in JSDoc and block comments, in tooling directives, when unpaired, in a run (a ```` ``` ```` fence), and when the span already holds a double quote, since `` `split(".")` `` cannot be requoted without nesting.
 
 ### Tooling directives
-A directive is not prose, so the rules that read a comment as English leave one alone: `no-line-comment-backticks`, `require-capitalized-comments`, `max-line-comment-length`, `no-comment-above-jsdoc` and `no-jsx-comments`. The set is `eslint`/`eslint-*`, `ts-*`, `biome-ignore`, `prettier-ignore`, `globals`, `exported`, `jshint`, `jslint`, `istanbul`, `c8`/`v8`, `webpack`, `noinspection`, `#region`/`#endregion`, and anything opening with `@`.
+A directive is not prose, so the rules that read a comment as English leave one alone: `no-line-comment-backticks`, `no-comment-semicolons`, `require-capitalized-comments`, `max-line-comment-length`, `no-comment-above-jsdoc` and `no-jsx-comments`. The set is `eslint`/`eslint-*`, `ts-*`, `biome-ignore`, `prettier-ignore`, `globals`, `exported`, `jshint`, `jslint`, `istanbul`, `c8`/`v8`, `webpack`, `noinspection`, `#region`/`#endregion`, and anything opening with `@`.
 
 This matters most in JSX, where a suppression has to sit directly above the node it suppresses:
 ```tsx
@@ -379,6 +384,17 @@ async store({ auth, request }: HttpContext) {
 ```
 The exemption is keyed on the `HttpContext` annotation, so a destructured parameter of any other type is documented as usual, and a handler's own non-context parameters still need their `@param`. Binding the context whole (`ctx: HttpContext`) is **not** exempt, since it still owes an `@param ctx`, and it is a violation in its own right that `no-ctx-httpcontext-param` reports.
 
+`require-jsdoc-tag-descriptions` then checks what those tags say. An `@param` or `@returns` that stops at its name or `{Type}` only restates the signature, so it reports:
+```js
+ * @param {string} url                ->  reported, it stops at the name
+ * @param url - The link to call       ->  OK, a leading "-" is accepted
+ * @returns {Promise<{ id: string }>}  ->  reported, it stops at the type
+ * @returns The created record.        ->  OK
+```
+A description may wrap onto the next line, and a parent documented through its members (a bare `@param options` above `@param options.id The id.`) is left alone. Every JSDoc is checked, not only a function's.
+
+`no-jsdoc-tag-aliases` keeps the tag names themselves consistent, renaming each synonym JSDoc accepts to one canonical spelling: `@return` to `@returns`, `@arg`/`@argument` to `@param`, `@exception` to `@throws`, `@yield` to `@yields`, `@prop` to `@property`, and `@desc` to `@description`.
+
 ### Line comment periods
 `no-line-comment-period` only treats a dot as prose when whitespace or the end of the comment follows it, so dots inside code (`foo.bar`, `subagent.*`, `split(".")`), inside a quoted or back-ticked span, in an ellipsis, or closing an abbreviation (`e.g.`, `i.e.`, `etc.`) are left alone.
 
@@ -389,6 +405,29 @@ The two prose cases are handled differently, since removing a period is only saf
 const a = 1 // Reads the token. Cached  ->  reported, not fixed
 ```
 Only a terminal period is auto-fixed. A mid-comment period runs two fragments together, and auto-splitting it onto a new line mangles wrapped prose paragraphs, so that case is reported for a human or agent to reword rather than fixed.
+
+### Comment semicolons
+`no-comment-semicolons` reports a semicolon joining two clauses in any comment, whether `//`, block, or JSDoc:
+```js
+// Reads the token; caches it            ->  reported
+// Reads the token, then caches it       ->  OK
+// Loops with for(;;) until "a(); b()"   ->  OK, both are code
+```
+Like a period, a semicolon only counts as prose when whitespace or the end of the comment follows it, so one inside a token (`for(;;)`, `a=1;b=2`) is code. Quoted and back-ticked spans, ```` ``` ```` fences, JSDoc `@example` blocks, HTML entities (`&amp;`), and tooling directives are skipped as well. A commented-out statement ending in `;` is reported, and deleting it is usually the right answer. Nothing is auto-fixed, since whether the clauses want a comma, `so`, or `but` depends on the sentence.
+
+### Component props types
+Two React rules keep a component's props declared one way, as a named `<Component>Props` type. `no-inline-props-type` reports an inline object literal and extracts it:
+```tsx
+export default function AdminLayout({ children }: { children: ReactNode }) {
+
+// Becomes
+type AdminLayoutProps = { children: ReactNode }
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+```
+The type lands above the component and any comment attached to it, so a JSDoc stays on the component. It is still reported but not fixed for a generic component, whose literal may name its type parameters, for a component nested in another function, and when the name is already taken. An intersection extending a library type, the shadcn idiom `React.ComponentProps<"button"> & { asChild?: boolean }`, is left alone.
+
+`require-props-type-name` then checks the name: a props type declared in the same file must be `<Component>Props`, so a generic `Props`, or one that drifted after a rename (`ClusterProvisioningStatus` taking `ProvisioningStatusProps`), is reported. `Readonly<…>` and `PropsWithChildren<…>` are looked through. An imported type and a type several components share are left alone, since no single component owns them, and the rename is not auto-fixed, since an exported type may be imported elsewhere.
 
 ## Code breathing
 The `breathing` config encodes what a style guide usually calls "code must breathe": blank lines between logical steps, so a function reads as paragraphs rather than as one block of text. Three rules cover it.

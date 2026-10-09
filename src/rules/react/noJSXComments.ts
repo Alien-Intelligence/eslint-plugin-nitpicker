@@ -46,7 +46,7 @@ class NoJSXComments extends NitpickerRule<MessageIds, Options> {
                 if (comments.length === 0) return
 
                 // A directive suppresses the node directly below it, so extracting
-                // a sub-component would delete it; requiring every comment to be
+                // a sub-component would delete it, and requiring every comment to be
                 // one keeps a directive stacked with prose reportable
                 if (comments.every(isDirectiveComment)) return
 

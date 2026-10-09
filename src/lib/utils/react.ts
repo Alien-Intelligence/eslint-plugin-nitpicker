@@ -113,6 +113,20 @@ export function functionReturnsJsx(fn: FunctionNode, visitorKeys: VisitorKeys): 
 }
 
 /**
+ * Checks whether a function is a React component, i.e. a `PascalCase` function
+ * that returns JSX.
+ * @param fn The function node to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the function body.
+ * @returns True if the function is a component.
+ */
+export function isComponentFunction(fn: FunctionNode, visitorKeys: VisitorKeys): boolean {
+    const name = getFunctionName(fn)
+    if (name === undefined) return false
+
+    return isReactComponentName(name) && functionReturnsJsx(fn, visitorKeys)
+}
+
+/**
  * Checks whether a function is a React component or a custom hook, the scopes
  * where `useMemo` is available and where local derivations should be memoized.
  * @param fn The function node to inspect.
@@ -123,7 +137,52 @@ export function isComponentOrHook(fn: FunctionNode, visitorKeys: VisitorKeys): b
     const name = getFunctionName(fn)
     if (name === undefined) return false
 
-    return isHookName(name) || (isReactComponentName(name) && functionReturnsJsx(fn, visitorKeys))
+    return isHookName(name) || isComponentFunction(fn, visitorKeys)
+}
+
+/**
+ * Resolves the type a component's props are annotated with, i.e. the type of its
+ * first parameter, whether bound whole or destructured.
+ * @param fn The component function to inspect.
+ * @returns The props type, or `null` when the props are unannotated.
+ */
+export function getPropsType(fn: FunctionNode): TSESTree.TypeNode | null {
+    const param = fn.params[0]
+    if (param === undefined || param.type === "TSParameterProperty") return null
+
+    const binding = param.type === "AssignmentPattern" ? param.left : param
+
+    return binding.typeAnnotation?.typeAnnotation ?? null
+}
+
+/**
+ * Resolves the name a type reference is written with, reading the last segment of
+ * a qualified name, so `React.PropsWithChildren` reads as `PropsWithChildren`.
+ * @param type The type reference to name.
+ * @returns The referenced name.
+ */
+function typeReferenceName(type: TSESTree.TSTypeReference): string {
+    if (type.typeName.type === "TSQualifiedName") return type.typeName.right.name
+
+    return type.typeName.type === "Identifier" ? type.typeName.name : ""
+}
+
+/**
+ * Resolves the named type a component's props are declared with, looking through
+ * the wrappers that pass a props type through unchanged, e.g. `Readonly<…>`.
+ * @param fn The component function to inspect.
+ * @returns The type name, or `null` when the props are not one named type.
+ */
+export function getPropsTypeName(fn: FunctionNode): TSESTree.Identifier | null {
+    let type = getPropsType(fn)
+
+    while (type?.type === "TSTypeReference" && CONSTANTS.REACT.PROPS_WRAPPERS.has(typeReferenceName(type))) {
+        type = type.typeArguments?.params[0] ?? null
+    }
+
+    if (type?.type !== "TSTypeReference" || type.typeName.type !== "Identifier") return null
+
+    return type.typeName
 }
 
 /**

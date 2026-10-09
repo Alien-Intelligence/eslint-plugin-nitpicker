@@ -67,7 +67,7 @@ describe("require-consistent-member-jsdoc", () => {
     })
 
     test("It should judge a nested type literal on its own members", ({ expect }) => {
-        // The outer block is fully documented; the inner one documents none, so both are consistent
+        // The outer block is fully documented and the inner one documents none, so both are consistent
         const code = [
             "interface P {",
             "    /**",
