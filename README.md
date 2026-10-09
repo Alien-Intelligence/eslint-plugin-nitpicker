@@ -341,7 +341,7 @@ Guidance on how to respond to a warning belongs in the rule's own `fix:` message
  */
 function send(user, url) { return 1 }
 ```
-A **void** or **`Promise<void>`** function needs no `@returns`, and neither does a component returning JSX. A parameter named `_`, or prefixed with it, is skipped, since that name says the binding exists only to hold a position, the same convention `catch-error-name` mandates for `_error`:
+A **void** or **`Promise<void>`** function needs no `@returns`, and neither does a component returning JSX, a list of it included (`rows.map(row => <Row />)`, `.flatMap`, or an array literal). A parameter named `_`, or prefixed with it, is skipped, since that name says the binding exists only to hold a position, the same convention `catch-error-name` mandates for `_error`:
 ```ts
 /**
  * Handles the broadcast.

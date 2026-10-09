@@ -189,6 +189,11 @@ describe("require-complete-jsdoc", () => {
         expect(lintRule(RULE, "/**\n * The card.\n */\nfunction Card() {\n    return <div />\n}", TSX)).toHaveLength(0)
     })
 
+    test("It should not require @returns on a component rendering a list", ({ expect }) => {
+        const code = "/**\n * The rows.\n */\nfunction Rows() {\n    return ids.map(id => <Row key={id} />)\n}"
+        expect(lintRule(RULE, code, TSX)).toHaveLength(0)
+    })
+
     // Where the JSDoc lives
     test("It should check a documented class method", ({ expect }) => {
         const code = "class A {\n    /**\n     * Runs.\n     */\n    run(id: string): void {\n        go(id)\n    }\n}"

@@ -46,12 +46,31 @@ export function isFunctionValue(node: TSESTree.Expression | null | undefined): b
 }
 
 /**
+ * Checks whether a call renders a list, i.e. a `.map` or `.flatMap` whose
+ * callback returns JSX, as in `rows.map(row => <Row />)`.
+ * @param node The call to inspect.
+ * @param visitorKeys The AST visitor keys, used to walk the callback body.
+ * @returns True if the call yields a list of JSX elements.
+ */
+function isListRender(node: TSESTree.CallExpression, visitorKeys: VisitorKeys): boolean {
+    if (node.callee.type !== "MemberExpression" || node.callee.property.type !== "Identifier") return false
+    if (node.callee.computed || !CONSTANTS.REACT.LIST_METHODS.has(node.callee.property.name)) return false
+
+    const callback = node.arguments[0]
+    if (callback?.type !== "ArrowFunctionExpression" && callback?.type !== "FunctionExpression") return false
+
+    return functionReturnsJsx(callback, visitorKeys)
+}
+
+/**
  * Checks whether an expression evaluates to JSX, following the branches a
- * component commonly returns through (ternaries, `&&`, comma sequences).
+ * component commonly returns through (ternaries, `&&`, comma sequences) and
+ * the lists it renders (array literals, `.map` and `.flatMap` calls).
  * @param node The expression to inspect, if any.
+ * @param visitorKeys The AST visitor keys, used to walk a list callback's body.
  * @returns True if the expression can produce a JSX element or fragment.
  */
-export function isJsxExpression(node: TSESTree.Expression | null | undefined): boolean {
+export function isJsxExpression(node: TSESTree.Expression | null | undefined, visitorKeys: VisitorKeys): boolean {
     if (!node) return false
 
     switch (node.type) {
@@ -59,11 +78,19 @@ export function isJsxExpression(node: TSESTree.Expression | null | undefined): b
         case "JSXFragment":
             return true
         case "ConditionalExpression":
-            return isJsxExpression(node.consequent) || isJsxExpression(node.alternate)
+            return isJsxExpression(node.consequent, visitorKeys) || isJsxExpression(node.alternate, visitorKeys)
         case "LogicalExpression":
-            return isJsxExpression(node.left) || isJsxExpression(node.right)
+            return isJsxExpression(node.left, visitorKeys) || isJsxExpression(node.right, visitorKeys)
         case "SequenceExpression":
-            return isJsxExpression(node.expressions.at(-1))
+            return isJsxExpression(node.expressions.at(-1), visitorKeys)
+        case "ArrayExpression":
+            return node.elements.some(
+                element => element?.type !== "SpreadElement" && isJsxExpression(element, visitorKeys),
+            )
+        case "ChainExpression":
+            return isJsxExpression(node.expression, visitorKeys)
+        case "CallExpression":
+            return isListRender(node, visitorKeys)
         default:
             return false
     }
@@ -79,10 +106,10 @@ export function isJsxExpression(node: TSESTree.Expression | null | undefined): b
 export function functionReturnsJsx(fn: FunctionNode, visitorKeys: VisitorKeys): boolean {
     // An arrow with an expression body returns that expression directly
     if (fn.type === "ArrowFunctionExpression" && fn.body.type !== "BlockStatement") {
-        return isJsxExpression(fn.body)
+        return isJsxExpression(fn.body, visitorKeys)
     }
 
-    return someReturn(fn.body, visitorKeys, isJsxExpression)
+    return someReturn(fn.body, visitorKeys, argument => isJsxExpression(argument, visitorKeys))
 }
 
 /**

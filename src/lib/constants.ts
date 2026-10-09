@@ -233,6 +233,12 @@ const CONSTANTS = {
         MEMO_HOOKS: new Set(["useMemo", "useCallback"]),
 
         /**
+         * The array methods a component renders a list through, whose result is
+         * JSX whenever their callback returns JSX, e.g. `rows.map(row => <Row />)`.
+         */
+        LIST_METHODS: new Set(["map", "flatMap"]),
+
+        /**
          * The default maximum length of a `className` class string.
          */
         MAX_CLASSNAME_LENGTH: 120,
