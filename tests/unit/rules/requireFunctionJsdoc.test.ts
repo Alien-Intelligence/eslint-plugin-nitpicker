@@ -94,6 +94,24 @@ describe("require-function-jsdoc", () => {
         expect(messages).toHaveLength(0)
     })
 
+    test("It should not report a React component rendering a list through `.map`", ({ expect }) => {
+        const code = "export default function Rows({ rows }) {\n    return rows.map(row => <Row key={row.id} />)\n}"
+        expect(lintRule(RULE, code, { filename: "Rows.tsx" })).toHaveLength(0)
+
+        const block = "const Rows = ({ rows }) => rows?.flatMap(row => {\n    return [<Row key={row.id} />]\n})"
+        expect(lintRule(RULE, block, { filename: "Rows.tsx" })).toHaveLength(0)
+    })
+
+    test("It should not report a React component returning an array of JSX", ({ expect }) => {
+        const code = 'function Pair() {\n    return [<A key="a" />, <B key="b" />]\n}'
+        expect(lintRule(RULE, code, { filename: "Pair.tsx" })).toHaveLength(0)
+    })
+
+    test("It should report a PascalCase function mapping to plain values", ({ expect }) => {
+        const code = "function Ids(rows) {\n    return rows.map(row => row.id)\n}"
+        expect(lintRule(RULE, code, { filename: "Ids.tsx" })).toHaveLength(1)
+    })
+
     test("It should report an undocumented function declaration", ({ expect }) => {
         const messages = lintRule(RULE, "function foo() {}")
         expect(messages).toHaveLength(1)
